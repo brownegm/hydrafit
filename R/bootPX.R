@@ -1,5 +1,5 @@
-#' Bootstrap percent loss in conductance
-#'
+#' Bootstrap percent loss in conductance.
+#' @details takes the best fit model created in \code{\link{fx_select}} and estimates values from a distribution based on mean and standard deviation.
 #' @param df input data frame containing best fit models, parameter estimates and their SDs
 #' @param fx_type what model type fit the best
 #' @param px choose what percent loss you are solving for PX e.g., P50, P80 etc
