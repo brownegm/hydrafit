@@ -1,0 +1,103 @@
+this contains results from the last check:
+ bootPX : <anonymous> : <anonymous>: no visible global function
+     definition for ‘rnorm’
+   do_the_thing_linear: no visible global function definition for ‘lm’
+   do_the_thing_linear: no visible global function definition for ‘anneal’
+   do_the_thing_linear: no visible binding for global variable ‘dnorm’
+   do_the_thing_linear: no visible global function definition for ‘lines’
+   do_the_thing_linear: no visible global function definition for ‘title’
+   do_the_thing_nonlinear: no visible global function definition for
+     ‘anneal’
+   do_the_thing_nonlinear: no visible binding for global variable ‘dnorm’
+   do_the_thing_nonlinear: no visible global function definition for
+     ‘lines’
+   do_the_thing_nonlinear: no visible global function definition for
+     ‘title’
+   fx_select: no visible binding for global variable ‘df_lin’
+   fx_select: no visible binding for global variable ‘df_log’
+   fx_select: no visible binding for global variable ‘df_sig’
+   fx_select: no visible binding for global variable ‘df_exp1’
+   fx_select: no visible binding for global variable ‘df_exp2’
+   Undefined global functions or variables:
+     anneal df_exp1 df_exp2 df_lin df_log df_sig dnorm lines lm rnorm
+     title
+   Consider adding
+     importFrom("graphics", "lines", "title")
+     importFrom("stats", "dnorm", "lm", "rnorm")
+   to your NAMESPACE file.
+✔  checking Rd files ...
+✔  checking Rd metadata ...
+✔  checking Rd line widths ...
+✔  checking Rd cross-references ...
+W  checking for missing documentation entries ...
+   Undocumented code objects:
+     ‘define_parsE2’ ‘define_parsL’ ‘define_parsS’
+   All user-level objects in a package should have documentation entries.
+   See chapter ‘Writing R documentation files’ in the ‘Writing R
+   Extensions’ manual.
+✔  checking for code/documentation mismatches (537ms)
+✔  checking Rd \usage sections (601ms)
+✔  checking Rd contents ...
+✔  checking for unstated dependencies in examples ...
+─  checking examples ... NONE
+✔  checking for non-standard things in the check directory
+✔  checking for detritus in the temp directory
+
+   See
+     ‘/Users/mr.bean/Documents/Research_UCLA/hydrafit.Rcheck/00check.log’
+   for details.
+
+
+── R CMD check results ──────────────────────────────────────────────────────────────── hydrafit 0.1.0 ────
+Duration: 15.2s
+
+❯ checking for missing documentation entries ... WARNING
+  Undocumented code objects:
+    ‘define_parsE2’ ‘define_parsL’ ‘define_parsS’
+  All user-level objects in a package should have documentation entries.
+  See chapter ‘Writing R documentation files’ in the ‘Writing R
+  Extensions’ manual.
+
+❯ checking dependencies in R code ... NOTE
+  Package in Depends field not imported from: ‘likelihood’
+    These packages need to be imported from (in the NAMESPACE file)
+    for when this namespace is loaded but not attached.
+
+❯ checking R code for possible problems ... NOTE
+  bootPX : <anonymous> : <anonymous>: no visible global function
+    definition for ‘rnorm’
+  do_the_thing_linear: no visible global function definition for ‘lm’
+  do_the_thing_linear: no visible global function definition for ‘anneal’
+  do_the_thing_linear: no visible binding for global variable ‘dnorm’
+  do_the_thing_linear: no visible global function definition for ‘lines’
+  do_the_thing_linear: no visible global function definition for ‘title’
+  do_the_thing_nonlinear: no visible global function definition for
+    ‘anneal’
+  do_the_thing_nonlinear: no visible binding for global variable ‘dnorm’
+  do_the_thing_nonlinear: no visible global function definition for
+    ‘lines’
+  do_the_thing_nonlinear: no visible global function definition for
+    ‘title’
+  fx_select: no visible binding for global variable ‘df_lin’
+  fx_select: no visible binding for global variable ‘df_log’
+  fx_select: no visible binding for global variable ‘df_sig’
+  fx_select: no visible binding for global variable ‘df_exp1’
+  fx_select: no visible binding for global variable ‘df_exp2’
+  Undefined global functions or variables:
+    anneal df_exp1 df_exp2 df_lin df_log df_sig dnorm lines lm rnorm
+    title
+  Consider adding
+    importFrom("graphics", "lines", "title")
+    importFrom("stats", "dnorm", "lm", "rnorm")
+  to your NAMESPACE file.
+
+0 errors ✔ | 1 warning ✖ | 2 notes ✖
+Error: R CMD check found WARNINGs
+Execution halted
+
+Exited with status 1.
+
+
+this contains results from the last check
+
+
