@@ -1,18 +1,17 @@
 
 #' Compute the best fit likelihood parameters for each species for each model type
-#'
+#' @details See r/fitfunctions.R for functional types and see R/defineparams.R for parameter definitions.
 #' @param input_df input folder with kl and psi values
-#' @param model_type select appropriate model type here i.e., Sigmoidal, Exponentials and Logistic. See \code{\link{fitfunctions}} for functional types
-#' @param pars1 parameters set based on values in input df. See \code{\link{defineparams}} for parameter definitions.
-#' @param par_lo1 parameter values set as lower bounds for estimates. See \code{\link{defineparams}} for parameter definitions.
+#' @param model_type select appropriate model type here i.e., Sigmoidal, Exponentials and Logistic. See R/fitfunctions.R for functional types
+#' @param pars1 parameters set based on values in input df. See R/defineparams.R for parameter definitions.
+#' @param par_lo1 parameter values set as lower bounds for estimates. See R/defineparams.R for parameter definitions.
 #' @param par_hi1 parameter values set as upper bounds for estimates.
-#' @param model_type_char select appriopriate model type here
+#' @param model_type_char select appropriate model type here
 #' @param plot True or false for plotting model parameters
 #'
 #' @return Returns best fitting model parameters for each species for nonlinear fits
-#' @export
-#'
-#'See \code{\link{fitfunctions}} for functional types and see \code{\link{defineparams}} for parameter definitions.
+#' @export do_the_thing_nonlinear
+
 
 do_the_thing_nonlinear <- function(input_df, model_type, pars1, par_lo1, par_hi1, model_type_char=character(), plot=F) {
   model_type = model_type

@@ -5,9 +5,11 @@
 #'
 #' @return parameters used in setting predicting the best fit parameters
 #'
-#' @export
-#'
-#' @examples
+#' @export define_parsE
+#' @export define_parsL
+#' @export define_parsS
+#' @export define_parsE2
+
 
 define_parsE <- function(input_df){
   parsE <- list(A=max(input_df$kl),B=1, sd=2)

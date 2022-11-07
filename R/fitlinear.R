@@ -2,11 +2,11 @@
 #' Fits linear parameters for species' data.
 #'
 #' @param input_df input folder with kl and psi values
-#' @param model_type select appriopriate model type here linear
+#' @param model_type select appropriate model type here linear
 #' @param plot True or false for plotting model parameters
 #'
 #' @return Returns best fitting model parameters for each species for nonlinear fits
-#' @export
+#' @export do_the_thing_linear
 #'
 #'
 #'

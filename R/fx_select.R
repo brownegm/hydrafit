@@ -1,7 +1,7 @@
 # function to pick model with the lowest AICc for each species
 
 #' Select the best fitting function for each species based on the lowest AICc score.
-#' Requires that you input all of the fitting parameter dataframes from \code{\link{fitlinear}} and \code{\link{fitnonlinear}}
+#' Requires that you input all of the fitting parameter dataframes from [fitlinear](R/fitlinear.R) and [fit_nonlinear](R/fitnonlinear.R)
 #'
 #' @param .df_lin dataframe of linear fits
 #' @param .df_log dataframe of logistic fits
@@ -10,7 +10,7 @@
 #' @param .df_exp2 dataframe of second exponential fits
 #'
 #' @return returns a dataframe with the best fit models
-#' @export
+#' @export fx_select
 #'
 
 fx_select<-function(.df_lin=df_lin, .df_log=df_log, .df_sig=df_sig, .df_exp1=df_exp1, .df_exp2=df_exp2){

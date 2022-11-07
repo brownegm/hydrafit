@@ -1,6 +1,3 @@
-
-
-
 #' Define functions and parameter values
 #'
 #' @param A model parameter A
@@ -9,7 +6,11 @@
 #' @param Xo Xo parameter in the model
 #'
 #' @return functions to be used in estimating fits for parameters
-#' @export
+#' @export Exponential
+#' @export Logistic
+#' @export Sigmoidal
+#' @export Exponential2
+#' @export Linear
 #'
 #'
 Exponential <-function (A,B,psi){A*exp(-B*psi)}
