@@ -1,5 +1,3 @@
-# function to pick model with the lowest AICc for each species
-
 #' Select the best fitting function for each species based on the lowest AICc score.
 #' Requires that you input all of the fitting parameter dataframes from [fitlinear](R/fitlinear.R) and [fit_nonlinear](R/fitnonlinear.R)
 #'
@@ -33,10 +31,14 @@ fx_select<-function(.df_lin=df_lin, .df_log=df_log, .df_sig=df_sig, .df_exp1=df_
                  .df_exp2[i,"AICcorr"]))
 
     lowestAICc<-lapply(dfs, function(df) #select the row from the appropriate df to add to output
+
       if(df[[i,"AICcorr"]]==minAIC){
+
         return(df[i,])
-      }else{
-      }
+
+        }else{
+
+        }
     )
     lowestAICc[sapply(lowestAICc, is.null)] <- NULL#lapply creates NULLs in the list; remove here
 

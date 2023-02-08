@@ -6,11 +6,11 @@
 #' @param plot True or false for plotting model parameters
 #'
 #' @return Returns best fitting model parameters for each species for nonlinear fits
-#' @export do_the_thing_linear
+#' @export fit_linear
 #'
 #'
 #'
-do_the_thing_linear <- function(input_df, model_type, plot=F) {
+fit_linear <- function(input_df, model_type, plot=F) {
 
   model_type = model_type
 
@@ -22,6 +22,7 @@ do_the_thing_linear <- function(input_df, model_type, plot=F) {
               log=TRUE)
 
   lm(input_df$kl ~ input_df$psi)-> fita #a normal linear regression gave the best starting parameters
+
   pars = list(A=summary(fita)$coeff[1,1],
               B =summary(fita)$coeff[2,1],
               sd = 1)
@@ -59,7 +60,7 @@ do_the_thing_linear <- function(input_df, model_type, plot=F) {
   gmax<-res$best_pars$A
 
   parvecLog<-c(Species= paste(input_df[1,1]),
-               data.type="Linear",# data.type=paste(input_df[1,2]),
+               data.type="Linear",
                A = res$best_pars[1], B = res$best_pars[2], C = res$best_pars[3], D = res$best_pars[4],
                loglikeli = res$max_likeli, rsq = rsq,
                slope = slope,
