@@ -9,11 +9,11 @@ bootPX(df, fx_type = character(), px = 0.5, sims = 1000)
 \arguments{
 \item{df}{input data frame containing best fit models, parameter estimates and their SDs}
 
-\item{fx_type}{what model type fit the best}
+\item{fx_type}{Best fitting model}
 
-\item{px}{choose what percent loss you are solving for PX e.g., P50, P80 etc}
+\item{px}{Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)}
 
-\item{sims}{#how many samples to generate?}
+\item{sims}{Number of simulated values to generate}
 }
 \value{
 returns a list of sims length predicted PX values

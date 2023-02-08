@@ -4,11 +4,11 @@ Title: Tests for best fits for hydraulic vulnerability curves and bootstrap curv
 Version: 0.1.0
 Author: Megan Bartlett, Marvin Browne
 Maintainer: Marvin Browne <brownegm@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: The functions provided in this package used for estimating hydraulic decline parameters
+    These functions include those with find outliers, fit curves, and bootstrap estimatation of percent loss in the hydraulic function
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Depends: 
     likelihood
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3

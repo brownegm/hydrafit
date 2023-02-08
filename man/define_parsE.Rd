@@ -7,10 +7,10 @@
 define_parsE(input_df)
 }
 \arguments{
-\item{input_df}{input folder with kl and psi values}
+\item{input_df}{input d with kl and psi values}
 }
 \value{
-parameters used in setting predicting the best fit parameters
+Parameters used in setting predicting the best fit parameters
 }
 \description{
 Define parameter values

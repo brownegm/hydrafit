@@ -6,6 +6,7 @@
 #' @param plot True or false for plotting model parameters
 #'
 #' @return Returns best fitting model parameters for each species for nonlinear fits
+#'
 #' @export fit_linear
 #'
 #'
