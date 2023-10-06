@@ -2,7 +2,7 @@
 % Please edit documentation in R/bootPX.R
 \name{bootPX}
 \alias{bootPX}
-\title{Bootstrap percent loss in conductance.}
+\title{Tool for estimating confidence intervals for percent loss in conductance.}
 \usage{
 bootPX(df, fx_type = character(), px = 0.5, sims = 1000)
 }
@@ -19,8 +19,16 @@ bootPX(df, fx_type = character(), px = 0.5, sims = 1000)
 returns a list of sims length predicted PX values
 }
 \description{
-Bootstrap percent loss in conductance.
+Tool for estimating confidence intervals for percent loss in conductance.
 }
 \details{
-takes the best fit model created in [fx_select()] and estimates values from a distribution based on mean and standard deviation.
+This function takes the best fit model chosen by `fx_select()` and estimates confidence intervals
+ by re-sampling model parameters from a normal distribution based on mean and standard deviation. Note that
+ the standard deviation used here is estimated as the square root of a hessian matrix created when the anneal
+ functions tests for the best fit model.
+
+\itemize{
+   \item Annealing function info: `https://www.rdocumentation.org/packages/likelihood/versions/1.7/topics/Simulated%20Annealing%20Algorithm`
+   \item Github page:https://github.com/cran/likelihood/blob/master/R/anneal.R. See lines 742-797 specifically within the code.
+}
 }

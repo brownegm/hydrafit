@@ -1,14 +1,27 @@
-#' Bootstrap percent loss in conductance.
+#' Tool for estimating confidence intervals for percent loss in conductance.
 #'
-#' @details takes the best fit model created in [fx_select()] and estimates values from a distribution based on mean and standard deviation.
+#'@details This function takes the best fit model chosen by `fx_select()` and estimates confidence intervals
+#'  by re-sampling model parameters from a normal distribution based on mean and standard deviation. Note that
+#'  the standard deviation used here is estimated as the square root of a hessian matrix created when the anneal
+#'  functions tests for the best fit model.
+#'
+#'\itemize{
+#'    \item Annealing function info: `https://www.rdocumentation.org/packages/likelihood/versions/1.7/topics/Simulated%20Annealing%20Algorithm`
+#'    \item Github page:https://github.com/cran/likelihood/blob/master/R/anneal.R. See lines 742-797 specifically within the code.
+#' }
+#'
+#'
 #' @param df input data frame containing best fit models, parameter estimates and their SDs
 #' @param fx_type Best fitting model
 #' @param px Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)
 #' @param sims Number of simulated values to generate
 #'
 #' @return returns a list of sims length predicted PX values
+#'
+#' @importFrom stats rnorm
 #' @export bootPX
 #'
+
 bootPX<-function(df,
                  fx_type=character(),
                  px=0.5,

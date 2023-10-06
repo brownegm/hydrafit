@@ -1,15 +1,26 @@
 #' Define parameter values
 #'
-#' @param input_df input d with kl and psi values
+#' @param input_df Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations
 #'
-#' @return Parameters used in setting predicting the best fit parameters
+#' @return Parameter values to be used in setting predicting the best fit parameters
 #'
+#' @description Functions used here set initial, lower and upper limits to parameter estimates
+#'
+#' @details Functions described here define parameters for the models named below:
+#'
+#' \bold{Model types:}
+#'
+#' \itemize{
+#' \item Exponential
+#' \item Exponential2
+#' \item Logistic
+#' \item Sigmoidal
+#' \item Linear
+#' }
+#'
+#' @family internal
+#' @rdname define_pars
 #' @export define_parsE
-#' @export define_parsL
-#' @export define_parsS
-#' @export define_parsE2
-
-
 
 define_parsE <- function(input_df) {
 
@@ -32,7 +43,8 @@ define_parsE <- function(input_df) {
 }
 
 
-
+#' @rdname define_pars
+#' @export define_parsL
 define_parsL <- function(input_df) {
 
   parsL = list(
@@ -63,7 +75,8 @@ define_parsL <- function(input_df) {
 }
 
 
-
+#' @rdname define_pars
+#' @export define_parsS
 define_parsS <- function(input_df) {
   parsS <- list(
     A = max(input_df$kl),
@@ -90,7 +103,8 @@ define_parsS <- function(input_df) {
   ))
 }
 
-
+#' @rdname define_pars
+#' @export define_parsE2
 define_parsE2 <- function(input_df) {
 
   parsE2 <- list(

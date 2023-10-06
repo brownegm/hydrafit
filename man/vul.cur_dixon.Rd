@@ -2,7 +2,7 @@
 % Please edit documentation in R/outliertest.R
 \name{vul.cur_dixon}
 \alias{vul.cur_dixon}
-\title{Function for working hydraulic vulnerability curve data. Tests for 
+\title{Function for working hydraulic vulnerability curve data. Tests for
 outliers via the dixon Q test function.}
 \usage{
 vul.cur_dixon(data, breaks_by = 0.5, test_var = character(), ...)
@@ -20,6 +20,6 @@ vul.cur_dixon(data, breaks_by = 0.5, test_var = character(), ...)
 Data frame with the bins of data, the Dixon test alternative hypothesis, test statistic and p-value.
 }
 \description{
-Function for working hydraulic vulnerability curve data. Tests for 
+Function for working hydraulic vulnerability curve data. Tests for
 outliers via the dixon Q test function.
 }

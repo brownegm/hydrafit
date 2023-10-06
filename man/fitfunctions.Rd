@@ -25,7 +25,9 @@ Linear(A, B, psi)
 
 \item{psi}{x value for the model}
 
-\item{Xo}{Xo parameter in the model}
+\item{Xo}{Xo parameter in the sigmoidal model}
+
+\item{C}{C parameter in the Exponential 2 model}
 }
 \value{
 Returns models for estimating parameter values

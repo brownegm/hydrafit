@@ -3,15 +3,9 @@
 \name{fx_select}
 \alias{fx_select}
 \title{Select the best fitting function for each species based on the lowest AICc score.
-Requires that you input all of the fitting parameter dataframes from [fitlinear](R/fitlinear.R) and [fit_nonlinear](R/fitnonlinear.R)}
+Requires that you input all of the fitting parameter data frames from [fitlinear](R/fitlinear.R) and [fit_nonlinear](R/fitnonlinear.R)}
 \usage{
-fx_select(
-  .df_lin = df_lin,
-  .df_log = df_log,
-  .df_sig = df_sig,
-  .df_exp1 = df_exp1,
-  .df_exp2 = df_exp2
-)
+fx_select(.df_lin, .df_log, .df_sig, .df_exp1, .df_exp2)
 }
 \arguments{
 \item{.df_lin}{dataframe of linear fits}
@@ -29,5 +23,5 @@ returns a dataframe with the best fit models
 }
 \description{
 Select the best fitting function for each species based on the lowest AICc score.
-Requires that you input all of the fitting parameter dataframes from [fitlinear](R/fitlinear.R) and [fit_nonlinear](R/fitnonlinear.R)
+Requires that you input all of the fitting parameter data frames from [fitlinear](R/fitlinear.R) and [fit_nonlinear](R/fitnonlinear.R)
 }

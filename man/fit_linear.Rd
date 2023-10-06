@@ -2,16 +2,18 @@
 % Please edit documentation in R/fitlinear.R
 \name{fit_linear}
 \alias{fit_linear}
-\title{Fits linear parameters for species' data.}
+\title{fit_linear}
 \usage{
-fit_linear(input_df, model_type, plot = F)
+fit_linear(input_df, model_type = hydrafit::Linear(), plot = F, ...)
 }
 \arguments{
-\item{input_df}{input folder with kl and psi values}
+\item{input_df}{Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations}
 
-\item{model_type}{select appropriate model type here linear}
+\item{model_type}{Select appropriate model function. Here the default is linear}
 
 \item{plot}{True or false for plotting model parameters}
+
+\item{...}{Additional plotting parameters if plot==T (e.g., xlab, ylab)}
 }
 \value{
 Returns best fitting model parameters for each species for nonlinear fits

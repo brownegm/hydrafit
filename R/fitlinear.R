@@ -1,21 +1,23 @@
-
+#' fit_linear
+#'
 #' Fits linear parameters for species' data.
 #'
-#' @param input_df input folder with kl and psi values
-#' @param model_type select appropriate model type here linear
+#' @param input_df Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations
+#' @param model_type Select appropriate model function. Here the default is linear
 #' @param plot True or false for plotting model parameters
+#' @param ... Additional plotting parameters if plot==T (e.g., xlab, ylab)
+#'
 #'
 #' @return Returns best fitting model parameters for each species for nonlinear fits
 #'
+#' @importFrom stats dnorm lm
+#' @importFrom graphics lines title
 #' @export fit_linear
 #'
-#'
-#'
-fit_linear <- function(input_df, model_type, plot=F) {
+
+fit_linear <- function(input_df, model_type=hydrafit::Linear(), plot=F, ...) {
 
   model_type = model_type
-
-  #model_type_char= as.character(model_type)
 
   var <- list(psi="psi",
               x="kl",
@@ -72,10 +74,14 @@ fit_linear <- function(input_df, model_type, plot=F) {
 
   if(plot==T){
 
-    plot(res$source_data$psi, res$source_data$kl, xlab = "Water Potential (-MPa)", ylab = "Stomatal Conductance (mmol m-2 s-1)")
+    plot(res$source_data$psi, res$source_data$kl, ...)
+
     cbind(res$source_data$psi, res$source_data$predicted)-> for_plotting
+
     for_plotting[order(for_plotting[,1]),]-> for_plotting
+
     lines(for_plotting[,1], for_plotting[,2], col="blue")
+
     title(paste(input_df[1,1], input_df[1,2]))
 
   }

@@ -4,20 +4,12 @@
 \alias{fit_nonlinear}
 \title{Compute the best fit likelihood parameters for each species for each model type}
 \usage{
-fit_nonlinear(
-  input_df,
-  model_type,
-  pars1,
-  par_lo1,
-  par_hi1,
-  model_type_char = character(),
-  plot = F
-)
+fit_nonlinear(input_df, model_type, pars1, par_lo1, par_hi1, plot = F, ...)
 }
 \arguments{
 \item{input_df}{input folder with kl and psi values}
 
-\item{model_type}{select appropriate model type here i.e., Sigmoidal, Exponentials and Logistic. See R/fitfunctions.R for functional types}
+\item{model_type}{select appropriate model type here}
 
 \item{pars1}{parameters set based on values in input df. See R/defineparams.R for parameter definitions.}
 
@@ -25,11 +17,9 @@ fit_nonlinear(
 
 \item{par_hi1}{parameter values set as upper bounds for estimates.}
 
-\item{model_type_char}{select appropriate model type here}
-
 \item{plot}{True or false for plotting model parameters}
 
-\item{...}{Plotting parameters passed to plot() if plot=TRUE}
+\item{...}{Plotting parameters passed to \code{plot()} if plot=TRUE}
 }
 \value{
 Returns best fitting model parameters for each species for nonlinear fits
@@ -39,4 +29,13 @@ Compute the best fit likelihood parameters for each species for each model type
 }
 \details{
 See r/fitfunctions.R for functional types and see R/defineparams.R for parameter definitions.
+
+This function utilizes the `anneal` function of the likelihood package \code{citation('likelihood')}. Within this function there are few assumptions about how we expect the annealing and fitting process is run:
+
+\itemize{
+\item It looks weird that kl is the x variable here, but anneal calculates the slope and R2 of the fit using the predicted kl values as the y and the observed kl values as the x
+\item The parameters are set to change slowly in the fitting procedure (the temp_red variable) helped a lot. You can watch the fitting proceed with show_display. \emph{This option needs to be change within the function itself. There is no parameter in the function at the moment to do this.}
+\item AIC formula: -2LL + 2 x parameters (incl nuisance, i.e.,sd)
+\item AICcorr formula: -2LL + (2n x parameters (incl nuisance, i.e.,sd)/(n-parameters-1))
+}
 }

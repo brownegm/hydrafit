@@ -7,9 +7,19 @@
 #' @param pars1 parameters set based on values in input df. See R/defineparams.R for parameter definitions.
 #' @param par_lo1 parameter values set as lower bounds for estimates. See R/defineparams.R for parameter definitions.
 #' @param par_hi1 parameter values set as upper bounds for estimates.
-#' @param model_type_char select appropriate model type here
+#' @param model_type select appropriate model type here
 #' @param plot True or false for plotting model parameters
-#' @param ... Plotting parameters passed to plot() if plot=TRUE
+#' @param ... Plotting parameters passed to \code{plot()} if plot=TRUE
+#'
+#'
+#' @details This function utilizes the `anneal` function of the likelihood package \code{citation('likelihood')}. Within this function there are few assumptions about how we expect the annealing and fitting process is run:
+#'
+#' \itemize{
+#' \item It looks weird that kl is the x variable here, but anneal calculates the slope and R2 of the fit using the predicted kl values as the y and the observed kl values as the x
+#' \item The parameters are set to change slowly in the fitting procedure (the temp_red variable) helped a lot. You can watch the fitting proceed with show_display. \emph{This option needs to be change within the function itself. There is no parameter in the function at the moment to do this.}
+#' \item AIC formula: -2LL + 2 x parameters (incl nuisance, i.e.,sd)
+#' \item AICcorr formula: -2LL + (2n x parameters (incl nuisance, i.e.,sd)/(n-parameters-1))
+#' }
 #'
 #' @return Returns best fitting model parameters for each species for nonlinear fits
 #'
@@ -24,10 +34,8 @@ fit_nonlinear <-
            pars1,
            par_lo1,
            par_hi1,
-           model_type_char = character(),
-           plot = F) {
+           plot = F, ...) {
 
-    model_type = model_type
 
     var <- list(
       psi = "psi",
@@ -35,7 +43,6 @@ fit_nonlinear <-
       mean = "predicted",
       log = TRUE
     )
-    #It looks weird that kl is the x variable here, but anneal calculates the slope and R2 of the fit using the predicted kl values as the y and the observed kl values as the x
 
     pars = pars1
     par_lo = par_lo1
@@ -80,7 +87,7 @@ fit_nonlinear <-
 
     parvecLog <- c(
       Species = paste(input_df[1, 1]),
-      data.type = model_type_char,
+      data.type = model_type,
       A = res$best_pars[1],
       B = res$best_pars[2],
       C = res$best_pars[3],
@@ -102,10 +109,15 @@ fit_nonlinear <-
 
     if (plot == T) {
       plot(res$source_data$psi,
-           res$source_data$kl,...)
+           res$source_data$kl,
+           ...)
+
       cbind(res$source_data$psi, res$source_data$predicted) -> for_plotting
+
       for_plotting[order(for_plotting[, 1]), ] -> for_plotting
+
       lines(for_plotting[, 1], for_plotting[, 2], col = "blue")
+
       title(paste(input_df[1, 1], input_df[1, 2]))
 
     }
