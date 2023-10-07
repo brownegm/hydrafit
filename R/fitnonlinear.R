@@ -53,7 +53,7 @@ fit_nonlinear <-
 
     res <-
       anneal(
-        model = model_type,
+        model = mod.type,
         par = pars1,
         source_data = input_df,
         var = var,
