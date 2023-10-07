@@ -3,11 +3,10 @@
 #' @details See r/fitfunctions.R for functional types and see R/defineparams.R for parameter definitions.
 #'
 #' @param input_df input folder with kl and psi values
-#' @param model_type select appropriate model type here i.e., Sigmoidal, Exponentials and Logistic. See R/fitfunctions.R for functional types
+#' @param model_type select appropriate model type here i.e., "S" for Sigmoidal, "E" and "E2" for Exponentials and "L" for Logistic. See R/fitfunctions.R for functional types
 #' @param pars1 parameters set based on values in input df. See R/defineparams.R for parameter definitions.
 #' @param par_lo1 parameter values set as lower bounds for estimates. See R/defineparams.R for parameter definitions.
 #' @param par_hi1 parameter values set as upper bounds for estimates.
-#' @param model_type select appropriate model type here
 #' @param plot True or false for plotting model parameters
 #' @param ... Plotting parameters passed to \code{plot()} if plot=TRUE
 #'
@@ -36,6 +35,10 @@ fit_nonlinear <-
            par_hi1,
            plot = F, ...) {
 
+  mod.type<- ifelse(model_type=="L", Logistic,
+                        ifelse(model_type=="E", Exponential,
+                               ifelse(model_type=="E2",Exponential2,
+                                      ifelse(model_type=="S", Sigmoidal))))
 
     var <- list(
       psi = "psi",
