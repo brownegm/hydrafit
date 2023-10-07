@@ -9,7 +9,7 @@ fit_nonlinear(input_df, model_type, pars1, par_lo1, par_hi1, plot = F, ...)
 \arguments{
 \item{input_df}{input folder with kl and psi values}
 
-\item{model_type}{select appropriate model type here}
+\item{model_type}{select appropriate model type here i.e., "S" for Sigmoidal, "E" and "E2" for Exponentials and "L" for Logistic. See R/fitfunctions.R for functional types}
 
 \item{pars1}{parameters set based on values in input df. See R/defineparams.R for parameter definitions.}
 
