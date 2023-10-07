@@ -35,7 +35,7 @@ fit_nonlinear <-
            par_hi1,
            plot = F, ...) {
 
-  mod.type<- ifelse(model_type=="L", Logistic,
+  mod<- ifelse(model_type=="L", Logistic,
                         ifelse(model_type=="E", Exponential,
                                ifelse(model_type=="E2",Exponential2,
                                       ifelse(model_type=="S", Sigmoidal))))
@@ -53,7 +53,7 @@ fit_nonlinear <-
 
     res <-
       anneal(
-        model = mod.type,
+        model = mod,
         par = pars1,
         source_data = input_df,
         var = var,
