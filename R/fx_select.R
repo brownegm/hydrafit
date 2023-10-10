@@ -19,7 +19,7 @@ fx_select <- function(.df_lin,
   #establish objects
   output <-
     data.frame(
-      Species = as.character(),
+      species = as.character(),
       data.type = as.character(),
       A = numeric(),
       B = numeric(),
