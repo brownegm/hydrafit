@@ -89,15 +89,15 @@ bootPX<-function(df,
         cat("Check data. Linear is rarely the best fit.")
         ## df$psi_k50<- (px-1)*(-df$A.A)*-1/(df$B.B)
 
-      }else if(fx_type=="Exponential"){
+      }else if(fx_type=="exp"){
 
         psi_px[i]<- log(px)/(-param_samples[[i]][[1]][1])
 
-      }else if (fx_type=="Exponential2"){
+      }else if (fx_type=="exp2"){
 
         psi_px[i]<- log(((px)*(-param_samples[[i]][[1]][3]+param_samples[[i]][[1]][1]))/param_samples[[i]][[1]][1])/(-param_samples[[i]][[1]][2])
 
-      }else if (fx_type=="Logistic"){
+      }else if (fx_type=="log"){
 
         psi_px[i]<- param_samples[[i]][[1]][2]*(1/px-1)^(1/param_samples[[i]][[1]][1])
 
