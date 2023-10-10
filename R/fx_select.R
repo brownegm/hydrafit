@@ -39,7 +39,12 @@ fx_select <- function(.df_lin,
       psi_k20 = numeric(),
       psi_k50 = numeric(),
       psi_k80 = numeric(),
-      psi_k95 = numeric()
+      psi_k95 = numeric(),
+      max_cond_at0.1=numeric(),
+      psi_k20_at0.1 = numeric(),
+      psi_k50_at0.1 = numeric(),
+      psi_k80_at0.1 = numeric(),
+      psi_k95_at0.1 = numeric()
     )
 
   rows <- dim(.df_lin)[1]#how many species rows are there
