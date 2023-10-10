@@ -30,8 +30,8 @@ bootPX<-function(df,
   psi_px<-list()
 
   #check conditions
-  fx_with_param3<-fx_type%in%c("Exponential2", "Logistic", "Sigmoidal")
-  fx_with_A<-fx_type%in%c("Exponential2","Linear")
+  fx_with_param3<-fx_type%in%c("exp2", "log", "sig")
+  fx_with_A<-fx_type%in%c("exp2","Linear")
 
   #define model parameters
 
