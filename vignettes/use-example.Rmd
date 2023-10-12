@@ -16,4 +16,405 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(hydrafit)
+library(here)
+library(dplyr)
+library(readxl)
+library(hydrafit)
+```
+
+```{r}
+# load data
+dd_full <- readxl::read_xlsx(here("data", "all_NEON_20230120.xlsx")) %>%
+  mutate(species.site = paste(site, Species, sep = "_"))
+
+dd <- dd_full %>%
+  rename(species = Species, psi = Psi_lowest, kl = K) %>% # rename var names to fit with the rest of the syntax below.
+  mutate(data.type = rep(1, dim(dd_full)[1])) %>%
+  select(species.site, data.type, psi, kl) # function's expecting this order
+
+#dd<-dd%>%select(!c(Individual,Leaf,site))
+
+#data prep
+dd$to_split = paste(dd$species.site, dd$data.type)
+aggregate(dd, by =list(dd$to_split), FUN=length) -> speciesN
+speciesN[which(speciesN$to_split > 5),1] -> species_list
+#Trying to fit curves with less than 6 points returns -inf for the AICcor. Are those the binned data? Would it be possible to make the bins smaller so there are more points?
+
+# first, just to make sure that things work as expected, let's print out
+# the gs column for each species
+for (ii in 1:length(species_list)){
+  subset(dd, dd$to_split == species_list[ii], select =c(1:5)) -> data_by_sp
+  print(data_by_sp)
+}
+# From Megan::I couldn't get the list format to save as a usable .csv file, so I changed everything to dataframes
+
+# Line Fitting ------------------------------------------------------------
+
+# Declare the data frame to store the results
+modelfitting_results_linear <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+modelfitting_results_logistic <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+modelfitting_results_sigmoidal <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+modelfitting_results_exp1 <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+modelfitting_results_exp2 <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+
+# use these gs's as inputs to the likelihood function
+#Linear
+pdf(file = here('outputs','Linear_fits.pdf'), width =8.5, height=5, onefile=T)
+#Open a pdf file to save fitted curve plots in 
+# #For every species, fit the curve and record the results  
+cli::cli_progress_bar("Fitting curves (Linear)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  (subset(dd, dd$to_split == species_list[ii], select =c(1:5)) -> data_by_sp)
+  Linear_fits = fit_linear(data_by_sp, Linear, plot=F, xlab="Water Potential (-MPa)", ylab="Leaf Hydraulic Conductance (units)")
+  Linear_fits$D.NA<- NA # placeholder to keep all of the data frames the same size
+  Linear_fits$sterror.NA <- NA
+  rbind(modelfitting_results_linear, as.data.frame(Linear_fits))-> modelfitting_results_linear
+  #print(ii)
+  cli::cli_progress_update()
+} 
+
+dev.off()
+
+#estimate the pX values 
+modelfitting_results_linear$psi_k20<- (0.8-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k50<- (0.5-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k80<- (0.2-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k95<- (0.05-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
+
+
+# PX values with max at 0.1 MPa
+modelfitting_results_linear$gmax_at0.1 <- (modelfitting_results_linear$B.B*0.1)+modelfitting_results_linear$A.A
+modelfitting_results_linear$psi_k20_at0.1<- ((0.8*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k50_at0.1<- ((0.5*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k80_at0.1<- ((0.2*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k95_at0.1<- ((0.05*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
+
+# #Every model has different formulas for k50 and k95
+# which(is.na(as.numeric(modelfitting_results[,12]))=='TRUE' | is.na(as.numeric(modelfitting_results[,13]))=='TRUE'| is.na(as.numeric(modelfitting_results[,14]))=='TRUE') -> problem_rows
+# 
+# #Look for curves that returns NAs for the parameter error values
+# write.csv(modelfitting_results, file = here('outputs',"Linear_fits.csv"))
+# cat("Linear has ", length(problem_rows), "curve(s) with NAs: ", problem_rows)
+# 
+
+#Logistic
+#Declare the pdf file to hold the plots
+pdf(file = here('outputs','Logistic_fits.pdf'), width =8.5, height=5, onefile=T)
+#Empty the data frame of the previous results
+#modelfitting_results[FALSE,] -> modelfitting_results
+cli::cli_progress_bar("Fitting curves (logistic)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  subset(dd, dd$to_split == species_list[ii], select = c(1:5)) -> data_by_sp
+  define_parsL(data_by_sp) -> par_estimates
+  parsL=par_estimates[[1]]
+  par_loL=par_estimates[[2]]
+  par_highL=par_estimates[[3]]
+  Logistic_fits = fit_nonlinear(data_by_sp, parsL, par_loL, par_highL, model_type = "log", plot=F)
+  rbind(modelfitting_results_logistic, as.data.frame(Logistic_fits))-> modelfitting_results_logistic
+  cli::cli_progress_update()
+}
+
+dev.off()
+
+modelfitting_results_logistic$psi_k20<- modelfitting_results_logistic$C.Xo*(1/0.8-1)^(1/modelfitting_results_logistic$B.B)
+modelfitting_results_logistic$psi_k50<- modelfitting_results_logistic$C.Xo*(1/0.5-1)^(1/modelfitting_results_logistic$B.B)
+modelfitting_results_logistic$psi_k80<- modelfitting_results_logistic$C.Xo*(1/0.2-1)^(1/modelfitting_results_logistic$B.B)
+modelfitting_results_logistic$psi_k95<- modelfitting_results_logistic$C.Xo*(1/0.05-1)^(1/modelfitting_results_logistic$B.B)
+
+# PX values with max at 0.1 MPa
+modelfitting_results_logistic$gmax_at0.1 <- (modelfitting_results_logistic$A.A)/(1+((0.1/modelfitting_results_logistic$C.Xo)^modelfitting_results_logistic$B.B))
+modelfitting_results_logistic$psi_k20_at0.1<- (modelfitting_results_logistic$C.Xo)*(((modelfitting_results_logistic$A.A)/(0.8*modelfitting_results_logistic$gmax_at0.1)-1)^(1/modelfitting_results_logistic$B.B))
+modelfitting_results_logistic$psi_k50_at0.1<- (modelfitting_results_logistic$C.Xo)*(((modelfitting_results_logistic$A.A)/(0.5*modelfitting_results_logistic$gmax_at0.1)-1)^(1/modelfitting_results_logistic$B.B))
+modelfitting_results_logistic$psi_k80_at0.1<- (modelfitting_results_logistic$C.Xo)*(((modelfitting_results_logistic$A.A)/(0.2*modelfitting_results_logistic$gmax_at0.1)-1)^(1/modelfitting_results_logistic$B.B))
+modelfitting_results_logistic$psi_k95_at0.1<- (modelfitting_results_logistic$C.Xo)*(((modelfitting_results_logistic$A.A)/(0.05*modelfitting_results_logistic$gmax_at0.1)-1)^(1/modelfitting_results_logistic$B.B))
+
+# which(is.na(as.numeric(modelfitting_results[,12]))=='TRUE' | is.na(as.numeric(modelfitting_results[,13]))=='TRUE'| is.na(as.numeric(modelfitting_results[,14]))=='TRUE'| is.na(as.numeric(modelfitting_results[,15]))=='TRUE') -> problem_rows
+# write.csv(modelfitting_results, file = here('outputs',"Logistic_fits.csv"))
+# cat("Logistic has ", length(problem_rows), "curve(s) with NAs: ", problem_rows)
+
+
+#Sigmoidal
+#Declare the pdf file to hold the plots
+pdf(file = here('outputs','Sigmoidal_fits.pdf'), width =8.5, height=5, onefile=T)
+##Empty the data frame of results
+#modelfitting_results[FALSE,] -> modelfitting_results
+cli::cli_progress_bar("Fitting curves (Sigmoidal)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  subset(dd, dd$to_split == species_list[ii], select =c(1:5)) -> data_by_sp
+  define_parsS(data_by_sp) -> par_estimates
+  parsS=par_estimates[[1]]
+  par_loS=par_estimates[[2]]
+  par_highS=par_estimates[[3]]
+  Sigmoidal_fits = fit_nonlinear(data_by_sp, parsS, par_loS, par_highS, model_type= "sig", plot=F)
+  rbind(modelfitting_results_sigmoidal, as.data.frame(Sigmoidal_fits))-> modelfitting_results_sigmoidal
+  cli::cli_progress_update()
+}
+#dev.off()
+
+modelfitting_results_sigmoidal$psi_k20<- modelfitting_results_sigmoidal$C.Xo - modelfitting_results_sigmoidal$B.B*log(1/0.8 -1)
+modelfitting_results_sigmoidal$psi_k50<- modelfitting_results_sigmoidal$C.Xo - modelfitting_results_sigmoidal$B.B*log(1/0.5 -1)
+modelfitting_results_sigmoidal$psi_k80<- modelfitting_results_sigmoidal$C.Xo - modelfitting_results_sigmoidal$B.B*log(1/0.2 -1)
+modelfitting_results_sigmoidal$psi_k95<- modelfitting_results_sigmoidal$C.Xo - modelfitting_results_sigmoidal$B.B*log(1/0.05 -1)
+
+# PX values with max at 0.1 MPa
+modelfitting_results_sigmoidal$gmax_at0.1 <- (modelfitting_results_sigmoidal$A.A)/(1+exp(-((0.1-modelfitting_results_sigmoidal$C.Xo)/modelfitting_results_sigmoidal$B.B)))
+modelfitting_results_sigmoidal$psi_k20_at0.1<- -modelfitting_results_sigmoidal$B.B*(modelfitting_results_sigmoidal$A.A-(0.8*modelfitting_results_sigmoidal$gmax_at0.1)-log(0.8*modelfitting_results_sigmoidal$gmax_at0.1)) + modelfitting_results_sigmoidal$C.Xo
+modelfitting_results_sigmoidal$psi_k50_at0.1<- -modelfitting_results_sigmoidal$B.B*(modelfitting_results_sigmoidal$A.A-(0.5*modelfitting_results_sigmoidal$gmax_at0.1)-log(0.5*modelfitting_results_sigmoidal$gmax_at0.1)) + modelfitting_results_sigmoidal$C.Xo
+modelfitting_results_sigmoidal$psi_k80_at0.1<- -modelfitting_results_sigmoidal$B.B*(modelfitting_results_sigmoidal$A.A-(0.2*modelfitting_results_sigmoidal$gmax_at0.1)-log(0.2*modelfitting_results_sigmoidal$gmax_at0.1)) + modelfitting_results_sigmoidal$C.Xo
+modelfitting_results_sigmoidal$psi_k95_at0.1<- -modelfitting_results_sigmoidal$B.B*(modelfitting_results_sigmoidal$A.A-(0.05*modelfitting_results_sigmoidal$gmax_at0.1)-log(0.05*modelfitting_results_sigmoidal$gmax_at0.1)) + modelfitting_results_sigmoidal$C.Xo
+
+
+# which(is.na(as.numeric(modelfitting_results[,12]))=='TRUE' | is.na(as.numeric(modelfitting_results[,13]))=='TRUE'| is.na(as.numeric(modelfitting_results[,14]))=='TRUE'| is.na(as.numeric(modelfitting_results[,15]))=='TRUE') -> problem_rows
+# write.csv(modelfitting_results, file = here('outputs',"Sigmoidal_fits.csv"))
+# cat("Sigmoidal has ", length(problem_rows), "curve(s) with NAs: ", problem_rows)
+
+#Exponential
+pdf(file = here('outputs','Exponential_fits.pdf'), width =8.5, height=5, onefile=T)
+#modelfitting_results[FALSE,] -> modelfitting_results
+cli::cli_progress_bar("Fitting curves (Exponential)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  subset(dd, dd$to_split == species_list[ii], select =c(1:5)) -> data_by_sp
+  define_parsE(data_by_sp) -> par_estimates
+  parsE=par_estimates[[1]]
+  par_loE=par_estimates[[2]]
+  par_highE=par_estimates[[3]]
+  Exponential_fits = fit_nonlinear(data_by_sp, parsE, par_loE, par_highE, model_type = "exp", plot=F)
+  Exponential_fits$D.NA<- NA 
+  Exponential_fits$sterror.NA <- NA
+  rbind(modelfitting_results_exp1, as.data.frame(Exponential_fits))-> modelfitting_results_exp1
+  cli::cli_progress_update()
+}
+dev.off()
+
+modelfitting_results_exp1$psi_k20<- log(0.8)/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k50<- log(0.5)/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k80<- log(0.2)/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k95<- log(0.05)/(-modelfitting_results_exp1$B.B)
+
+# PX values with max at 0.1 MPa
+modelfitting_results_exp1$gmax_at0.1 <- modelfitting_results_exp1$A.A * exp(-modelfitting_results_exp1$B.B*0.1)
+modelfitting_results_exp1$psi_k20_at0.1<- (log((0.8*modelfitting_results_exp1$gmax_at0.1)/modelfitting_results_exp1$A.A))/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k50_at0.1<- (log((0.5*modelfitting_results_exp1$gmax_at0.1)/modelfitting_results_exp1$A.A))/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k80_at0.1<- (log((0.2*modelfitting_results_exp1$gmax_at0.1)/modelfitting_results_exp1$A.A))/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k95_at0.1<- (log((0.05*modelfitting_results_exp1$gmax_at0.1)/modelfitting_results_exp1$A.A))/(-modelfitting_results_exp1$B.B)
+
+# which(is.na(as.numeric(modelfitting_results[,12]))=='TRUE' | is.na(as.numeric(modelfitting_results[,13]))=='TRUE'| is.na(as.numeric(modelfitting_results[,14]))=='TRUE') -> problem_rows
+# write.csv(modelfitting_results, file = here('outputs',"Exponential_fits.csv"))
+# cat("Exponential has ", length(problem_rows), "curve(s) with NAs: ", problem_rows)
+
+#Exponential2
+pdf(file = here('outputs','Exponential2_fits.pdf'), width =8.5, height=5, onefile=T)
+#modelfitting_results[FALSE,] -> modelfitting_results
+cli::cli_progress_bar("Fitting curves (Exponential 2)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  subset(dd, dd$to_split == species_list[ii], select =c(1:5)) -> data_by_sp
+  define_parsE2(data_by_sp) -> par_estimates
+  parsE2=par_estimates[[1]]
+  par_loE2=par_estimates[[2]]
+  par_highE2=par_estimates[[3]]
+  Exponential2_fits = fit_nonlinear(data_by_sp,  parsE2, par_loE2, par_highE2, model_type= "exp2", plot=F)
+  #########Update from Megan: this fit returns NaN (not a number) or "N/A" instead of NA at times (probably when C is very small),
+  ####and this converts everything else in the modelfitting_results columns to NA-
+  ###this replaces the NaNs with -999, so they'll be easy to find
+  Exponential2_fits[which(is.na(Exponential2_fits)== TRUE)] = -999
+  Exponential2_fits[which(Exponential2_fits== "N/A")] = -999
+
+  rbind(modelfitting_results_exp2, as.data.frame(Exponential2_fits))-> modelfitting_results_exp2
+  cli::cli_progress_update()
+}
+
+dev.off()
+
+modelfitting_results_exp2$psi_k20<- log(0.8- modelfitting_results_exp2$C.C/modelfitting_results_exp2$A.A)/(-modelfitting_results_exp2$B.B)
+modelfitting_results_exp2$psi_k50<- log(0.5- modelfitting_results_exp2$C.C/modelfitting_results_exp2$A.A)/(-modelfitting_results_exp2$B.B)
+modelfitting_results_exp2$psi_k80<- log(0.2- modelfitting_results_exp2$C.C/modelfitting_results_exp2$A.A)/(-modelfitting_results_exp2$B.B)
+modelfitting_results_exp2$psi_k95<- log(0.05- modelfitting_results_exp2$C.C/modelfitting_results_exp2$A.A)/(-modelfitting_results_exp2$B.B)
+
+# PX values with max at 0.1 MPa
+modelfitting_results_exp2$gmax_at0.1 <- modelfitting_results_exp2$C.C+(modelfitting_results_exp2$A.A * exp(-modelfitting_results_exp2$B.B*0.1))
+modelfitting_results_exp2$psi_k20_at0.1<- -((log(((0.8*modelfitting_results_exp2$gmax_at0.1)-modelfitting_results_exp2$C.C)/modelfitting_results_exp2$A.A))/(modelfitting_results_exp2$B.B))
+modelfitting_results_exp2$psi_k50_at0.1<- -((log(((0.5*modelfitting_results_exp2$gmax_at0.1)-modelfitting_results_exp2$C.C)/modelfitting_results_exp2$A.A))/(modelfitting_results_exp2$B.B))
+modelfitting_results_exp2$psi_k80_at0.1<- -((log(((0.2*modelfitting_results_exp2$gmax_at0.1)-modelfitting_results_exp2$C.C)/modelfitting_results_exp2$A.A))/(modelfitting_results_exp2$B.B))
+modelfitting_results_exp2$psi_k95_at0.1<- -((log(((0.05*modelfitting_results_exp2$gmax_at0.1)-modelfitting_results_exp2$C.C)/modelfitting_results_exp2$A.A))/(modelfitting_results_exp2$B.B))
+
+
+#########Update from Megan: these are the functions for psi at different k thresholds
+# which(is.na(as.numeric(modelfitting_results[,12]))=='TRUE' | as.numeric(modelfitting_results[,12])==-999 |is.na(as.numeric(modelfitting_results[,13]))=='TRUE'| as.numeric(modelfitting_results[,13])==-999 | is.na(as.numeric(modelfitting_results[,14]))=='TRUE'| as.numeric(modelfitting_results[,14])==-999 ) -> problem_rows
+# write.csv(modelfitting_results, file = here('outputs',"Exponential2_fits.csv"))
+# cat("Exponential2 has ", length(problem_rows), "curve(s) with NAs: ", problem_rows)
+
+
+#excel file with all the fits for each species.
+
+# Bootstrapping Psi_KXX ---------------------------------------------------
+
+#source bootstrap function
+#source(here("r_script", "boot.R"))
+
+#standard error function
+se<-function(x){
+  sd(x, na.rm = T)/sqrt(length(x))# specifying na.rm=T because sometimes the predicted parameters estimate negative values and log(negative #)=NA
+}
+
+#rename files for concision and legibility
+df_lin<-modelfitting_results_linear
+df_sig<-modelfitting_results_sigmoidal
+df_log<-modelfitting_results_logistic
+df_exp1<-modelfitting_results_exp1
+df_exp2<-modelfitting_results_exp2
+
+mod_bestfit_temp<-fx_select(df_lin, df_log, df_sig, df_exp1, df_exp2)#produce df with the best model fit for each species
+
+# some of the fits do not match the data well. Here I remove the ones that don't and replace them with 
+# others as long as the replacement is less than or equal to 2 AICcorr values. Luckily, the better option for all is logistic
+mod_bestfit_temp<-mod_bestfit_temp%>%
+  filter(!species%in%c("HF_QURU", 'MOF_QUAL', "SCBI_QUAL", 'SCBI_QURU', 'SCBI_QUVE', "SJER_QUWI", "OSBS_PIPA"))%>%
+  mutate_at(3:26, as.numeric)
+  
+df_log_newbest<-df_log%>%
+  filter(Species%in%c("HF_QURU", 'MOF_QUAL', "SCBI_QUAL", 'SCBI_QURU', 'SCBI_QUVE', "SJER_QUWI", "OSBS_PIPA"))%>%
+  mutate_at(3:26, as.numeric)
+
+names(df_log_newbest)<-names(mod_bestfit_temp)# names don't match before this; now they do
+
+#put it all together now
+mod_bestfit<-rbind(mod_bestfit_temp, df_log_newbest)
+
+##
+# boot_v2<-booty(version=2)
+# mod_bestfit<-mod_bestfit_temp
+
+#output_v1<-data.frame(species=character(), pred_mean=numeric(), pred_median=numeric(), pred_se=numeric(), conf_low=numeric(), conf_high=numeric())
+output_boot <-
+  data.frame(
+    species = character(),
+    pred_mean = numeric(),
+    pred_median = numeric(),
+    pred_se = numeric(),
+    conf_low = numeric(),
+    conf_high = numeric()
+  )
+
+alpha=0.05
+
+set.seed(1994)
+
+for( i in 1:dim(mod_bestfit)[1]){
+  print(i)
+  suppressWarnings(boot_vals<-bootPX(mod_bestfit,
+                    fx_type=mod_bestfit[i,"data.type"], 
+                    px=0.5)%>%unlist())# suppressing warnings for the NAs that are produced
+  
+  boot_mean<-mean(boot_vals, na.rm=T)# specifying na.rm=T because sometimes the predicted parameters estimate negative values and log(negative #)=NA
+  
+  boot_se<-se(boot_vals)
+  
+  boot_median<-median(boot_vals,na.rm = T)# specifying na.rm=T because sometimes the predicted parameters estimate negative values and log(negative #)=NA
+  #determine confidence intervals
+  deg_of_freedom= length(boot_vals)
+  t_score=qt(p=alpha/2, df=deg_of_freedom, lower.tail = F)
+  
+  margin_error<-t_score*boot_se
+  
+  conf.low<-mod_bestfit[i,"psi_k50"]-margin_error # using the predicted pX value to make the error make sense
+  conf.high<-mod_bestfit[i,"psi_k50"]+margin_error
+  
+  output_boot[i,1]<-mod_bestfit[i,"species"]
+  output_boot[i,2]<-boot_mean
+  output_boot[i,3]<-boot_median
+  output_boot[i,4]<-boot_se
+  output_boot[i,5]<-conf.low
+  output_boot[i,6]<-conf.high
+}
+
 ```
