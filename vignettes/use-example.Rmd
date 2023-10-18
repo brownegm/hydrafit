@@ -18,13 +18,18 @@ knitr::opts_chunk$set(
 library(hydrafit)
 library(here)
 library(dplyr)
+
 ```
+
+### Estimation of parameters
+
+The aim of this vignette is to illustrate an example of estimating parameters and bootstrapping confidence intervals around the percent loss in hydraulic conductivity. The functions assume that the data is in organized by species, and includes at least leaf water potential value (often in MPa) and leaf hydraulic conductance or stomatal conductance measurements (often in mmols m^-2^ s\^-1). The data can be log adjusted if you'd like and put in the same data set using `data.type` column. The default is to add the column and input 1 for all entries.
 
 ```{r}
 # load data
 
 
-dd <- dd_full %>%
+cebe <- cebe_efm %>%
   rename(species = Species, psi = Psi_lowest, kl = K) %>% # rename var names to fit with the rest of the syntax below.
   mutate(data.type = rep(1, dim(dd_full)[1])) %>%
   select(species.site, data.type, psi, kl) # function's expecting this order
