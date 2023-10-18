@@ -12,15 +12,12 @@ Data frame with two columns
 }
 }
 \source{
-Extracted from Scoffoni et al. 2011: https://doi-org.stanford.idm.oclc.org/10.1104/pp.111.173856
+Extracted from Scoffoni et al. 2011: <https://doi-org.stanford.idm.oclc.org/10.1104/pp.111.173856>
 }
 \usage{
 cebe_efm
 }
 \description{
 Dataset contains paired measurements of leaf hydraulic conductance and leaf water potential.
-}
-\examples{
-head(cebe_efm)
 }
 \keyword{datasets}
