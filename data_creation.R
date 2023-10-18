@@ -1,4 +1,6 @@
 ## Making a version of the data that can be saved in the hydrafit package
+## Collected evaporative flux data from Scoffoni et al. 2011
+## https://doi-org.stanford.idm.oclc.org/10.1104/pp.111.173856
 
 ##@author: Marvin
 
@@ -6,25 +8,21 @@
 
 library(here)
 library(dplyr)
-library(readxl)
+library(readr)
 
-# load data
-dd_full <- readxl::read_xlsx("~/Documents/Research_UCLA/NEON_EFM/data/all_NEON_20230120.xlsx") %>%
-  mutate(species.site = paste(site, Species, sep = "_"))
+# load raw
+cebe_efm <- read_csv("~/Downloads/scoffonietal2012_cebe_efm.csv",
+                     col_names = FALSE)
+View(cebe_efm)
 
-dd <- dd_full %>%
-  rename(species = Species, psi = Psi_lowest, kl = K) %>% # rename var names to fit with the rest of the syntax below.
-  mutate(data.type = rep(1, dim(dd_full)[1])) %>%
-  select(species.site, data.type, psi, kl) # function's expecting this order
+names(cebe_efm)<-c("psi", "kl")
 
+cebe_efm <- cebe_efm%>%
+  mutate(psi = psi*-1)
 
-head(dd)
+plot(cebe_efm$kl, cebe_efm$psi)
 
-# subset the data
-
-dd.filter <- dd %>%
-  dplyr::filter(species.site=="HF_QURU")
-
-dd.mani <- dd.filter %>%
-  mutate(kl=kl+0.6828)
-
+## save data
+use_data(cebe_efm,
+         version = 3,
+         overwrite = T)# sometimes things change
