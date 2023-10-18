@@ -1,8 +1,8 @@
 ---
-title: "How to fit and bootstrap"
+title: "How to fit hydraulics parameters"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{How to fit and bootstrap}
+  %\VignetteIndexEntry{How to fit hydraulics parameters}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
