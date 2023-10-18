@@ -18,14 +18,11 @@ knitr::opts_chunk$set(
 library(hydrafit)
 library(here)
 library(dplyr)
-library(readxl)
-library(hydrafit)
 ```
 
 ```{r}
 # load data
-dd_full <- readxl::read_xlsx(here("data", "all_NEON_20230120.xlsx")) %>%
-  mutate(species.site = paste(site, Species, sep = "_"))
+
 
 dd <- dd_full %>%
   rename(species = Species, psi = Psi_lowest, kl = K) %>% # rename var names to fit with the rest of the syntax below.
