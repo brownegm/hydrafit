@@ -1,9 +1,10 @@
-#' Cercocarpus betuloides evaporative flux measurements
+#' \emph{Cercocarpus betuloides} evaporative flux measurements
 #'
 #' Dataset contains paired measurements of leaf hydraulic conductance and leaf water potential.
 #'
-#' @format Data frame with two columns
+#' @format Data frame with three columns
 #' \describe{
+#' \item{species}{Species code (two letters Genus + two letters species)}
 #' \item{psi}{Leaf water potential in MPa}
 #' \item{kl}{Leaf hydraulic conductance measured via evaporative flux. Units : mmol m^-2 s^-1 }
 #' }

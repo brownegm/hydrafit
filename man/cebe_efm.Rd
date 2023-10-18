@@ -3,10 +3,11 @@
 \docType{data}
 \name{cebe_efm}
 \alias{cebe_efm}
-\title{Cercocarpus betuloides evaporative flux measurements}
+\title{\emph{Cercocarpus betuloides} evaporative flux measurements}
 \format{
-Data frame with two columns
+Data frame with three columns
 \describe{
+\item{species}{Species code (two letters Genus + two letters species)}
 \item{psi}{Leaf water potential in MPa}
 \item{kl}{Leaf hydraulic conductance measured via evaporative flux. Units : mmol m^-2 s^-1 }
 }
