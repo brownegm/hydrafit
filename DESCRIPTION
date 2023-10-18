@@ -14,7 +14,7 @@ Imports:
     outliers
 Depends: 
     likelihood,
-    R (>= 2.10)
+    R (>= 3.5)
 RoxygenNote: 7.2.3
 Suggests: 
     knitr,

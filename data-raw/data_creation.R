@@ -5,20 +5,21 @@
 ##@author: Marvin
 
 # packages
-
 library(here)
 library(dplyr)
 library(readr)
 
 # load raw
-cebe_efm <- read_csv("~/Downloads/scoffonietal2012_cebe_efm.csv",
+cebe_efm <- read_csv(here("data-raw", "scoffonietal2012_cebe_efm.csv"),
                      col_names = FALSE)
-View(cebe_efm)
 
 names(cebe_efm)<-c("psi", "kl")
 
 cebe_efm <- cebe_efm%>%
-  mutate(psi = psi*-1)
+  mutate(psi = psi*-1)%>%
+  mutate(species = rep("cebe"), .before = psi)
+
+head(cebe_efm)
 
 plot(cebe_efm$kl, cebe_efm$psi)
 
