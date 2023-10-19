@@ -10,7 +10,4 @@
 #' }
 #' @source Extracted from Scoffoni et al. 2011: <https://doi-org.stanford.idm.oclc.org/10.1104/pp.111.173856>
 #'
-
-"cebe_efm"
-
-hydrafit::cebe_efm
+NULL
