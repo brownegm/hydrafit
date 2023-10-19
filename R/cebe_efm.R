@@ -13,4 +13,4 @@
 
 "cebe_efm"
 
-cebe_efm
+hydrafit::cebe_efm

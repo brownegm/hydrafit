@@ -2,8 +2,7 @@
 % Please edit documentation in R/fx_select.R
 \name{fx_select}
 \alias{fx_select}
-\title{Select the best fitting function for each species based on the lowest AICc score.
-Requires that you input all of the fitting parameter data frames from [fitlinear](R/fitlinear.R) and [fit_nonlinear](R/fitnonlinear.R)}
+\title{Select the best fitting function for each species based on the lowest AICc score.}
 \usage{
 fx_select(.df_lin, .df_log, .df_sig, .df_exp1, .df_exp2)
 }
@@ -19,9 +18,8 @@ fx_select(.df_lin, .df_log, .df_sig, .df_exp1, .df_exp2)
 \item{.df_exp2}{dataframe of second exponential fits}
 }
 \value{
-returns a dataframe with the best fit models
+Returns a dataframe with the best fit models. Note: D here is the third parameter for Exp2 or Sigmoidal models.
 }
 \description{
-Select the best fitting function for each species based on the lowest AICc score.
-Requires that you input all of the fitting parameter data frames from [fitlinear](R/fitlinear.R) and [fit_nonlinear](R/fitnonlinear.R)
+Requires that you input all of the fitting parameter data frames from `hydrafit::fitlinear()` and `hydrafit::fit_nonlinear()`.
 }
