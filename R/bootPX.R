@@ -6,8 +6,8 @@
 #'  functions tests for the best fit model.
 #'
 #'\itemize{
-#'    \item Annealing function info: `https://www.rdocumentation.org/packages/likelihood/versions/1.7/topics/Simulated%20Annealing%20Algorithm`
-#'    \item Github page:https://github.com/cran/likelihood/blob/master/R/anneal.R. See lines 742-797 specifically within the code.
+#'    \item Annealing function info: \url{https://www.rdocumentation.org/packages/likelihood/versions/1.7/topics/Simulated%20Annealing%20Algorithm}
+#'    \item Github page: \url{https://github.com/cran/likelihood/blob/master/R/anneal.R}. See lines 742-797 specifically within the code.
 #' }
 #'
 #'
