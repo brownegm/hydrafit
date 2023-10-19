@@ -1,5 +1,6 @@
 #' Select the best fitting function for each species based on the lowest AICc score.
-#' Requires that you input all of the fitting parameter data frames from [fitlinear](R/fitlinear.R) and [fit_nonlinear](R/fitnonlinear.R)
+#'
+#' @description Requires that you input all of the fitting parameter data frames from `hydrafit::fitlinear()` and `hydrafit::fit_nonlinear()`.
 #'
 #' @param .df_lin dataframe of linear fits
 #' @param .df_log dataframe of logistic fits
@@ -7,7 +8,7 @@
 #' @param .df_exp1 dataframe of first exponential fits
 #' @param .df_exp2 dataframe of second exponential fits
 #'
-#' @return returns a dataframe with the best fit models
+#' @return Returns a dataframe with the best fit models. Note: D here is the third parameter for Exp2 or Sigmoidal models.
 #' @export fx_select
 #'
 

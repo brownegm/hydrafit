@@ -338,7 +338,6 @@ se<-function(x){
   sd(x, na.rm = T)/sqrt(length(x))# specifying na.rm=T because sometimes the predicted parameters estimate negative values and log(negative #)=NA
 }
 
-#output_v1<-data.frame(species=character(), pred_mean=numeric(), pred_median=numeric(), pred_se=numeric(), conf_low=numeric(), conf_high=numeric())
 output_boot <-
   data.frame(
     species = character(),
@@ -351,10 +350,10 @@ output_boot <-
 
 alpha=0.05
 
-set.seed(1994)
+set.seed(1994) #  For reproducibility
 
 for( i in 1:dim(mod_bestfit)[1]){
-  print(i)
+  
   suppressWarnings(boot_vals<-bootPX(mod_bestfit,
                     fx_type=mod_bestfit[i,"data.type"], 
                     px=0.5)%>%unlist())# suppressing warnings for the NAs that are produced
