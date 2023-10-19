@@ -1,7 +1,7 @@
 #' \emph{Cercocarpus betuloides} evaporative flux measurements
 #'
 #' Dataset contains paired measurements of leaf hydraulic conductance and leaf water potential.
-#'
+#' @name cebe_efm
 #' @format Data frame with three columns
 #' \describe{
 #' \item{species}{Species code (two letters Genus + two letters species)}
