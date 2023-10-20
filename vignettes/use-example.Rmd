@@ -1,5 +1,5 @@
 ---
-title: "How to fit hydraulics parameters"
+title: "How to fit and bootstrap hydraulics parameters"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{How to fit hydraulics parameters}
@@ -10,13 +10,14 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>", 
+  fig.width = 5, 
+  fig.height = 4
 )
 ```
 
 ```{r setup}
 library(hydrafit)
-
 ```
 
 ### Estimation of parameters
@@ -303,7 +304,7 @@ modelfitting_results_exp2$psi_k95_at0.1<- -((log(((0.05*modelfitting_results_exp
 
 ### Model selection with `fx_select()`
 
-Once parameters for each model type are created for each species, we select the best fitting model by lowest corrected AIC (AICc). Sometimes the fits do not match the data well or in ways that are questionable physiologically (i.e., the line drawn is below the points and skirt extreme low conductance values before $\Psi_{leaf} = -1 MPa$. This is a key reason to **plot** the data in the subsequent steps. One justification for substituting another model type for the lower AICc model is if the replacement is within 2 AICc units. Before bootstrapping confidence intervals one may remove the observations from the `mod_bestfit` object created below. and replace them with the equivalent rows in the appropriate model data.frame. 
+Once parameters for each model type are created for each species, we select the best fitting model by lowest corrected AIC (AICc). Sometimes the fits do not match the data well or in ways that are questionable physiologically (i.e., the line drawn is below the points and skirt extreme low conductance values before $\Psi_{leaf}$ = -1 MPa. This is a key reason to **plot** the data in the preceding steps. One justification for substituting another model type for the lower AICc model is if the replacement is within 2 AICc units. Before bootstrapping confidence intervals one may remove the observations from the `mod_bestfit` object created below. and replace them with the equivalent rows in the appropriate model data.frame. 
 
 ```{r model-selection}
 
