@@ -18,17 +18,19 @@ You can install the development version of hydrafit from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("brownegm/hydrafit")
+# install.packages("devtools") #only done if not already downloaded
+devtools::install_github("brownegm/hydrafit", build_vignettes = T)
+#> Skipping install of 'hydrafit' from a github remote, the SHA1 (25f683ae) has not changed since last install.
+#>   Use `force = TRUE` to force installation
 ```
 
-## Example…tbd
+## Example
 
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+An example of the use of the functions is available as a vignette.
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this. You could also
-use GitHub Actions to re-render `README.Rmd` every time you push. An
-example workflow can be found here:
-<https://github.com/r-lib/actions/tree/v1/examples>.
+``` r
+browseVignettes(package = "hydrafit")
+#> starting httpd help server ... done
+```
+
+available in /vignettes.
