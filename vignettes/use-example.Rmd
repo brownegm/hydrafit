@@ -16,8 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(hydrafit)
-library(here)
-library(dplyr)
+
 ```
 
 ### Estimation of parameters
@@ -26,9 +25,11 @@ The aim of this vignette is to illustrate an example of estimating parameters an
 
 ```{r data_preparation}
 # load data
+if(require(dplyr)){
 cebe <- hydrafit::cebe_efm %>%
-  mutate(data.type = rep(1, dim(cebe_efm)[1]), .before=psi) 
+  dplyr::mutate(data.type = rep(1, dim(cebe_efm)[1]), .before=psi) }
 
+cebe$to_split <- paste(cebe$species, cebe$data.type)
 # declare the data frame to store the results
 modelfitting_results_linear <-
   data.frame(
@@ -128,7 +129,7 @@ modelfitting_results_exp2 <-
 
 # specific list of species for for loops
 
-species_list <- unique(cebe$species)
+species_list <- unique(cebe$to_split)
 ```
 
 Now, we preform the fitting procedures using the `likelihood` function and fill in the data for each model type. **NOTE**: Make sure that you check for NAs in the final outputs. Also, a common error is about the best fitting model is not the potential best fit. Check with the `?anneal` function for more information.
@@ -142,14 +143,14 @@ The subsequent functions provide the functionality to plot vulnerability curves 
 #Open a pdf file to save fitted curve plots in 
 
 #For every species, fit the curve and record the results  
-cli::cli_progress_bar("Fitting curves (Linear)", total=length(species_list))
+#cli::cli_progress_bar("Fitting curves (Linear)", total=length(species_list))
 for (ii in 1:length(species_list)){
   (subset(cebe, cebe$to_split == species_list[ii], select =c(1:dim(cebe)[2])) -> data_by_sp)
-  Linear_fits = fit_linear(data_by_sp, Linear, plot=F, xlab="Water Potential (-MPa)", ylab="Leaf Hydraulic Conductance (units)")
+  Linear_fits = fit_linear(data_by_sp, Linear, plot=T, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
   Linear_fits$D.NA<- NA # placeholder to keep all of the data frames the same size
   Linear_fits$sterror.NA <- NA
   rbind(modelfitting_results_linear, as.data.frame(Linear_fits))-> modelfitting_results_linear
-  cli::cli_progress_update()
+  #cli::cli_progress_update()
 } 
 #dev.off()
 
@@ -173,16 +174,16 @@ modelfitting_results_linear$psi_k95_at0.1<- ((0.05*modelfitting_results_linear$g
 #Declare the pdf file to hold the plots
 #pdf(file = here('outputs','Logistic_fits.pdf'), width =8.5, height=5, onefile=T)
 
-cli::cli_progress_bar("Fitting curves (logistic)", total=length(species_list))
+#cli::cli_progress_bar("Fitting curves (logistic)", total=length(species_list))
 for (ii in 1:length(species_list)){
   subset(cebe, cebe$to_split == species_list[ii], select = c(1:dim(cebe)[2])) -> data_by_sp
   define_parsL(data_by_sp) -> par_estimates
   parsL=par_estimates[[1]]
   par_loL=par_estimates[[2]]
   par_highL=par_estimates[[3]]
-  Logistic_fits = fit_nonlinear(data_by_sp, parsL, par_loL, par_highL, model_type = "log", plot=F)
+  Logistic_fits = fit_nonlinear(data_by_sp, parsL, par_loL, par_highL, model_type = "log", plot=T,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
   rbind(modelfitting_results_logistic, as.data.frame(Logistic_fits))-> modelfitting_results_logistic
-  cli::cli_progress_update()
+ # cli::cli_progress_update()
 }
 
 #dev.off()
@@ -204,16 +205,16 @@ modelfitting_results_logistic$psi_k95_at0.1<- (modelfitting_results_logistic$C.X
 #Declare the pdf file to hold the plots
 #pdf(file = here('outputs','Sigmoidal_fits.pdf'), width =8.5, height=5, onefile=T)
 
-cli::cli_progress_bar("Fitting curves (Sigmoidal)", total=length(species_list))
+#cli::cli_progress_bar("Fitting curves (Sigmoidal)", total=length(species_list))
 for (ii in 1:length(species_list)){
   subset(cebe, cebe$to_split == species_list[ii], select =c(1:dim(cebe)[2])) -> data_by_sp
   define_parsS(data_by_sp) -> par_estimates
   parsS=par_estimates[[1]]
   par_loS=par_estimates[[2]]
   par_highS=par_estimates[[3]]
-  Sigmoidal_fits = fit_nonlinear(data_by_sp, parsS, par_loS, par_highS, model_type= "sig", plot=F)
+  Sigmoidal_fits = fit_nonlinear(data_by_sp, parsS, par_loS, par_highS, model_type= "sig", plot=T,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
   rbind(modelfitting_results_sigmoidal, as.data.frame(Sigmoidal_fits))-> modelfitting_results_sigmoidal
-  cli::cli_progress_update()
+  #cli::cli_progress_update()
 }
 #dev.off()
 
@@ -234,18 +235,18 @@ modelfitting_results_sigmoidal$psi_k95_at0.1<- -modelfitting_results_sigmoidal$B
 
 
 #pdf(file = here('outputs','Exponential_fits.pdf'), width =8.5, height=5, onefile=T)
-cli::cli_progress_bar("Fitting curves (Exponential)", total=length(species_list))
+#cli::cli_progress_bar("Fitting curves (Exponential)", total=length(species_list))
 for (ii in 1:length(species_list)){
   subset(cebe, cebe$to_split == species_list[ii], select =c(1:dim(cebe)[2])) -> data_by_sp
   define_parsE(data_by_sp) -> par_estimates
   parsE=par_estimates[[1]]
   par_loE=par_estimates[[2]]
   par_highE=par_estimates[[3]]
-  Exponential_fits = fit_nonlinear(data_by_sp, parsE, par_loE, par_highE, model_type = "exp", plot=F)
+  Exponential_fits = fit_nonlinear(data_by_sp, parsE, par_loE, par_highE, model_type = "exp", plot=T, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
   Exponential_fits$D.NA<- NA 
   Exponential_fits$sterror.NA <- NA
   rbind(modelfitting_results_exp1, as.data.frame(Exponential_fits))-> modelfitting_results_exp1
-  cli::cli_progress_update()
+  #cli::cli_progress_update()
 }
 #dev.off()
 
@@ -266,14 +267,14 @@ modelfitting_results_exp1$psi_k95_at0.1<- (log((0.05*modelfitting_results_exp1$g
 
 #pdf(file = here('outputs','Exponential2_fits.pdf'), width =8.5, height=5, onefile=T)
 
-cli::cli_progress_bar("Fitting curves (Exponential 2)", total=length(species_list))
+#cli::cli_progress_bar("Fitting curves (Exponential 2)", total=length(species_list))
 for (ii in 1:length(species_list)){
   subset(cebe, cebe$to_split == species_list[ii], select =c(1:dim(cebe)[2])) -> data_by_sp
   define_parsE2(data_by_sp) -> par_estimates
   parsE2=par_estimates[[1]]
   par_loE2=par_estimates[[2]]
   par_highE2=par_estimates[[3]]
-  Exponential2_fits = fit_nonlinear(data_by_sp,  parsE2, par_loE2, par_highE2, model_type= "exp2", plot=F)
+  Exponential2_fits = fit_nonlinear(data_by_sp,  parsE2, par_loE2, par_highE2, model_type= "exp2", plot=T, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
   #########Update from Megan: this fit returns NaN (not a number) or "N/A" instead of NA at times (probably when C is very small),
   ####and this converts everything else in the modelfitting_results columns to NA-
   ###this replaces the NaNs with -999, so they'll be easy to find
@@ -281,7 +282,7 @@ for (ii in 1:length(species_list)){
   Exponential2_fits[which(Exponential2_fits== "N/A")] = -999
 
   rbind(modelfitting_results_exp2, as.data.frame(Exponential2_fits))-> modelfitting_results_exp2
-  cli::cli_progress_update()
+ # cli::cli_progress_update()
 }
 
 #dev.off()
@@ -315,9 +316,10 @@ df_exp2<-modelfitting_results_exp2
 
 mod_bestfit_temp<-fx_select(df_lin, df_log, df_sig, df_exp1, df_exp2)#produce df with the best model fit for each species
 
+if(require("dplyr")){
 mod_bestfit<-mod_bestfit_temp%>%
-  mutate_at(3:26, as.numeric)
-
+  dplyr::mutate_at(3:26, as.numeric)
+}
 ```
 
 ### Bootstrapping PX
@@ -380,5 +382,6 @@ for( i in 1:dim(mod_bestfit)[1]){
   output_boot[i,6]<-conf.high
 }
 
+output_boot
 ```
 

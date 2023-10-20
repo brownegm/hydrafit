@@ -1,6 +1,5 @@
 #' cebe_efm
 #'
-#'
 #' \emph{Cercocarpus betuloides} evaporative flux measurements
 #'
 #' Dataset contains paired measurements of leaf hydraulic conductance and leaf water potential.
@@ -14,4 +13,4 @@
 #' @source Extracted from Scoffoni et al. 2011: \url{https://doi-org.stanford.idm.oclc.org/10.1104/pp.111.173856}
 #'
 #'
-NULL
+"cebe_efm"
