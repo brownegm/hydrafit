@@ -16,7 +16,7 @@ bootPX(df, fx_type = character(), px = 0.5, sims = 1000)
 \item{sims}{Number of simulated values to generate}
 }
 \value{
-returns a list of sims length predicted PX values
+Returns a list of simulations predicted PX values the length of the number `sims`.
 }
 \description{
 Tool for estimating confidence intervals for percent loss in conductance.
@@ -28,7 +28,7 @@ This function takes the best fit model chosen by `fx_select()` and estimates con
  functions tests for the best fit model.
 
 \itemize{
-   \item Annealing function info: `https://www.rdocumentation.org/packages/likelihood/versions/1.7/topics/Simulated%20Annealing%20Algorithm`
-   \item Github page:https://github.com/cran/likelihood/blob/master/R/anneal.R. See lines 742-797 specifically within the code.
+   \item Annealing function info: \url{https://tinyurl.com/annealingsim}
+   \item Github page: \url{https://github.com/cran/likelihood/blob/master/R/anneal.R}. See lines 742-797 specifically within the code.
 }
 }

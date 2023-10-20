@@ -6,7 +6,7 @@
 #'  functions tests for the best fit model.
 #'
 #'\itemize{
-#'    \item Annealing function info: \url{https://www.rdocumentation.org/packages/likelihood/versions/1.7/topics/Simulated%20Annealing%20Algorithm}
+#'    \item Annealing function info: \url{https://tinyurl.com/annealingsim}
 #'    \item Github page: \url{https://github.com/cran/likelihood/blob/master/R/anneal.R}. See lines 742-797 specifically within the code.
 #' }
 #'
@@ -16,11 +16,11 @@
 #' @param px Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)
 #' @param sims Number of simulated values to generate
 #'
-#' @return returns a list of sims length predicted PX values
+#' @return Returns a list of simulations predicted PX values the length of the number `sims`.
 #'
 #' @importFrom stats rnorm
 #' @export bootPX
-#'
+
 
 bootPX<-function(df,
                  fx_type=character(),
