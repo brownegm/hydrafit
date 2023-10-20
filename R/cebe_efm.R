@@ -10,7 +10,7 @@
 #' \item{psi}{Leaf water potential in MPa}
 #' \item{kl}{Leaf hydraulic conductance measured via evaporative flux. Units : mmol m^-2 s^-1 }
 #' }
-#' @source Extracted from Scoffoni et al. 2011: \url{https://doi-org.stanford.idm.oclc.org/10.1104/pp.111.173856}
+#' @source Extracted from Scoffoni et al. 2011: \url{https://academic.oup.com/plphys/article/156/2/832/6108859}
 #'
 #'
 "cebe_efm"
