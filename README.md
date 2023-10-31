@@ -20,8 +20,19 @@ You can install the development version of hydrafit from
 ``` r
 # install.packages("devtools") #only done if not already downloaded
 devtools::install_github("brownegm/hydrafit", build_vignettes = T)
-#> Skipping install of 'hydrafit' from a github remote, the SHA1 (25f683ae) has not changed since last install.
-#>   Use `force = TRUE` to force installation
+#> Downloading GitHub repo brownegm/hydrafit@HEAD
+#> 
+#> ── R CMD build ─────────────────────────────────────────────────────────────────
+#>      checking for file ‘/private/var/folders/_x/1l0pg7m93wd7xfx24m9gy3800000gn/T/Rtmpq80uqG/remotes184667623d8da/brownegm-hydrafit-8ed21d7/DESCRIPTION’ ...  ✔  checking for file ‘/private/var/folders/_x/1l0pg7m93wd7xfx24m9gy3800000gn/T/Rtmpq80uqG/remotes184667623d8da/brownegm-hydrafit-8ed21d7/DESCRIPTION’
+#>   ─  preparing ‘hydrafit’:
+#>      checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
+#>   ─  installing the package to build vignettes
+#>      creating vignettes ...  ✔  creating vignettes (7.6s)
+#>   ─  checking for LF line-endings in source and make files and shell scripts
+#>   ─  checking for empty or unneeded directories
+#>   ─  building ‘hydrafit_0.1.0.tar.gz’
+#>      
+#> 
 ```
 
 ## Example
@@ -33,4 +44,4 @@ browseVignettes(package = "hydrafit")
 #> starting httpd help server ... done
 ```
 
-available in /vignettes.
+The unrendered vignette is also available in /vignettes.

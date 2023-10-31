@@ -35,5 +35,5 @@ An example of the use of the functions is available as a vignette.
 ```{r}
 browseVignettes(package = "hydrafit")
 ```
-available in /vignettes. 
+The unrendered vignette is also available in /vignettes. 
 
