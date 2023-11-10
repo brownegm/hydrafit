@@ -1,0 +1,388 @@
+---
+title: "How to fit and bootstrap hydraulics parameters"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{How to fit hydraulics parameters}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  fig.width = 5, 
+  fig.height = 4
+)
+```
+
+```{r setup}
+library(hydrafit)
+```
+
+### Estimation of parameters
+
+The aim of this vignette is to illustrate an example of estimating parameters and bootstrapping confidence intervals around the percent loss in hydraulic conductivity. The functions assume that the data is in organized by species, and includes at least leaf water potential value (often in MPa) and leaf hydraulic conductance or stomatal conductance measurements (often in mmol m^-2^ s^-1^). The data can be log adjusted if you'd like and put in the same data set using `data.type` column. The default is to create the column and input 1 for all entries. Here, `data.type` is created and data.frames to store data from the model estimation are created (i.e., Linear, Exponential, Exponential2, Logistic, and Sigmoidal).
+
+```{r data_preparation}
+# load data
+if(require(dplyr)){
+cebe <- hydrafit::cebe_efm %>%
+  dplyr::mutate(data.type = rep(1, dim(cebe_efm)[1]), .before=psi) }
+
+cebe$to_split <- paste(cebe$species, cebe$data.type)
+# declare the data frame to store the results
+modelfitting_results_linear <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+modelfitting_results_logistic <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+modelfitting_results_sigmoidal <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+modelfitting_results_exp1 <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+modelfitting_results_exp2 <-
+  data.frame(
+    Species = as.character(),
+    data.type = as.character(),
+    A = numeric(),
+    B = numeric(),
+    C = numeric(),
+    D = numeric(),
+    loglikeli = numeric(),
+    rsq = numeric(),
+    slope = numeric(),
+    AIC = numeric(),
+    AICcorr = numeric(),
+    sterror1 = numeric(),
+    sterror2 = numeric(),
+    sterror3 = numeric(),
+    sterror4 = numeric(),
+    N = numeric()
+  )
+
+# specific list of species for for loops
+
+species_list <- unique(cebe$to_split)
+```
+
+Now, we preform the fitting procedures using the `likelihood` function and fill in the data for each model type. **NOTE**: Make sure that you check for NAs in the final outputs. Also, a common error is about the best fitting model is not the potential best fit. Check with the `?anneal` function for more information.
+
+The subsequent functions provide the functionality to plot vulnerability curves by species. This especially important if you would like to make sure that the best fit model (i.e., chosen by AICc) is actually the best visual fit for the data. Here, the `plot` parameter is set to `FALSE`. However, the code necessary to do that is still within the chuck but commented out. The plots would be created with your working directory. Lastly, for the sake of tracking the progress of the line fitting, `cli::cli_progress_bar` is added for each model type. It creates a nice progress bar in the console to watch the process happen. Once the parameters are estimated P50, P80, and P95 are calculated based on Kmax and Kmax at 0.1 MPa, which may be more realistic. 
+
+```{r perform_fitting}
+#Linear
+#pdf(file = here('outputs','Linear_fits.pdf'), width =8.5, height=5, onefile=T)
+
+#Open a pdf file to save fitted curve plots in 
+
+#For every species, fit the curve and record the results  
+#cli::cli_progress_bar("Fitting curves (Linear)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  (subset(cebe, cebe$to_split == species_list[ii], select =c(1:dim(cebe)[2])) -> data_by_sp)
+  Linear_fits = fit_linear(data_by_sp, Linear, plot=T, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+  Linear_fits$D.NA<- NA # placeholder to keep all of the data frames the same size
+  Linear_fits$sterror.NA <- NA
+  rbind(modelfitting_results_linear, as.data.frame(Linear_fits))-> modelfitting_results_linear
+  #cli::cli_progress_update()
+} 
+#dev.off()
+
+#estimate the pX values 
+modelfitting_results_linear$psi_k20<- (0.8-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k50<- (0.5-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k80<- (0.2-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k95<- (0.05-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
+
+
+# PX values with max at 0.1 MPa
+modelfitting_results_linear$gmax_at0.1 <- (modelfitting_results_linear$B.B*0.1)+modelfitting_results_linear$A.A
+modelfitting_results_linear$psi_k20_at0.1<- ((0.8*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k50_at0.1<- ((0.5*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k80_at0.1<- ((0.2*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k95_at0.1<- ((0.05*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
+
+
+#Logistic
+
+#Declare the pdf file to hold the plots
+#pdf(file = here('outputs','Logistic_fits.pdf'), width =8.5, height=5, onefile=T)
+
+#cli::cli_progress_bar("Fitting curves (logistic)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  subset(cebe, cebe$to_split == species_list[ii], select = c(1:dim(cebe)[2])) -> data_by_sp
+  define_parsL(data_by_sp) -> par_estimates
+  parsL=par_estimates[[1]]
+  par_loL=par_estimates[[2]]
+  par_highL=par_estimates[[3]]
+  Logistic_fits = fit_nonlinear(data_by_sp, parsL, par_loL, par_highL, model_type = "log", plot=T,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+  rbind(modelfitting_results_logistic, as.data.frame(Logistic_fits))-> modelfitting_results_logistic
+ # cli::cli_progress_update()
+}
+
+#dev.off()
+
+modelfitting_results_logistic$psi_k20<- modelfitting_results_logistic$C.Xo*(1/0.8-1)^(1/modelfitting_results_logistic$B.B)
+modelfitting_results_logistic$psi_k50<- modelfitting_results_logistic$C.Xo*(1/0.5-1)^(1/modelfitting_results_logistic$B.B)
+modelfitting_results_logistic$psi_k80<- modelfitting_results_logistic$C.Xo*(1/0.2-1)^(1/modelfitting_results_logistic$B.B)
+modelfitting_results_logistic$psi_k95<- modelfitting_results_logistic$C.Xo*(1/0.05-1)^(1/modelfitting_results_logistic$B.B)
+
+# PX values with max at 0.1 MPa
+modelfitting_results_logistic$gmax_at0.1 <- (modelfitting_results_logistic$A.A)/(1+((0.1/modelfitting_results_logistic$C.Xo)^modelfitting_results_logistic$B.B))
+modelfitting_results_logistic$psi_k20_at0.1<- (modelfitting_results_logistic$C.Xo)*(((modelfitting_results_logistic$A.A)/(0.8*modelfitting_results_logistic$gmax_at0.1)-1)^(1/modelfitting_results_logistic$B.B))
+modelfitting_results_logistic$psi_k50_at0.1<- (modelfitting_results_logistic$C.Xo)*(((modelfitting_results_logistic$A.A)/(0.5*modelfitting_results_logistic$gmax_at0.1)-1)^(1/modelfitting_results_logistic$B.B))
+modelfitting_results_logistic$psi_k80_at0.1<- (modelfitting_results_logistic$C.Xo)*(((modelfitting_results_logistic$A.A)/(0.2*modelfitting_results_logistic$gmax_at0.1)-1)^(1/modelfitting_results_logistic$B.B))
+modelfitting_results_logistic$psi_k95_at0.1<- (modelfitting_results_logistic$C.Xo)*(((modelfitting_results_logistic$A.A)/(0.05*modelfitting_results_logistic$gmax_at0.1)-1)^(1/modelfitting_results_logistic$B.B))
+
+#Sigmoidal
+
+#Declare the pdf file to hold the plots
+#pdf(file = here('outputs','Sigmoidal_fits.pdf'), width =8.5, height=5, onefile=T)
+
+#cli::cli_progress_bar("Fitting curves (Sigmoidal)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  subset(cebe, cebe$to_split == species_list[ii], select =c(1:dim(cebe)[2])) -> data_by_sp
+  define_parsS(data_by_sp) -> par_estimates
+  parsS=par_estimates[[1]]
+  par_loS=par_estimates[[2]]
+  par_highS=par_estimates[[3]]
+  Sigmoidal_fits = fit_nonlinear(data_by_sp, parsS, par_loS, par_highS, model_type= "sig", plot=T,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+  rbind(modelfitting_results_sigmoidal, as.data.frame(Sigmoidal_fits))-> modelfitting_results_sigmoidal
+  #cli::cli_progress_update()
+}
+#dev.off()
+
+modelfitting_results_sigmoidal$psi_k20<- modelfitting_results_sigmoidal$C.Xo - modelfitting_results_sigmoidal$B.B*log(1/0.8 -1)
+modelfitting_results_sigmoidal$psi_k50<- modelfitting_results_sigmoidal$C.Xo - modelfitting_results_sigmoidal$B.B*log(1/0.5 -1)
+modelfitting_results_sigmoidal$psi_k80<- modelfitting_results_sigmoidal$C.Xo - modelfitting_results_sigmoidal$B.B*log(1/0.2 -1)
+modelfitting_results_sigmoidal$psi_k95<- modelfitting_results_sigmoidal$C.Xo - modelfitting_results_sigmoidal$B.B*log(1/0.05 -1)
+
+# PX values with max at 0.1 MPa
+modelfitting_results_sigmoidal$gmax_at0.1 <- (modelfitting_results_sigmoidal$A.A)/(1+exp(-((0.1-modelfitting_results_sigmoidal$C.Xo)/modelfitting_results_sigmoidal$B.B)))
+modelfitting_results_sigmoidal$psi_k20_at0.1<- -modelfitting_results_sigmoidal$B.B*(modelfitting_results_sigmoidal$A.A-(0.8*modelfitting_results_sigmoidal$gmax_at0.1)-log(0.8*modelfitting_results_sigmoidal$gmax_at0.1)) + modelfitting_results_sigmoidal$C.Xo
+modelfitting_results_sigmoidal$psi_k50_at0.1<- -modelfitting_results_sigmoidal$B.B*(modelfitting_results_sigmoidal$A.A-(0.5*modelfitting_results_sigmoidal$gmax_at0.1)-log(0.5*modelfitting_results_sigmoidal$gmax_at0.1)) + modelfitting_results_sigmoidal$C.Xo
+modelfitting_results_sigmoidal$psi_k80_at0.1<- -modelfitting_results_sigmoidal$B.B*(modelfitting_results_sigmoidal$A.A-(0.2*modelfitting_results_sigmoidal$gmax_at0.1)-log(0.2*modelfitting_results_sigmoidal$gmax_at0.1)) + modelfitting_results_sigmoidal$C.Xo
+modelfitting_results_sigmoidal$psi_k95_at0.1<- -modelfitting_results_sigmoidal$B.B*(modelfitting_results_sigmoidal$A.A-(0.05*modelfitting_results_sigmoidal$gmax_at0.1)-log(0.05*modelfitting_results_sigmoidal$gmax_at0.1)) + modelfitting_results_sigmoidal$C.Xo
+
+
+#Exponential
+
+
+#pdf(file = here('outputs','Exponential_fits.pdf'), width =8.5, height=5, onefile=T)
+#cli::cli_progress_bar("Fitting curves (Exponential)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  subset(cebe, cebe$to_split == species_list[ii], select =c(1:dim(cebe)[2])) -> data_by_sp
+  define_parsE(data_by_sp) -> par_estimates
+  parsE=par_estimates[[1]]
+  par_loE=par_estimates[[2]]
+  par_highE=par_estimates[[3]]
+  Exponential_fits = fit_nonlinear(data_by_sp, parsE, par_loE, par_highE, model_type = "exp", plot=T, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+  Exponential_fits$D.NA<- NA 
+  Exponential_fits$sterror.NA <- NA
+  rbind(modelfitting_results_exp1, as.data.frame(Exponential_fits))-> modelfitting_results_exp1
+  #cli::cli_progress_update()
+}
+#dev.off()
+
+modelfitting_results_exp1$psi_k20<- log(0.8)/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k50<- log(0.5)/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k80<- log(0.2)/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k95<- log(0.05)/(-modelfitting_results_exp1$B.B)
+
+# PX values with max at 0.1 MPa
+modelfitting_results_exp1$gmax_at0.1 <- modelfitting_results_exp1$A.A * exp(-modelfitting_results_exp1$B.B*0.1)
+modelfitting_results_exp1$psi_k20_at0.1<- (log((0.8*modelfitting_results_exp1$gmax_at0.1)/modelfitting_results_exp1$A.A))/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k50_at0.1<- (log((0.5*modelfitting_results_exp1$gmax_at0.1)/modelfitting_results_exp1$A.A))/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k80_at0.1<- (log((0.2*modelfitting_results_exp1$gmax_at0.1)/modelfitting_results_exp1$A.A))/(-modelfitting_results_exp1$B.B)
+modelfitting_results_exp1$psi_k95_at0.1<- (log((0.05*modelfitting_results_exp1$gmax_at0.1)/modelfitting_results_exp1$A.A))/(-modelfitting_results_exp1$B.B)
+
+
+#Exponential2
+
+#pdf(file = here('outputs','Exponential2_fits.pdf'), width =8.5, height=5, onefile=T)
+
+#cli::cli_progress_bar("Fitting curves (Exponential 2)", total=length(species_list))
+for (ii in 1:length(species_list)){
+  subset(cebe, cebe$to_split == species_list[ii], select =c(1:dim(cebe)[2])) -> data_by_sp
+  define_parsE2(data_by_sp) -> par_estimates
+  parsE2=par_estimates[[1]]
+  par_loE2=par_estimates[[2]]
+  par_highE2=par_estimates[[3]]
+  Exponential2_fits = fit_nonlinear(data_by_sp,  parsE2, par_loE2, par_highE2, model_type= "exp2", plot=T, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+  #########Update from Megan: this fit returns NaN (not a number) or "N/A" instead of NA at times (probably when C is very small),
+  ####and this converts everything else in the modelfitting_results columns to NA-
+  ###this replaces the NaNs with -999, so they'll be easy to find
+  Exponential2_fits[which(is.na(Exponential2_fits)== TRUE)] = -999
+  Exponential2_fits[which(Exponential2_fits== "N/A")] = -999
+
+  rbind(modelfitting_results_exp2, as.data.frame(Exponential2_fits))-> modelfitting_results_exp2
+ # cli::cli_progress_update()
+}
+
+#dev.off()
+
+modelfitting_results_exp2$psi_k20<- log(0.8- modelfitting_results_exp2$C.C/modelfitting_results_exp2$A.A)/(-modelfitting_results_exp2$B.B)
+modelfitting_results_exp2$psi_k50<- log(0.5- modelfitting_results_exp2$C.C/modelfitting_results_exp2$A.A)/(-modelfitting_results_exp2$B.B)
+modelfitting_results_exp2$psi_k80<- log(0.2- modelfitting_results_exp2$C.C/modelfitting_results_exp2$A.A)/(-modelfitting_results_exp2$B.B)
+modelfitting_results_exp2$psi_k95<- log(0.05- modelfitting_results_exp2$C.C/modelfitting_results_exp2$A.A)/(-modelfitting_results_exp2$B.B)
+
+# PX values with max at 0.1 MPa
+modelfitting_results_exp2$gmax_at0.1 <- modelfitting_results_exp2$C.C+(modelfitting_results_exp2$A.A * exp(-modelfitting_results_exp2$B.B*0.1))
+modelfitting_results_exp2$psi_k20_at0.1<- -((log(((0.8*modelfitting_results_exp2$gmax_at0.1)-modelfitting_results_exp2$C.C)/modelfitting_results_exp2$A.A))/(modelfitting_results_exp2$B.B))
+modelfitting_results_exp2$psi_k50_at0.1<- -((log(((0.5*modelfitting_results_exp2$gmax_at0.1)-modelfitting_results_exp2$C.C)/modelfitting_results_exp2$A.A))/(modelfitting_results_exp2$B.B))
+modelfitting_results_exp2$psi_k80_at0.1<- -((log(((0.2*modelfitting_results_exp2$gmax_at0.1)-modelfitting_results_exp2$C.C)/modelfitting_results_exp2$A.A))/(modelfitting_results_exp2$B.B))
+modelfitting_results_exp2$psi_k95_at0.1<- -((log(((0.05*modelfitting_results_exp2$gmax_at0.1)-modelfitting_results_exp2$C.C)/modelfitting_results_exp2$A.A))/(modelfitting_results_exp2$B.B))
+
+```
+
+### Model selection with `fx_select()`
+
+Once parameters for each model type are created for each species, we select the best fitting model by lowest corrected AIC (AICc). Sometimes the fits do not match the data well or in ways that are questionable physiologically (i.e., the line drawn is below the points and skirt extreme low conductance values before $\Psi_{leaf}$ = -1 MPa. This is a key reason to **plot** the data in the preceding steps. One justification for substituting another model type for the lower AICc model is if the replacement is within 2 AICc units. Before bootstrapping confidence intervals one may remove the observations from the `mod_bestfit` object created below. and replace them with the equivalent rows in the appropriate model data.frame. 
+
+```{r model-selection}
+
+#rename files for concision and legibility
+df_lin<-modelfitting_results_linear
+df_sig<-modelfitting_results_sigmoidal
+df_log<-modelfitting_results_logistic
+df_exp1<-modelfitting_results_exp1
+df_exp2<-modelfitting_results_exp2
+
+mod_bestfit_temp<-fx_select(df_lin, df_log, df_sig, df_exp1, df_exp2)#produce df with the best model fit for each species
+
+if(require("dplyr")){
+mod_bestfit<-mod_bestfit_temp%>%
+  dplyr::mutate_at(3:26, as.numeric)
+}
+```
+
+### Bootstrapping PX
+
+To bootstrap confidence intervals, we use the `bootPX()` function. This function takes the best fitting model chosen by the lowest AICc values across the 5 model types. The function takes each parameter estimate for each species and its error value and samples from the normal distribution constructed from the estimate and its metric of dispersion. The function used in the model fitting, `anneal()` creates "standard errors" from the square root of the hessian matrices for each modelled function parameter. The square root of hessian matrices is the standard deviation of the estimate. Therefore, it is used as such when constructing the distribution for resampling. Future renditions of this may utilize the native function bootstrapping function in R.
+
+#### For more information: 
+
+See here for more information about the annealing function and how it works: [https://www.rdocumentation.org/packages/likelihood/versions/1.7/topics/Simulated%20Annealing%20Algorithm](https://www.rdocumentation.org/packages/likelihood/versions/1.7/topics/Simulated%20Annealing%20Algorithm`)
+
+The hessian matrix information from within the function itself is here: <https://github.com/cran/likelihood/blob/master/R/anneal.R.> See lines 742-797 specifically within the code for where it is calculated.
+
+```{r bootstrap-confidence}
+# Bootstrapping Psi_KXX ---------------------------------------------------
+ 
+#standard error function
+se<-function(x){
+  sd(x, na.rm = T)/sqrt(length(x))# specifying na.rm=T because sometimes the predicted parameters estimate negative values and log(negative #)=NA
+}
+
+output_boot <-
+  data.frame(
+    species = character(),
+    pred_mean = numeric(),
+    pred_median = numeric(),
+    pred_se = numeric(),
+    conf_low = numeric(),
+    conf_high = numeric()
+  )
+
+alpha=0.05
+
+set.seed(1994) #  For reproducibility
+
+for( i in 1:dim(mod_bestfit)[1]){
+  
+  suppressWarnings(boot_vals<-bootPX(mod_bestfit,
+                    fx_type=mod_bestfit[i,"data.type"], 
+                    px=0.5)%>%unlist())# suppressing warnings for the NAs that are produced
+  
+  boot_mean<-mean(boot_vals, na.rm=T)# specifying na.rm=T because sometimes the predicted parameters estimate negative values and log(negative #)=NA
+  
+  boot_se<-se(boot_vals)
+  
+  boot_median<-median(boot_vals,na.rm = T)# specifying na.rm=T because sometimes the predicted parameters estimate negative values and log(negative #)=NA
+  #determine confidence intervals
+  deg_of_freedom= length(boot_vals)
+  t_score=qt(p=alpha/2, df=deg_of_freedom, lower.tail = F)
+  
+  margin_error<-t_score*boot_se
+  
+  conf.low<-mod_bestfit[i,"psi_k50"]-margin_error # using the predicted pX value to make the error make sense
+  conf.high<-mod_bestfit[i,"psi_k50"]+margin_error
+  
+  output_boot[i,1]<-mod_bestfit[i,"species"]
+  output_boot[i,2]<-boot_mean
+  output_boot[i,3]<-boot_median
+  output_boot[i,4]<-boot_se
+  output_boot[i,5]<-conf.low
+  output_boot[i,6]<-conf.high
+}
+
+output_boot
+```
+
