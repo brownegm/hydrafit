@@ -38,30 +38,30 @@ names(hear_efm)<-c("psi", "kl")
 # create each df for CEBE alone and modify so psi is negative and there is
 # a column for species name before psi column
 cebe_efm <- cebe_efm%>%
-  mutate(psi = psi*-1)%>%
+  #mutate(psi = psi*-1)%>%
   mutate(species = rep("cebe"), .before = psi)
 
 heca_efm <- heca_efm%>%
-  mutate(psi = psi*-1)%>%
+  #mutate(psi = psi*-1)%>%
   mutate(species = rep("heca"), .before = psi)
 
 quag_efm <- quag_efm%>%
-  mutate(psi = psi*-1)%>%
+  #mutate(psi = psi*-1)%>%
   mutate(species = rep("quag"), .before = psi)
 
 laca_efm <- laca_efm%>%
-  mutate(psi = psi*-1)%>%
+  #mutate(psi = psi*-1)%>%
   mutate(species = rep("laca"), .before = psi)
 
 hear_efm <- hear_efm%>%
-  mutate(psi = psi*-1)%>%
+  #mutate(psi = psi*-1)%>%
   mutate(species = rep("hear"), .before = psi)
 
 # check the changes
 head(cebe_efm)
 
 # plot to make sure
-plot(cebe_efm$kl~cebe_efm$psi, xlim=c(0,-7))
+plot(cebe_efm$kl~cebe_efm$psi)
 
 ## combine all dataframes into one for multi-species comparisons
 

@@ -48,7 +48,21 @@ bootPX<-function(df,
 
     }
 
-  if(fx_with_param3==T & fx_with_A==T){#exponential2
+
+  if(fx_with_param3==F & fx_with_A==T){# linear
+
+    param_samples <- lapply(c(1:sims), #create 1000 samples of paired values
+
+                            function(x){
+
+                              lapply(1, function(y) c(sample(rnorm(1000, A, A.sd), size=1,replace=T),#sample for A
+                                                      sample(rnorm(1000, B, B.sd), size=1,replace=T) #sample for B
+                                                      ))
+
+                            })
+
+
+  }else if(fx_with_param3==T & fx_with_A==T){#exponential2
 
     param_samples <- lapply(c(1:sims), #create 1000 samples of paired values
 
@@ -86,8 +100,8 @@ bootPX<-function(df,
       #Sample parameters and bootstrap PX(P50 here)
       if(fx_type=="Linear"){
 
-        cat("Check data. Linear is rarely the best fit.")
-        ## df$psi_k50<- (px-1)*(-df$A.A)*-1/(df$B.B)
+        #cat("Check data. Linear is rarely the best fit.")
+       psi_px[i] <- ((px-1)-param_samples[[i]][[1]][1])/(param_samples[[i]][[1]][2])
 
       }else if(fx_type=="exp"){
 
