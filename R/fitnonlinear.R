@@ -35,7 +35,7 @@ fit_nonlinear <-
            par_hi1,
            plot = F, ...) {
 
-  mod<- ifelse(model_type=="log", Logistic,
+  mod <- ifelse(model_type=="log", Logistic,
                         ifelse(model_type=="exp", Exponential,
                                ifelse(model_type=="exp2",Exponential2,
                                       ifelse(model_type=="sig", Sigmoidal))))
