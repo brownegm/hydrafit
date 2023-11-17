@@ -1,12 +1,16 @@
-#' Title
+#' psiPX: Estimate plrc at a given maximum conductance
 #'
-#' @param fx_type
+#' @description
+#' Creates a function that estimates the percent loss in conductance assuming maximum conductance at a chosen leaf water potential.
+#' @details The functions within the functional are anonymous themselves, hence the "\(params)" structure.
 #'
-#' @return
+#' @param fx_type Function type. See ?Exponential for function options.
 #'
-#' @examples
+#' @return Returns a function which takes model parameters,"px", and "max_cond_at" as parameters.
+#'
 
 psiPx <- function(fx_type = character()) {
+
   if (fx_type == "Linear") {
     \(A, B, px = 0.5, max_cond_at = 0) {
       max_c <- (B * max_cond_at) + A
