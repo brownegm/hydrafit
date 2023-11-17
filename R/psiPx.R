@@ -8,10 +8,12 @@
 #'
 #' @return Returns a function which takes model parameters,"px", and "max_cond_at" as parameters.
 #'
+#' @noRd
 
 psiPx <- function(fx_type = character()) {
 
   if (fx_type == "Linear") {
+
     \(A, B, px = 0.5, max_cond_at = 0) {
       max_c <- (B * max_cond_at) + A
 

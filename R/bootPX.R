@@ -62,7 +62,7 @@ bootPX<-function(df,
                             })
 
 
-  }else (fx_with_param3==T){#exponential2, logistic, and sigmoidal
+  }else{#exponential2, logistic, and sigmoidal
 
     param_samples <- lapply(c(1:sims), #create 1000 samples of paired values
 
@@ -76,20 +76,20 @@ bootPX<-function(df,
 
   }
 
-  psi_px_boot <- psiPx(fx_type=fx_type)
+  psi_px_boot <- hydrafit:::psiPx(fx_type=fx_type)
 
     for(i in 1:sims){# this is a lot to look at!!! Only way to index this list of lists since unlist makes this unusable
 
       if (fx_with_param3==T){
 
-        psi_px <- psi_px_boot(A=param_samples[[i]][[1]][1],
+        psi_px[i] <- psi_px_boot(A=param_samples[[i]][[1]][1],
                               B=param_samples[[i]][[1]][2],
                               C=param_samples[[i]][[1]][3],
                               px = px, max_cond_at= psi_max)
 
       }else{
 
-        psi_px <- psi_px_boot(A=param_samples[[i]][[1]][1],
+        psi_px[i] <- psi_px_boot(A=param_samples[[i]][[1]][1],
                               B=param_samples[[i]][[1]][2],
                               px = px, max_cond_at= psi_max)
 

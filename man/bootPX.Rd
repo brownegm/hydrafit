@@ -4,7 +4,7 @@
 \alias{bootPX}
 \title{Tool for estimating confidence intervals for percent loss in conductance.}
 \usage{
-bootPX(df, fx_type = character(), px = 0.5, sims = 1000)
+bootPX(df, fx_type = character(), px = 0.5, sims = 1000, psi_max = numeric())
 }
 \arguments{
 \item{df}{input data frame containing best fit models, parameter estimates and their SDs}
