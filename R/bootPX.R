@@ -25,13 +25,14 @@
 bootPX<-function(df,
                  fx_type=character(),
                  px=0.5,
-                 sims=1000){
+                 sims=1000,
+                 psi_max=numeric()){
 
   psi_px<-list()
 
   #check conditions
   fx_with_param3<-fx_type%in%c("exp2", "log", "sig")
-  fx_with_A<-fx_type%in%c("exp2","Linear")
+  #fx_with_A<-fx_type%in%c("exp2","Linear")
 
   #define model parameters
 
@@ -48,8 +49,7 @@ bootPX<-function(df,
 
     }
 
-
-  if(fx_with_param3==F & fx_with_A==T){# linear
+  if(fx_with_param3==F){# linear and exponential
 
     param_samples <- lapply(c(1:sims), #create 1000 samples of paired values
 
@@ -62,7 +62,7 @@ bootPX<-function(df,
                             })
 
 
-  }else if(fx_with_param3==T & fx_with_A==T){#exponential2
+  }else (fx_with_param3==T){#exponential2, logistic, and sigmoidal
 
     param_samples <- lapply(c(1:sims), #create 1000 samples of paired values
 
@@ -70,55 +70,53 @@ bootPX<-function(df,
 
                               lapply(1, function(y) c(sample(rnorm(1000, A, A.sd), size=1,replace=T),#sample for A
                                                       sample(rnorm(1000, B, B.sd), size=1,replace=T), #sample for B
-                                                      sample(rnorm(1000, param_3, param_3.sd), size=1,replace=T)))#sample for Xo
+                                                      sample(rnorm(1000, param_3, param_3.sd), size=1,replace=T)))#sample for Xo or C
 
                             })
 
-  }else if( fx_with_param3==T & fx_with_A==F){#logistic, sigmoidal
-
-    param_samples <- lapply(c(1:sims), #create 1000 samples of paired values
-
-                            function(x){
-
-                              lapply(1, function(y) c(sample(rnorm(1000, B, B.sd), size=1,replace=T), #sample for B
-                                                      sample(rnorm(1000, param_3, param_3.sd), size=1,replace=T)))#sample for Xo
-
-                            })
-  }else if(fx_with_param3==F & fx_with_A==F){#this is the case for exponential 1
-
-    param_samples <- lapply(c(1:sims), #create 1000 samples of paired values
-
-                            function(x){
-
-                              lapply(1, function(y) c(sample(rnorm(1000, B, B.sd), size=1,replace=T))) #sample for B
-
-                            })
   }
+
+  psi_px_boot <- psiPx(fx_type=fx_type)
 
     for(i in 1:sims){# this is a lot to look at!!! Only way to index this list of lists since unlist makes this unusable
 
-      #Sample parameters and bootstrap PX(P50 here)
-      if(fx_type=="Linear"){
+      if (fx_with_param3==T){
 
-        #cat("Check data. Linear is rarely the best fit.")
-       psi_px[i] <- ((px-1)-param_samples[[i]][[1]][1])/(param_samples[[i]][[1]][2])
+        psi_px <- psi_px_boot(A=param_samples[[i]][[1]][1],
+                              B=param_samples[[i]][[1]][2],
+                              C=param_samples[[i]][[1]][3],
+                              px = px, max_cond_at= psi_max)
 
-      }else if(fx_type=="exp"){
+      }else{
 
-        psi_px[i]<- log(px)/(-param_samples[[i]][[1]][1])
+        psi_px <- psi_px_boot(A=param_samples[[i]][[1]][1],
+                              B=param_samples[[i]][[1]][2],
+                              px = px, max_cond_at= psi_max)
 
-      }else if (fx_type=="exp2"){
+        }
 
-        psi_px[i]<- log(((px)*(-param_samples[[i]][[1]][3]+param_samples[[i]][[1]][1]))/param_samples[[i]][[1]][1])/(-param_samples[[i]][[1]][2])
-
-      }else if (fx_type=="log"){
-
-        psi_px[i]<- param_samples[[i]][[1]][2]*(1/px-1)^(1/param_samples[[i]][[1]][1])
-
-      }else{#if sigmoidal
-
-        psi_px[i]<- param_samples[[i]][[1]][2] - param_samples[[i]][[1]][1]*log(1/px -1)
-      }#end else
+      # #Sample parameters and bootstrap PX(P50 here)
+      # if(fx_type=="Linear"){
+      #
+      #   #cat("Check data. Linear is rarely the best fit.")
+      #  psi_px[i] <- ((px-1)-param_samples[[i]][[1]][1])/(param_samples[[i]][[1]][2])
+      #
+      # }else if(fx_type=="exp"){
+      #
+      #   psi_px[i]<- log(px)/(-param_samples[[i]][[1]][1])
+      #
+      # }else if (fx_type=="exp2"){
+      #
+      #   psi_px[i]<- log(((px)*(-param_samples[[i]][[1]][3]+param_samples[[i]][[1]][1]))/param_samples[[i]][[1]][1])/(-param_samples[[i]][[1]][2])
+      #
+      # }else if (fx_type=="log"){
+      #
+      #   psi_px[i]<- param_samples[[i]][[1]][2]*(1/px-1)^(1/param_samples[[i]][[1]][1])
+      #
+      # }else{#if sigmoidal
+      #
+      #   psi_px[i]<- param_samples[[i]][[1]][2] - param_samples[[i]][[1]][1]*log(1/px -1)
+      # }#end else
 
     }#end for loop
 return(psi_px)
