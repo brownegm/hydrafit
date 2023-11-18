@@ -93,30 +93,7 @@ bootPX<-function(df,
                               B=param_samples[[i]][[1]][2],
                               px = px, max_cond_at= psi_max)
 
-        }
-
-      # #Sample parameters and bootstrap PX(P50 here)
-      # if(fx_type=="Linear"){
-      #
-      #   #cat("Check data. Linear is rarely the best fit.")
-      #  psi_px[i] <- ((px-1)-param_samples[[i]][[1]][1])/(param_samples[[i]][[1]][2])
-      #
-      # }else if(fx_type=="exp"){
-      #
-      #   psi_px[i]<- log(px)/(-param_samples[[i]][[1]][1])
-      #
-      # }else if (fx_type=="exp2"){
-      #
-      #   psi_px[i]<- log(((px)*(-param_samples[[i]][[1]][3]+param_samples[[i]][[1]][1]))/param_samples[[i]][[1]][1])/(-param_samples[[i]][[1]][2])
-      #
-      # }else if (fx_type=="log"){
-      #
-      #   psi_px[i]<- param_samples[[i]][[1]][2]*(1/px-1)^(1/param_samples[[i]][[1]][1])
-      #
-      # }else{#if sigmoidal
-      #
-      #   psi_px[i]<- param_samples[[i]][[1]][2] - param_samples[[i]][[1]][1]*log(1/px -1)
-      # }#end else
+      }
 
     }#end for loop
 return(psi_px)
