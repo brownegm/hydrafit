@@ -35,7 +35,7 @@ data$to_split <- paste(data$species, data$data.type)
 # declare the data frame to store the results
 modelfitting_results_linear <-
   data.frame(
-    Species = as.character(),
+    species = as.character(),
     data.type = as.character(),
     A = numeric(),
     B = numeric(),
@@ -54,7 +54,7 @@ modelfitting_results_linear <-
   )
 modelfitting_results_logistic <-
   data.frame(
-    Species = as.character(),
+    species = as.character(),
     data.type = as.character(),
     A = numeric(),
     B = numeric(),
@@ -73,7 +73,7 @@ modelfitting_results_logistic <-
   )
 modelfitting_results_sigmoidal <-
   data.frame(
-    Species = as.character(),
+    species = as.character(),
     data.type = as.character(),
     A = numeric(),
     B = numeric(),
@@ -92,7 +92,7 @@ modelfitting_results_sigmoidal <-
   )
 modelfitting_results_exp1 <-
   data.frame(
-    Species = as.character(),
+    species = as.character(),
     data.type = as.character(),
     A = numeric(),
     B = numeric(),
@@ -111,7 +111,7 @@ modelfitting_results_exp1 <-
   )
 modelfitting_results_exp2 <-
   data.frame(
-    Species = as.character(),
+    species = as.character(),
     data.type = as.character(),
     A = numeric(),
     B = numeric(),
