@@ -2,7 +2,7 @@
 title: "How to fit and bootstrap hydraulics parameters (multiple)"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{How to fit hydraulics parameters (multiple)}
+  %\VignetteIndexEntry{How to fit and bootstrap hydraulics parameters (multiple)}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
