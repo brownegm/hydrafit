@@ -14,6 +14,8 @@ bootPX(df, fx_type = character(), px = 0.5, sims = 1000, psi_max = numeric())
 \item{px}{Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)}
 
 \item{sims}{Number of simulated values to generate}
+
+\item{psi_max}{estimate px based on what value of psi}
 }
 \value{
 Returns a list of simulations predicted PX values the length of the number `sims`.

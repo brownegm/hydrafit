@@ -15,6 +15,7 @@
 #' @param fx_type Best fitting model
 #' @param px Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)
 #' @param sims Number of simulated values to generate
+#' @param psi_max estimate px based on what value of psi
 #'
 #' @return Returns a list of simulations predicted PX values the length of the number `sims`.
 #'
@@ -28,7 +29,7 @@ bootPX<-function(df,
                  sims=1000,
                  psi_max=numeric()){
 
-  psi_px<-list()
+  psi_px<-vector()
 
   #check conditions
   fx_with_param3<-fx_type%in%c("exp2", "log", "sig")
@@ -70,26 +71,30 @@ bootPX<-function(df,
 
                               lapply(1, function(y) c(sample(rnorm(1000, A, A.sd), size=1,replace=T),#sample for A
                                                       sample(rnorm(1000, B, B.sd), size=1,replace=T), #sample for B
-                                                      sample(rnorm(1000, param_3, param_3.sd), size=1,replace=T)))#sample for Xo or C
+                                                      sample(rnorm(1000, param_3, param_3.sd), size=1, replace=T)))#sample for Xo or C
 
                             })
 
   }
 
-  psi_px_boot <- hydrafit:::psiPx(fx_type=fx_type)
+  psi_px_boot <- psiPx(fx_type=fx_type)
+
+  if (fx_with_param3==T){
 
     for(i in 1:sims){# this is a lot to look at!!! Only way to index this list of lists since unlist makes this unusable
 
-      if (fx_with_param3==T){
 
         psi_px[i] <- psi_px_boot(A=param_samples[[i]][[1]][1],
                               B=param_samples[[i]][[1]][2],
                               C=param_samples[[i]][[1]][3],
-                              px = px, max_cond_at= psi_max)
+                              px = px, max_cond_at = psi_max)
 
+    }
       }else{
 
-        psi_px[i] <- psi_px_boot(A=param_samples[[i]][[1]][1],
+    for(i in 1:sims){
+
+      psi_px[i] <- psi_px_boot(A=param_samples[[i]][[1]][1],
                               B=param_samples[[i]][[1]][2],
                               px = px, max_cond_at= psi_max)
 

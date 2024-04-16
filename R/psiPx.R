@@ -3,7 +3,7 @@
 #' @description
 #' Creates a function that estimates the percent loss in conductance assuming maximum conductance at a chosen leaf water potential.
 #' @details The functions within the functional are anonymous themselves, hence the "\(params)" structure.
-#'
+#' @keywords internal
 #' @param fx_type Function type. See ?Exponential for function options.
 #'
 #' @return Returns a function which takes model parameters,"px", and "max_cond_at" as parameters.

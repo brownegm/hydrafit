@@ -359,9 +359,10 @@ set.seed(1994) #  For reproducibility
 
 for( i in 1:dim(mod_bestfit)[1]){
   
-  boot_vals<-bootPX(mod_bestfit,
+  boot_vals_temp<-bootPX(mod_bestfit,
                     fx_type=mod_bestfit[i,"data.type"], 
-                    px=0.5, psi_max = 0.1)%>%unlist()# suppressing warnings here can help if errors resulting from NAs stop you from moving forward. 
+                    px=0.5, psi_max = 0.1)# suppressing warnings here can help if errors resulting from NAs stop you from moving forward. 
+  boot_vals <- unlist(boot_vals_temp)
   
   boot_mean<-mean(boot_vals, na.rm=T) # this values *is not * the same are the actual psi at X% loss in hydraulic conductance 
   

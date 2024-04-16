@@ -355,11 +355,12 @@ alpha=0.05
 
 set.seed(1994) #  For reproducibility
 
-for( i in 1:dim(mod_bestfit)[1]){
   
-  suppressWarnings(boot_vals<-bootPX(mod_bestfit,
-                    fx_type=mod_bestfit[i,"data.type"], 
-                    px=0.5)%>%unlist())# suppressing warnings for the NAs that are produced
+  boot_vals_temp<-bootPX(mod_bestfit,
+                    fx_type=mod_bestfit[1,"data.type"], 
+                    px=0.5, psi_max = 0.1)# suppressing warnings for the NAs that are produced
+  
+  boot_vals <- unlist(boot_vals_temp)
   
   boot_mean<-mean(boot_vals, na.rm=T)# specifying na.rm=T because sometimes the predicted parameters estimate negative values and log(negative #)=NA
   
@@ -372,16 +373,16 @@ for( i in 1:dim(mod_bestfit)[1]){
   
   margin_error<-t_score*boot_se
   
-  conf.low<-mod_bestfit[i,"psi_k50"]-margin_error # using the predicted pX value to make the error make sense
-  conf.high<-mod_bestfit[i,"psi_k50"]+margin_error
+  conf.low<-mod_bestfit[1,"psi_k50"]-margin_error # using the predicted pX value to make the error make sense
+  conf.high<-mod_bestfit[1,"psi_k50"]+margin_error
   
-  output_boot[i,1]<-mod_bestfit[i,"species"]
-  output_boot[i,2]<-boot_mean
-  output_boot[i,3]<-boot_median
-  output_boot[i,4]<-boot_se
-  output_boot[i,5]<-conf.low
-  output_boot[i,6]<-conf.high
-}
+  output_boot[1,1]<-mod_bestfit[1,"species"]
+  output_boot[1,2]<-boot_mean
+  output_boot[1,3]<-boot_median
+  output_boot[1,4]<-boot_se
+  output_boot[1,5]<-conf.low
+  output_boot[1,6]<-conf.high
+
 
 output_boot
 ```
