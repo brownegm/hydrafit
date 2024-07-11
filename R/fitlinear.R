@@ -17,7 +17,9 @@
 
 fit_linear <- function(input_df, model_type=hydrafit::Linear(), plot=F, ...) {
 
-  model_type = model_type
+  #model_type = model_type
+  df_names <- names(input_df)
+  stopifnot("Leaf conductance variable must be defined as 'kl' in input_df" = "kl" %in% df_names)
 
   var <- list(psi="psi",
               x="kl",
@@ -31,10 +33,10 @@ fit_linear <- function(input_df, model_type=hydrafit::Linear(), plot=F, ...) {
               sd = 1)
   par_lo1= list(A=summary(fita)$coeff[1,1]*0.1,
                 B =summary(fita)$coeff[2,1]*2,
-                sd =0.005)
+                sd = 0.005)
   par_hi1= list(A=summary(fita)$coeff[1,1]*2,
                 B =summary(fita)$coeff[2,1]*0.1,
-                sd =20)
+                sd = 20)
   #########Update from Megan: I decreased the sd of the par_lo1, linear fits now match the lm results
 
   res<-anneal(model = model_type, par= pars, source_data = input_df,
