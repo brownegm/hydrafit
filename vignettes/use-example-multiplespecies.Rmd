@@ -183,7 +183,7 @@ for (ii in 1:length(species_list)){
   parsL=par_estimates[[1]]
   par_loL=par_estimates[[2]]
   par_highL=par_estimates[[3]]
-  Logistic_fits = fit_nonlinear(data_by_sp, parsL, par_loL, par_highL, model_type = "log", plot=F,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+  Logistic_fits = fit_nonlinear(data_by_sp, parsL, par_loL, par_highL, model_type = "log", plot=T,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
   rbind(modelfitting_results_logistic, as.data.frame(Logistic_fits))-> modelfitting_results_logistic
  #cli::cli_progress_update()
 }
@@ -214,7 +214,7 @@ for (ii in 1:length(species_list)){
   parsS=par_estimates[[1]]
   par_loS=par_estimates[[2]]
   par_highS=par_estimates[[3]]
-  Sigmoidal_fits = fit_nonlinear(data_by_sp, parsS, par_loS, par_highS, model_type= "sig", plot=F,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+  Sigmoidal_fits = fit_nonlinear(data_by_sp, parsS, par_loS, par_highS, model_type= "sig", plot=T,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
   rbind(modelfitting_results_sigmoidal, as.data.frame(Sigmoidal_fits))-> modelfitting_results_sigmoidal
   #cli::cli_progress_update()
 }
@@ -244,7 +244,7 @@ for (ii in 1:length(species_list)){
   parsE=par_estimates[[1]]
   par_loE=par_estimates[[2]]
   par_highE=par_estimates[[3]]
-  Exponential_fits = fit_nonlinear(data_by_sp, parsE, par_loE, par_highE, model_type = "exp", plot=F, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+  Exponential_fits = fit_nonlinear(data_by_sp, parsE, par_loE, par_highE, model_type = "exp", plot=T, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
   Exponential_fits$D.NA<- NA 
   Exponential_fits$sterror.NA <- NA
   rbind(modelfitting_results_exp1, as.data.frame(Exponential_fits))-> modelfitting_results_exp1
@@ -276,7 +276,7 @@ for (ii in 1:length(species_list)){
   parsE2=par_estimates[[1]]
   par_loE2=par_estimates[[2]]
   par_highE2=par_estimates[[3]]
-  Exponential2_fits = fit_nonlinear(data_by_sp,  parsE2, par_loE2, par_highE2, model_type= "exp2", plot=F, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+  Exponential2_fits = fit_nonlinear(data_by_sp,  parsE2, par_loE2, par_highE2, model_type= "exp2", plot=T, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
   #########Update from Megan: this fit returns NaN (not a number) or "N/A" instead of NA at times (probably when C is very small),
   ####and this converts everything else in the modelfitting_results columns to NA-
   ###this replaces the NaNs with -999, so they'll be easy to find
