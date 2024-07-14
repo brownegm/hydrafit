@@ -29,6 +29,8 @@ bootPX<-function(df,
                  sims=1000,
                  psi_max=numeric()){
 
+  if(length(psi_max)<1){ stop("Value for psi_max must be provided.")}
+
   psi_px<-vector()
 
   #check conditions
@@ -37,13 +39,13 @@ bootPX<-function(df,
 
   #define model parameters
 
-  #define A, B and param_3(C or Xo); named 'param_3' because it can be either but for the sake of boot not important until output maybe
+  #define A, B and param_3(C or Xo); named 'param_3' because it can be either C or Xo but for the sake of boot not important until output
 
   A<-df[,"A"]; B<-df[,"B"] #parameter estimates
 
   A.sd<-df[,"sterror1"];B.sd<-df[,"sterror2"]#sd of parameter estimates
 
-  if(fx_with_param3==T){#only create the third parameter if test_fx_type==TRUE
+  if(fx_with_param3==T){#only create the third parameter if fx_typein fx_with_param3
 
     param_3<-df[,"C"]
     param_3.sd<-df[,"sterror3"]

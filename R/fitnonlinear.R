@@ -121,7 +121,7 @@ fit_nonlinear <-
 
       lines(for_plotting[, 1], for_plotting[, 2], col = "blue")
 
-      title(paste(input_df[1, 1], input_df[1, 2]))
+      title(paste(input_df[1, 1], input_df[1, 2], model_type))
 
     }
     return(parvecLog)
