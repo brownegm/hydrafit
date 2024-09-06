@@ -8,13 +8,14 @@ Description: The functions provided in this package used for estimating hydrauli
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-Imports:
 Depends: 
     likelihood,
     R (>= 3.5)
 RoxygenNote: 7.3.1
 Suggests: 
     knitr,
-    rmarkdown, 
-    dplyr
+    rmarkdown,
+    dplyr,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
+Config/testthat/edition: 3
