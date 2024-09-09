@@ -32,3 +32,4 @@ modelfitting_results_linear <-
   )
 
 #run all on the data linear should be the bestfit
+

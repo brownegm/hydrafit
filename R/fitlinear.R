@@ -54,23 +54,35 @@ fit_linear <- function(input_df, model_type=hydrafit::Linear(), plot=F, ...) {
 
   rsq <- res$R2
 
-  sterror<- res$std_errs#the function anneal calculates the "standard errors" as
+  sterror <- res$std_errs#the function anneal calculates the "standard errors" as
   #a the diagonal of the variance covariance matrix.Is this not then just the standard deviations
   #of the function's predicted parameters? See here:https://rdrr.io/cran/likelihood/src/R/anneal.R
 
   N <- length(res$source_data$kl)
 
-  gmax<-res$best_pars$A
+  max_cond <- res$best_pars$A
 
-  parvecLog<-c(Species= paste(input_df[1,1]),
+  parvecLog<-structure(c(species = paste(input_df[1,1]),
                data.type="Linear",
-               A = res$best_pars[1], B = res$best_pars[2], C = res$best_pars[3], D = res$best_pars[4],
-               loglikeli = res$max_likeli, rsq = rsq,
+               A = res$best_pars[1],
+               B = res$best_pars[2],
+               C = res$best_pars[3],
+               D = res$best_pars[4],
+               loglikeli = res$max_likeli,
+               rsq = rsq,
                slope = slope,
-               AIC = AIC, AICcorr = AICcorr,
-               sterror_1 = sterror[1], sterror = sterror[2], sterror = sterror[3], sterror = sterror[4],
+               AIC = AIC,
+               AICcorr = AICcorr,
+               sterrorA = sterror[1],
+               sterrorB = sterror[2],
+               sterrorC = sterror[3],
+               sterrorD = sterror[4],
                N = N,
-               gmax=gmax)
+               gmax=gmax),
+               # attributes
+               mod.type = "linear",
+               class = "modfit"
+               )
 
   if(plot==T){
 
