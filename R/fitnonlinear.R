@@ -24,21 +24,17 @@
 #' @export
 
 
-fit_nonlinear <-
-  function(input_df,
-           model_type,
-           plot = F, ...) {
+fit_nonlinear <- function(input_df,
+                          model_type,
+                          plot = F, ...) {
 
   mod <- ifelse(model_type=="log", Logistic,
                         ifelse(model_type=="exp", Exponential,
                                ifelse(model_type=="exp2",Exponential2,
                                       ifelse(model_type=="sig", Sigmoidal))))
 
-  par_estimates <- ifelse(model_type=="log", define_parsL(input_df),
-                         ifelse(model_type=="exp", define_parsE(input_df),
-                                ifelse(model_type=="exp2", define_parsE2(input_df),
-                                       ifelse(model_type=="sig", define_parsS(input_df)))))
-  print(par_estimates)
+  par_estimates <- define_pars(input_df, model_type = model_type)
+
   pars = par_estimates[[1]]
   pars_low_i = par_estimates[[2]]
   pars_high_i = par_estimates[[3]]
