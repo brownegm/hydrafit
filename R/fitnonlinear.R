@@ -4,9 +4,6 @@
 #'
 #' @param input_df input folder with kl and psi values
 #' @param model_type select appropriate model type here i.e., "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types
-#' @param pars1 parameters set based on values in input df. See R/defineparams.R for parameter definitions.
-#' @param par_lo1 parameter values set as lower bounds for estimates. See R/defineparams.R for parameter definitions.
-#' @param par_hi1 parameter values set as upper bounds for estimates.
 #' @param plot True or false for plotting model parameters
 #' @param ... Plotting parameters passed to \code{plot()} if plot=TRUE
 #'
@@ -30,15 +27,21 @@
 fit_nonlinear <-
   function(input_df,
            model_type,
-           pars1,
-           par_lo1,
-           par_hi1,
            plot = F, ...) {
 
   mod <- ifelse(model_type=="log", Logistic,
                         ifelse(model_type=="exp", Exponential,
                                ifelse(model_type=="exp2",Exponential2,
                                       ifelse(model_type=="sig", Sigmoidal))))
+
+  par_estimates <- ifelse(model_type=="log", define_parsL(input_df),
+                         ifelse(model_type=="exp", define_parsE(input_df),
+                                ifelse(model_type=="exp2", define_parsE2(input_df),
+                                       ifelse(model_type=="sig", define_parsS(input_df)))))
+  print(par_estimates)
+  pars = par_estimates[[1]]
+  pars_low_i = par_estimates[[2]]
+  pars_high_i = par_estimates[[3]]
 
     var <- list(
       psi = "psi",
@@ -47,18 +50,14 @@ fit_nonlinear <-
       log = TRUE
     )
 
-    pars = pars1
-    par_lo = par_lo1
-    par_hi = par_hi1
-
     res <-
       anneal(
         model = mod,
-        par = pars1,
+        par = pars,
         source_data = input_df,
         var = var,
-        par_lo = par_lo1,
-        par_hi = par_hi1,
+        par_lo = pars_low_i,
+        par_hi = pars_high_i,
         dep_var = "kl",
         pdf = dnorm,#pdf stands for probability density function
         max_iter = 5000,
@@ -72,45 +71,44 @@ fit_nonlinear <-
 
     #AIC formula: -2LL + 2*parameters (incl nuisance, i.e.,sd)
 
-    AIC <- res$aic
+    AIC <- res$aic|>as.numeric()
 
     #AICcorr formula: -2LL + (2*n*parameters (incl nuisance, i.e.,sd)/(n-parameters-1))
 
-    AICcorr <- res$aic_corr
+    AICcorr <- res$aic_corr|>as.numeric()
 
-    slope <- res$slope
+    slope <- res$slope|>as.numeric()
 
-    rsq <- res$R2
+    rsq <- res$R2|>as.numeric()
 
     sterror <- res$std_errs
 
     N <- length(res$source_data$kl)
 
-    gmax <- res$best_pars$A
+    max_cond <- res$best_pars$A|>as.numeric()
 
-    parvecLog <- structure(c(
-      Species = paste(input_df[1, 1]),
+    parvecLog <- structure(list(
+      species = paste(input_df[1, 1]),
       data.type = model_type,
-      A = res$best_pars[1],
-      B = res$best_pars[2],
-      C = res$best_pars[3],
-      D = res$best_pars[4],
+      A = res$best_pars[1]|>as.numeric(),
+      B = res$best_pars[2]|>as.numeric(),
+      C = res$best_pars[3]|>as.numeric(),
+      D = res$best_pars[4]|>as.numeric(),
       loglikeli = res$max_likeli,
       rsq = rsq,
       slope = slope,
       AIC = AIC,
       AICcorr = AICcorr,
-      sterror_1 = sterror[1],
-      sterror = sterror[2],
-      sterror = sterror[3],
-      sterror = sterror[4],
+      sterror_1 = sterror[1]|>as.numeric(),
+      sterror = sterror[2]|>as.numeric(),
+      sterror = sterror[3]|>as.numeric(),
+      sterror = sterror[4]|>as.numeric(),
       N = N,
-      gmax = gmax
-    ),
+      maxCond=max_cond),
     # attributes
-    mod.type = model_type,
-    class = "modfit"
+    mod.type = model_type
     )
+
     #plot the fit
 
     if (plot == T) {
