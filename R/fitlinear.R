@@ -19,7 +19,6 @@
 fit_linear <- function(input_df,
                        model_type=hydrafit::Linear,
                        plot=F,
-                       silent= F,
                        ...) {
 
   model_type = model_type
@@ -48,22 +47,22 @@ fit_linear <- function(input_df,
   )
   #########Update from Megan: I decreased the sd of the par_lo1, linear fits now match the lm results
 
-  res<-anneal(model = model_type, par= pars, source_data = input_df,
-              var = var, par_lo=par_lo1, par_hi= par_hi1, dep_var = "kl",
+  res<-anneal(model = model_type, par = pars, source_data = input_df,
+              var = var, par_lo = par_lo1, par_hi = par_hi1, dep_var = "kl",
               pdf = dnorm, max_iter=5000, show_display=F)
 
 
   #AIC formula: -2LL + 2*parameters (incl nuisance, i.e.,sd)
 
-  AIC<- res$aic
+  AIC<- res$aic|>as.numeric()
 
   #AICcorr formula: -2LL + (2*n*parameters (incl nuisance, i.e.,sd)/(n-parameters-1))
 
-  AICcorr <- res$aic_corr
+  AICcorr <- res$aic_corr|>as.numeric()
 
-  slope <-res$slope
+  slope <-res$slope|>as.numeric()
 
-  rsq <- res$R2
+  rsq <- res$R2|>as.numeric()
 
   sterror <- res$std_errs#the function anneal calculates the "standard errors" as
   #a the diagonal of the variance covariance matrix.Is this not then just the standard deviations
@@ -71,33 +70,33 @@ fit_linear <- function(input_df,
 
   N <- length(res$source_data$kl)
 
-  max_cond <- res$best_pars$A
+  max_cond <- res$best_pars$A|>as.numeric()
 
-  parvecLog<-structure(c(species = paste(input_df[1,1]),
-               data.type="Linear",
-               A = res$best_pars[[1]],
-               B = res$best_pars[[2]],
-               C = res$best_pars[[3]],
+  parvecLog<-structure(list(
+               species = paste(input_df[1,1]),
+               data.type = "Linear",
+               A = res$best_pars[[1]]|>as.numeric(),
+               B = res$best_pars[[2]]|>as.numeric(),
+               C = res$best_pars[[3]]|>as.numeric(),
                D = NA,
-               loglikeli = res$max_likeli,
+               loglikeli = res$max_likeli|>as.numeric(),
                rsq = rsq,
                slope = slope,
                AIC = AIC,
                AICcorr = AICcorr,
-               sterrorA = sterror[[1]],
-               sterrorB = sterror[[2]],
-               sterrorC = sterror[[3]],
+               sterrorA = sterror[[1]]|>as.numeric(),
+               sterrorB = sterror[[2]]|>as.numeric(),
+               sterrorC = sterror[[3]]|>as.numeric(),
                sterrorD = NA,
                N = N,
-               maxCond=max_cond),
+               maxCond=max_cond|>as.numeric()),
                # attributes
-               mod.type = "linear",
-               class = "modfit"
+               mod.type = "linear"
                )
 
   if(plot==T){
 
-    plot(res$source_data$psi, res$source_data$kl, ...)
+    plot(res$source_data$psi, res$source_data$kl)#, ...
 
     cbind(res$source_data$psi, res$source_data$predicted)-> for_plotting
 
