@@ -131,3 +131,17 @@ define_parsE2 <- function(input_df) {
     par_highE2
   ))
 }
+
+
+define_pars <- function(input_df, model_type){
+
+  par_fx <- ifelse(model_type=="log", define_parsL,
+                          ifelse(model_type=="exp", define_parsE,
+                                 ifelse(model_type=="exp2", define_parsE2,
+                                        ifelse(model_type=="sig", define_parsS))))
+
+  parameters <- par_fx(input_df)
+
+  return(parameters)
+
+}
