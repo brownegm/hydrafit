@@ -88,7 +88,7 @@ fit_nonlinear <-
 
     gmax <- res$best_pars$A
 
-    parvecLog <- c(
+    parvecLog <- structure(c(
       Species = paste(input_df[1, 1]),
       data.type = model_type,
       A = res$best_pars[1],
@@ -106,8 +106,11 @@ fit_nonlinear <-
       sterror = sterror[4],
       N = N,
       gmax = gmax
+    ),
+    # attributes
+    mod.type = model_type,
+    class = "modfit"
     )
-
     #plot the fit
 
     if (plot == T) {

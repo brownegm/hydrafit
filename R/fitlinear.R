@@ -5,6 +5,7 @@
 #' @param input_df Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations
 #' @param model_type Select appropriate model function. Here the default is linear
 #' @param plot True or false for plotting model parameters
+#' @param silent Suppress warnings from fit
 #' @param ... Additional plotting parameters if plot==T (e.g., xlab, ylab)
 #'
 #'
@@ -15,7 +16,11 @@
 #' @export fit_linear
 #'
 
-fit_linear <- function(input_df, model_type=hydrafit::Linear(), plot=F, ...) {
+fit_linear <- function(input_df,
+                       model_type=hydrafit::Linear,
+                       plot=F,
+                       silent= F,
+                       ...) {
 
   model_type = model_type
 
@@ -26,15 +31,21 @@ fit_linear <- function(input_df, model_type=hydrafit::Linear(), plot=F, ...) {
 
   lm(input_df$kl ~ input_df$psi)-> fita #a normal linear regression gave the best starting parameters
 
-  pars = list(A=summary(fita)$coeff[1,1],
-              B =summary(fita)$coeff[2,1],
-              sd = 1)
-  par_lo1= list(A=summary(fita)$coeff[1,1]*0.1,
-                B =summary(fita)$coeff[2,1]*2,
-                sd =0.005)
-  par_hi1= list(A=summary(fita)$coeff[1,1]*2,
-                B =summary(fita)$coeff[2,1]*0.1,
-                sd =20)
+  pars = list(
+    A = summary(fita)$coeff[1, 1],
+    B = summary(fita)$coeff[2, 1],
+    sd = 1
+    )
+  par_lo1 = list(
+    A = summary(fita)$coeff[1, 1] * 0.1,
+    B = summary(fita)$coeff[2, 1] * 2,
+    sd = 0.005
+  )
+  par_hi1 = list(
+    A = summary(fita)$coeff[1, 1] * 2,
+    B = summary(fita)$coeff[2, 1] * 0.1,
+    sd = 20
+  )
   #########Update from Megan: I decreased the sd of the par_lo1, linear fits now match the lm results
 
   res<-anneal(model = model_type, par= pars, source_data = input_df,
@@ -64,21 +75,21 @@ fit_linear <- function(input_df, model_type=hydrafit::Linear(), plot=F, ...) {
 
   parvecLog<-structure(c(species = paste(input_df[1,1]),
                data.type="Linear",
-               A = res$best_pars[1],
-               B = res$best_pars[2],
-               C = res$best_pars[3],
-               D = res$best_pars[4],
+               A = res$best_pars[[1]],
+               B = res$best_pars[[2]],
+               C = res$best_pars[[3]],
+               D = res$best_pars[[4]],
                loglikeli = res$max_likeli,
                rsq = rsq,
                slope = slope,
                AIC = AIC,
                AICcorr = AICcorr,
-               sterrorA = sterror[1],
-               sterrorB = sterror[2],
-               sterrorC = sterror[3],
-               sterrorD = sterror[4],
+               sterrorA = sterror[[1]],
+               sterrorB = sterror[[2]],
+               sterrorC = sterror[[3]],
+               sterrorD = sterror[[4]],
                N = N,
-               gmax=gmax),
+               maxCond=max_cond),
                # attributes
                mod.type = "linear",
                class = "modfit"
