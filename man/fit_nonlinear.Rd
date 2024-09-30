@@ -4,18 +4,12 @@
 \alias{fit_nonlinear}
 \title{Compute the best fit likelihood parameters for each species for each model type}
 \usage{
-fit_nonlinear(input_df, model_type, pars1, par_lo1, par_hi1, plot = F, ...)
+fit_nonlinear(input_df, model_type, plot = F, ...)
 }
 \arguments{
 \item{input_df}{input folder with kl and psi values}
 
 \item{model_type}{select appropriate model type here i.e., "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types}
-
-\item{pars1}{parameters set based on values in input df. See R/defineparams.R for parameter definitions.}
-
-\item{par_lo1}{parameter values set as lower bounds for estimates. See R/defineparams.R for parameter definitions.}
-
-\item{par_hi1}{parameter values set as upper bounds for estimates.}
 
 \item{plot}{True or false for plotting model parameters}
 

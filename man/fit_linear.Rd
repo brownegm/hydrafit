@@ -4,7 +4,7 @@
 \alias{fit_linear}
 \title{fit_linear}
 \usage{
-fit_linear(input_df, model_type = hydrafit::Linear(), plot = F, ...)
+fit_linear(input_df, model_type = hydrafit::Linear, plot = F, ...)
 }
 \arguments{
 \item{input_df}{Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations}
@@ -14,6 +14,8 @@ fit_linear(input_df, model_type = hydrafit::Linear(), plot = F, ...)
 \item{plot}{True or false for plotting model parameters}
 
 \item{...}{Additional plotting parameters if plot==T (e.g., xlab, ylab)}
+
+\item{silent}{Suppress warnings from fit}
 }
 \value{
 Returns best fitting model parameters for each species for nonlinear fits

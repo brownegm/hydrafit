@@ -58,7 +58,7 @@ fit_nonlinear <- function(input_df,
         pdf = dnorm,#pdf stands for probability density function
         max_iter = 5000,
         show_display = F,
-        temp_red = 0.05
+        temp_red = 0.001, initial_temp = 1000
       )
 
     #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
@@ -83,13 +83,16 @@ fit_nonlinear <- function(input_df,
 
     max_cond <- res$best_pars$A|>as.numeric()
 
+    D <- ifelse(model_type=="exp", NA, res$best_pars[[4]]|>as.numeric())
+    D.se <- ifelse(model_type=="exp", NA, sterror[[4]]|>as.numeric())
+
     parvecLog <- structure(list(
       species = paste(input_df[1, 1]),
       data.type = model_type,
       A = res$best_pars[[1]]|>as.numeric(),
       B = res$best_pars[[2]]|>as.numeric(),
       C = res$best_pars[[3]]|>as.numeric(),
-      D = res$best_pars[[4]]|>as.numeric(),
+      D = D,
       loglikeli = res$max_likeli,
       rsq = rsq,
       slope = slope,
@@ -98,7 +101,7 @@ fit_nonlinear <- function(input_df,
       sterrorA = sterror[[1]]|>as.numeric(),
       sterrorB = sterror[[2]]|>as.numeric(),
       sterrorC = sterror[[3]]|>as.numeric(),
-      sterrorD = sterror[[4]]|>as.numeric(),
+      sterrorD = D.se,
       N = N,
       maxCond=max_cond),
     # attributes
