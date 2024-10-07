@@ -148,26 +148,26 @@ The subsequent functions provide the functionality to plot vulnerability curves 
 for (ii in 1:length(species_list)){
   (subset(cebe, cebe$to_split == species_list[ii], select =c(1:dim(cebe)[2])) -> data_by_sp)
   Linear_fits = fit_linear(data_by_sp, Linear, plot=T, xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
-  Linear_fits$D.NA<- NA # placeholder to keep all of the data frames the same size
-  Linear_fits$sterror.NA <- NA
+  Linear_fits$D<- NA # placeholder to keep all of the data frames the same size
+  Linear_fits$sterrorD<- NA
   rbind(modelfitting_results_linear, as.data.frame(Linear_fits))-> modelfitting_results_linear
   #cli::cli_progress_update()
 } 
 #dev.off()
 
 #estimate the pX values 
-modelfitting_results_linear$psi_k20<- (0.8-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
-modelfitting_results_linear$psi_k50<- (0.5-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
-modelfitting_results_linear$psi_k80<- (0.2-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
-modelfitting_results_linear$psi_k95<- (0.05-1)*(-modelfitting_results_linear$A.A)*-1/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$psi_k20<- (0.8-1)*(-modelfitting_results_linear$A)*-1/(modelfitting_results_linear$B)
+modelfitting_results_linear$psi_k50<- (0.5-1)*(-modelfitting_results_linear$A)*-1/(modelfitting_results_linear$B)
+modelfitting_results_linear$psi_k80<- (0.2-1)*(-modelfitting_results_linear$A)*-1/(modelfitting_results_linear$B)
+modelfitting_results_linear$psi_k95<- (0.05-1)*(-modelfitting_results_linear$A)*-1/(modelfitting_results_linear$B)
 
 
 # PX values with max at 0.1 MPa
-modelfitting_results_linear$gmax_at0.1 <- (modelfitting_results_linear$B.B*0.1)+modelfitting_results_linear$A.A
-modelfitting_results_linear$psi_k20_at0.1<- ((0.8*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
-modelfitting_results_linear$psi_k50_at0.1<- ((0.5*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
-modelfitting_results_linear$psi_k80_at0.1<- ((0.2*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
-modelfitting_results_linear$psi_k95_at0.1<- ((0.05*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A.A)/(modelfitting_results_linear$B.B)
+modelfitting_results_linear$gmax_at0.1 <- (modelfitting_results_linear$B*0.1)+modelfitting_results_linear$A
+modelfitting_results_linear$psi_k20_at0.1<- ((0.8*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A)/(modelfitting_results_linear$B)
+modelfitting_results_linear$psi_k50_at0.1<- ((0.5*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A)/(modelfitting_results_linear$B)
+modelfitting_results_linear$psi_k80_at0.1<- ((0.2*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A)/(modelfitting_results_linear$B)
+modelfitting_results_linear$psi_k95_at0.1<- ((0.05*modelfitting_results_linear$gmax_at0.1)-modelfitting_results_linear$A)/(modelfitting_results_linear$B)
 
 
 #Logistic
