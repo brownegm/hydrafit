@@ -56,9 +56,9 @@ fit_nonlinear <- function(input_df,
         par_hi = pars_high_i,
         dep_var = "kl",
         pdf = dnorm,#pdf stands for probability density function
-        max_iter = 5000,
+        max_iter = 8000,
         show_display = F,
-        temp_red = 0.001, initial_temp = 1000
+        temp_red = 0.001, initial_temp = 100
       )
 
     #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
