@@ -103,7 +103,17 @@ fit_nonlinear <- function(input_df,
       sterrorC = sterror[[3]]|>as.numeric(),
       sterrorD = D.se,
       N = N,
-      maxCond=max_cond),
+      maxCond = max_cond,
+      psi_k20 = numeric(),
+      psi_k50 = numeric(),
+      psi_k80 = numeric(),
+      psi_k95 = numeric(),
+      max_cond_at0.1 = numeric(),
+      psi_k20_at0.1 = numeric(),
+      psi_k50_at0.1 = numeric(),
+      psi_k80_at0.1 = numeric(),
+      psi_k95_at0.1 = numeric()
+      ),
     # attributes
     mod.type = model_type
     )
