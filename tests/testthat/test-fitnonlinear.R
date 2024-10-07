@@ -48,7 +48,7 @@ try({
 # Bpred_logistic = round(exp_fits[["B"]], 1)
 # Cpred_logistic = round(exp_fits[["C"]], 1)
 
-
+fx_select(NULL,log_fits, sig_fits, exp_fits, exp2_fits)
 
 # test that the modelled values are equalled to the values I put in
 expect_equal(Apred, A)
