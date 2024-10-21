@@ -83,8 +83,10 @@ fit_nonlinear <- function(input_df,
 
     max_cond <- res$best_pars$A|>as.numeric()
 
-    D <- ifelse(model_type=="exp", NA, res$best_pars[[4]]|>as.numeric())
+    D <- ifelse(model_type=="exp", NA, res$best_pars$D|>as.numeric())
     D.se <- ifelse(model_type=="exp", NA, sterror[[4]]|>as.numeric())
+# create function to calculate water potential at X% max conductance
+    px_fx <- hydrafit::psiPx(fx_type = model_type)
 
     parvecLog <- structure(list(
       species = paste(input_df[1, 1]),
@@ -104,15 +106,15 @@ fit_nonlinear <- function(input_df,
       sterrorD = D.se,
       N = N,
       maxCond = max_cond,
-      psi_k20 = numeric(),
-      psi_k50 = numeric(),
-      psi_k80 = numeric(),
-      psi_k95 = numeric(),
-      max_cond_at0.1 = numeric(),
-      psi_k20_at0.1 = numeric(),
-      psi_k50_at0.1 = numeric(),
-      psi_k80_at0.1 = numeric(),
-      psi_k95_at0.1 = numeric()
+      psi_k20 = px_fx(A, B, C, px = 0.20)[[1]],
+      psi_k50 = px_fx(A, B, C, px = 0.50)[[1]],
+      psi_k80 = px_fx(A, B, C, px = 0.80)[[1]],
+      psi_k95 = px_fx(A, B, C, px = 0.95)[[1]],
+      max_cond_at0.1 = px_fx(A, B, C, max_cond=0.1)[[2]],
+      psi_k20_at0.1 = px_fx(A, B, C, px = 0.20, max_cond=0.1)[[1]],
+      psi_k50_at0.1 = px_fx(A, B, C, px = 0.50, max_cond=0.1)[[1]],
+      psi_k80_at0.1 = px_fx(A, B, C, px = 0.80, max_cond=0.1)[[1]],
+      psi_k95_at0.1 = px_fx(A, B, C, px = 0.95, max_cond=0.1)[[1]]
       ),
     # attributes
     mod.type = model_type

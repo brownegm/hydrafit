@@ -19,14 +19,14 @@ test_df_exp2 <- data.frame(psi=psi, kl= kl_exp2)
 test_df_sig <- data.frame(psi=psi, kl=kl_sig)
 test_df_log <- data.frame(psi=psi, kl=kl_log)
 
-cebe_test <- scof2012|>dplyr::filter(species=="cebe")
+cebe_test <- hydrafit::scof2012|>dplyr::filter(species=="cebe")
 # Run fit_linear function
 suppressWarnings(### TRY USING "TRY()" HERE
 try({
-  exp_fits = fit_nonlinear(input_df = cebe_test, model_type = "exp")
-  exp2_fits = fit_nonlinear(input_df = cebe_test, model_type = "exp2")
-  sig_fits = fit_nonlinear(input_df = cebe_test, model_type = "sig")
-  log_fits = fit_nonlinear(input_df = cebe_test, model_type = "log")
+  exp_fits = hydrafit::fit_nonlinear(input_df = cebe_test, model_type = "exp")
+  exp2_fits = hydrafit::fit_nonlinear(input_df = cebe_test, model_type = "exp2")
+  sig_fits = hydrafit::fit_nonlinear(input_df = cebe_test, model_type = "sig")
+  log_fits = hydrafit::fit_nonlinear(input_df = cebe_test, model_type = "log")
 }, silent = TRUE
   )
 )
@@ -48,7 +48,7 @@ try({
 # Bpred_logistic = round(exp_fits[["B"]], 1)
 # Cpred_logistic = round(exp_fits[["C"]], 1)
 
-fx_select(NULL,log_fits, sig_fits, exp_fits, exp2_fits)
+hydrafit::fx_select(NULL,log_fits, sig_fits, exp_fits, exp2_fits)
 
 # test that the modelled values are equalled to the values I put in
 expect_equal(Apred, A)
