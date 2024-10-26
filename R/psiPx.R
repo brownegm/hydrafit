@@ -30,7 +30,7 @@ psiPx <- function(fx_type = character()) {
 
       psi.px <- ((px_op * max_c) - A) / (B)
 
-      return(list(psi.px, max_c))
+      return(list(psi.px=psi.px, max_c= max_c))
 
     }
 
@@ -43,7 +43,7 @@ psiPx <- function(fx_type = character()) {
 
       psi.px <- (log((px_op * max_c) / A)) / (-B)
 
-      return(list(psi.px, max_c))
+      return(list(psi.px=psi.px, max_c= max_c))
     }
 
   } else if (fx_type == "exp2") {
@@ -55,7 +55,7 @@ psiPx <- function(fx_type = character()) {
 
       psi_px <- -((log(((px_op * max_c) - C) / A)) / (B))
 
-      return(list(psi_px, max_c))
+      return(list(psi.px=psi.px, max_c= max_c))
 
     }
 
@@ -68,7 +68,7 @@ psiPx <- function(fx_type = character()) {
 
       psi_px <- (C) * (((A) / (px_op * max_c) - 1) ^ (1 / B))
 
-      return(list(psi_px, max_c))
+      return(list(psi.px=psi.px, max_c= max_c))
     }
 
   } else{
@@ -82,7 +82,7 @@ psiPx <- function(fx_type = character()) {
 
       psi_px <- -B * (A - (px_op * max_c) - log(px_op * max_c)) + C
 
-      return(list(psi_px, max_c))
+      return(list(psi.px=psi.px, max_c= max_c))
 
     }
 
