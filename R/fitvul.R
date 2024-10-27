@@ -18,36 +18,30 @@ fitvul <- function (data, mod.type = c("log", "sig", "exp", "exp2"), plot = F, b
     data_by_species[[species_list[sp]]] <- subset(data, to_split == species_list[sp])
   }
 
+   run.fit.fx <- ifelse(model_type=="log", Logistic,
+                        ifelse(model_type=="exp", Exponential,
+                               ifelse(model_type=="exp2",Exponential2,
+                                      ifelse(model_type=="sig", Sigmoidal))))
 
- if(mod.type == "Linear"){
+   for (ii in seq_along(species_list)){
+     subset(cebe, cebe$to_split == species_list[ii], select = c(1:dim(cebe)[2])) -> data_by_sp
+     define_parsL(data_by_sp) -> par_estimates
+     parsL=par_estimates[[1]]
+     par_loL=par_estimates[[2]]
+     par_highL=par_estimates[[3]]
 
-   linear_fits = fit_linear(data_by_sp,
+if(mod.type=="Linear"){
+linear_fits = fit_linear(data_by_sp,
                             Linear,
                             plot = plot,
                             xlab = "Water Potential (MPa)",
                             ylab = "Leaf Hydraulic Conductance (mmol m^-2 s-1)")
    linear_fits$D.NA <- NA # placeholder to keep all of the data frames the same size
    linear_fits$sterror.NA <- NA
-
-   modelfitting_results_linear -> rbind(modelfitting_results_linear,
-                                        as.data.frame(Linear_fits))
-
- }else{
-
-   run.fit.fx <- ifelse(model_type=="log", Logistic,
-                        ifelse(model_type=="exp", Exponential,
-                               ifelse(model_type=="exp2",Exponential2,
-                                      ifelse(model_type=="sig", Sigmoidal))))
-
-   for (ii in 1:length(species_list)){
-     subset(cebe, cebe$to_split == species_list[ii], select = c(1:dim(cebe)[2])) -> data_by_sp
-     define_parsL(data_by_sp) -> par_estimates
-     parsL=par_estimates[[1]]
-     par_loL=par_estimates[[2]]
-     par_highL=par_estimates[[3]]
-     Logistic_fits = fit_nonlinear(data_by_sp, parsL, par_loL, par_highL, model_type = "log", plot=T,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
+}else{
+     fittedParameters = fit_nonlinear(data_by_sp, parsL, par_loL, par_highL, model_type = "log", plot=T,xlab="Water Potential (MPa)", ylab="Leaf Hydraulic Conductance (mmol m^-2 s-1)")
      rbind(modelfitting_results_logistic, as.data.frame(Logistic_fits))-> modelfitting_results_logistic
-     # cli::cli_progress_update()
+     }# cli::cli_progress_update()
    }
  }
 
