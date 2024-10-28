@@ -5,6 +5,8 @@
 \alias{define_parsL}
 \alias{define_parsS}
 \alias{define_parsE2}
+\alias{define_parslin}
+\alias{define_pars}
 \title{Define parameter values}
 \usage{
 define_parsE(input_df)
@@ -14,6 +16,10 @@ define_parsL(input_df)
 define_parsS(input_df)
 
 define_parsE2(input_df)
+
+define_parslin(input_df)
+
+define_pars(input_df, model_type)
 }
 \arguments{
 \item{input_df}{Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations}

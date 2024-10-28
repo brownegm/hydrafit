@@ -8,7 +8,7 @@
 #'
 #' @return Returns a function which takes model parameters,"px", and "max_cond_at" as parameters.
 #'
-#' @example
+#' @examples
 #' # create function for estimating pX with linear formula
 #' psi.px <- psiPx(fx_type = "Linear")
 #' A <- 2

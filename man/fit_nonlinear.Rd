@@ -28,7 +28,7 @@ This function utilizes the `anneal` function of the likelihood package \code{cit
 
 \itemize{
 \item It looks weird that kl is the x variable here, but anneal calculates the slope and R2 of the fit using the predicted kl values as the y and the observed kl values as the x
-\item The parameters are set to change slowly in the fitting procedure (the temp_red variable) helped a lot. You can watch the fitting proceed with show_display. \emph{This option needs to be change within the function itself. There is no parameter in the function at the moment to do this.}
+\item The parameters are set to change slowly in the fitting procedure (the temp_red variable) helped a lot. You can watch the fitting proceed with show_display. \emph{This option needs to be changed within the function itself. There is no parameter in the function at the moment to do this.}
 \item AIC formula: -2LL + 2 x parameters (incl nuisance, i.e.,sd)
 \item AICcorr formula: -2LL + (2n x parameters (incl nuisance, i.e.,sd)/(n-parameters-1))
 }

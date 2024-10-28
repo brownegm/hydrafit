@@ -19,6 +19,8 @@
 #' }
 #'
 #' @family internal
+
+
 #' @rdname define_pars
 #' @export define_parsE
 
@@ -158,6 +160,9 @@ return(list(pars, par_lo1, par_hi1))
 
 }
 
+
+#' @rdname define_pars
+#' @export define_pars
 define_pars <- function(input_df, model_type){
 
   par_fx <- ifelse(model_type=="log", define_parsL,
