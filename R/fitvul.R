@@ -1,6 +1,6 @@
 
 
-data <- hydrafit::cebe_efm
+data <- hydrafit::scof2012
 
 fitvul <- function (data, mod.type = c("log", "sig", "exp", "exp2"), plot = F, bootstrap = F, silent=T){
 
@@ -11,17 +11,15 @@ fitvul <- function (data, mod.type = c("log", "sig", "exp", "exp2"), plot = F, b
      cat("There are ", length(species_list), "unique species in this dataset.")
   }
 
-  data_by_species <- list()
-
   # Loop through species list and store each subset
-  for (sp in seq_along(species_list)) {
-    data_by_species[[species_list[sp]]] <- subset(data, to_split == species_list[sp])
-  }
+  data_by_species <- lapply(seq_along(species_list),
+                            function(sp) subset(data,
+                                                species==species_list[sp]))
 
    run.fit.fx <- ifelse(model_type=="log", Logistic,
                         ifelse(model_type=="exp", Exponential,
                                ifelse(model_type=="exp2",Exponential2,
-                                      ifelse(model_type=="sig", Sigmoidal))))
+                                      ifelse(model_type=="sig", Sigmoidal, Linear))))
 
    for (ii in seq_along(species_list)){
      subset(cebe, cebe$to_split == species_list[ii], select = c(1:dim(cebe)[2])) -> data_by_sp
