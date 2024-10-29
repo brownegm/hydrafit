@@ -1,7 +1,7 @@
 #' Define parameter values
 #'
 #' @param input_df Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations
-#'
+#' @param model_type
 #' @return Parameter values to be used in setting predicting the best fit parameters
 #'
 #' @description Functions used here set initial, lower and upper limits to parameter estimates
@@ -20,6 +20,20 @@
 #'
 #' @family internal
 
+#' @rdname define_pars
+#' @export define_pars
+define_pars <- function(input_df, model_type){
+
+  par_fx <- ifelse(model_type=="log", define_parsL,
+                   ifelse(model_type=="exp", define_parsE,
+                          ifelse(model_type=="exp2", define_parsE2,
+                                 ifelse(model_type=="sig", define_parsS, define_parslin))))
+
+  parameters <- par_fx(input_df)
+
+  return(parameters)
+
+}
 
 #' @rdname define_pars
 #' @export define_parsE
@@ -157,21 +171,5 @@ lm(input_df$kl ~ input_df$psi)-> fita #a normal linear regression gave the best 
   )
 
 return(list(pars, par_lo1, par_hi1))
-
-}
-
-
-#' @rdname define_pars
-#' @export define_pars
-define_pars <- function(input_df, model_type){
-
-  par_fx <- ifelse(model_type=="log", define_parsL,
-                          ifelse(model_type=="exp", define_parsE,
-                                 ifelse(model_type=="exp2", define_parsE2,
-                                        ifelse(model_type=="sig", define_parsS, define_parslin))))
-
-  parameters <- par_fx(input_df)
-
-  return(parameters)
 
 }

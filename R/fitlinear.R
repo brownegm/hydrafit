@@ -17,38 +17,26 @@
 #'
 
 fit_linear <- function(input_df,
-                       model_type=hydrafit::Linear,
+                       model_type="Linear",
                        plot=F,
                        ...) {
-
-  model_type = model_type
 
   var <- list(psi="psi",
               x="kl",
               mean="predicted",
               log=TRUE)
 
-  lm(input_df$kl ~ input_df$psi)-> fita #a normal linear regression gave the best starting parameters
 
-  pars = list(
-    A = summary(fita)$coeff[1, 1],
-    B = summary(fita)$coeff[2, 1],
-    sd = 1
-    )
-  par_lo1 = list(
-    A = summary(fita)$coeff[1, 1] * 0.1,
-    B = summary(fita)$coeff[2, 1] * 2,
-    sd = 0.005
-  )
-  par_hi1 = list(
-    A = summary(fita)$coeff[1, 1] * 2,
-    B = summary(fita)$coeff[2, 1] * 0.1,
-    sd = 20
-  )
-  #########Update from Megan: I decreased the sd of the par_lo1, linear fits now match the lm results
+par_estimates <- define_pars(input_df, model_type = model_type)
 
-  res<-anneal(model = model_type, par = pars, source_data = input_df,
-              var = var, par_lo = par_lo1, par_hi = par_hi1, dep_var = "kl",
+pars <- par_estimates[[1]]
+par_lo <- par_estimates[[2]]
+par_hi <- par_estimates[[3]]
+
+model_function <- hydrafit::Linear
+
+  res<-anneal(model = model_function, par = pars, source_data = input_df,
+              var = var, par_lo = par_lo, par_hi = par_hi, dep_var = "kl",
               pdf = dnorm, max_iter=5000, show_display=F)
 
 
@@ -111,3 +99,23 @@ fit_linear <- function(input_df,
   return(parvecLog)
 
 }
+
+
+
+# lm(input_df$kl ~ input_df$psi)-> fita #a normal linear regression gave the best starting parameters
+#
+# pars = list(
+#   A = summary(fita)$coeff[1, 1],
+#   B = summary(fita)$coeff[2, 1],
+#   sd = 1
+# )
+# par_lo1 = list(
+#   A = summary(fita)$coeff[1, 1] * 0.1,
+#   B = summary(fita)$coeff[2, 1] * 2,
+#   sd = 0.005
+# )
+# par_hi1 = list(
+#   A = summary(fita)$coeff[1, 1] * 2,
+#   B = summary(fita)$coeff[2, 1] * 0.1,
+#   sd = 20
+#)
