@@ -28,10 +28,10 @@ fit_nonlinear <- function(input_df,
                           model_type,
                           plot = F, ...) {
 
-  mod <- ifelse(model_type=="log", Logistic,
-                        ifelse(model_type=="exp", Exponential,
-                               ifelse(model_type=="exp2",Exponential2,
-                                      ifelse(model_type=="sig", Sigmoidal))))
+  mod <- ifelse(model_type=="log", hydrafit::Logistic,
+                        ifelse(model_type=="exp", hydrafit::Exponential,
+                               ifelse(model_type=="exp2",hydrafit::Exponential2,
+                                      ifelse(model_type=="sig", hydrafit::Sigmoidal, hydrafit::Linear))))
 
   par_estimates <- define_pars(input_df, model_type = model_type)
 
