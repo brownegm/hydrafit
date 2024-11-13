@@ -4,12 +4,14 @@
 \alias{fit_nonlinear}
 \title{Compute the best fit likelihood parameters for each species for each model type}
 \usage{
-fit_nonlinear(input_df, model_type, plot = F, ...)
+fit_nonlinear(input_df, model_type, max_cond_at, plot = F, ...)
 }
 \arguments{
 \item{input_df}{input folder with kl and psi values}
 
 \item{model_type}{select appropriate model type here i.e., "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types}
+
+\item{max_cond_at}{water potential which pX should be based upon.}
 
 \item{plot}{True or false for plotting model parameters}
 

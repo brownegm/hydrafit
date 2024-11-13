@@ -4,6 +4,7 @@
 #'
 #' @param input_df input folder with kl and psi values
 #' @param model_type select appropriate model type here i.e., "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types
+#' @param max_cond_at water potential which pX should be based upon.
 #' @param plot True or false for plotting model parameters
 #' @param ... Plotting parameters passed to \code{plot()} if plot=TRUE
 #'
@@ -26,12 +27,14 @@
 
 fit_nonlinear <- function(input_df,
                           model_type,
+                          max_cond_at,
                           plot = F, ...) {
 
   mod <- ifelse(model_type=="log", hydrafit::Logistic,
                         ifelse(model_type=="exp", hydrafit::Exponential,
                                ifelse(model_type=="exp2",hydrafit::Exponential2,
-                                      ifelse(model_type=="sig", hydrafit::Sigmoidal, hydrafit::Linear))))
+                                      ifelse(model_type=="sig", hydrafit::Sigmoidal,
+                                             hydrafit::Linear))))
 
   par_estimates <- define_pars(input_df, model_type = model_type)
 
@@ -65,6 +68,10 @@ fit_nonlinear <- function(input_df,
     #helped a lot. You can watch the fitting proceed with show_display,
     #but I've never found it very informative
 
+    # organize output
+    A = res$best_pars[[1]]|>as.numeric()
+    B = res$best_pars[[2]]|>as.numeric()
+    C = res$best_pars[[3]]|>as.numeric()
     #AIC formula: -2LL + 2*parameters (incl nuisance, i.e.,sd)
 
     AIC <- res$aic|>as.numeric()
@@ -83,8 +90,8 @@ fit_nonlinear <- function(input_df,
 
     max_cond <- res$best_pars$A|>as.numeric()
 
-    D <- ifelse(model_type=="exp", NA, res$best_pars$D|>as.numeric())
-    D.se <- ifelse(model_type=="exp", NA, sterror[[4]]|>as.numeric())
+    D <- ifelse(model_type%in%c("exp","Linear"), NA, res$best_pars$D|>as.numeric())
+    D.se <- ifelse(model_type%in%c("exp","Linear"), NA, sterror[[4]]|>as.numeric())
 
     # create function to calculate water potential at X% max conductance
     px_fx <- hydrafit:::psiPx(fx_type = model_type)
@@ -93,17 +100,21 @@ fit_nonlinear <- function(input_df,
     est_params <- list(A=A,
                        B=B)
     }else{
-      est_params <- list(A=A,
+    est_params <- list(A=A,
                          B=B,
                          C=C)
     }
 
+    px_estimates <- estimate_pxs(params = est_params,
+                                 px_fx = px_fx,
+                                 max_cond_at = max_cond_at)
+
     parvecLog <- structure(list(
       species = paste(input_df[1, 1]),
       data.type = model_type,
-      A = res$best_pars[[1]]|>as.numeric(),
-      B = res$best_pars[[2]]|>as.numeric(),
-      C = res$best_pars[[3]]|>as.numeric(),
+      A = A,
+      B = B,
+      C = C,
       D = D,
       loglikeli = res$max_likeli,
       rsq = rsq,
@@ -116,15 +127,15 @@ fit_nonlinear <- function(input_df,
       sterrorD = D.se,
       N = N,
       maxCond = max_cond,
-      psi_k20 = px_fx(A, B, C, px = 0.20)[[1]],
-      psi_k50 = px_fx(A, B, C, px = 0.50)[[1]],
-      psi_k80 = px_fx(A, B, C, px = 0.80)[[1]],
-      psi_k95 = px_fx(A, B, C, px = 0.95)[[1]],
-      max_cond_at0.1 = px_fx(A, B, C, max_cond=0.1)[[2]],
-      psi_k20_at0.1 = px_fx(A, B, C, px = 0.20, max_cond=0.1)[[1]],
-      psi_k50_at0.1 = px_fx(A, B, C, px = 0.50, max_cond=0.1)[[1]],
-      psi_k80_at0.1 = px_fx(A, B, C, px = 0.80, max_cond=0.1)[[1]],
-      psi_k95_at0.1 = px_fx(A, B, C, px = 0.95, max_cond=0.1)[[1]]
+      psi_k20 = px_estimates$p20,
+      psi_k50 = px_estimates$p50,
+      psi_k80 = px_estimates$p80,
+      psi_k95 = px_estimates$p95,
+      max_cond_at0.1 = px_estimates$max_c_atmaxpsi,
+      psi_k20_at0.1 = px_estimates$p20_atmaxcond,
+      psi_k50_at0.1 = px_estimates$p50_atmaxcond,
+      psi_k80_at0.1 = px_estimates$p80_atmaxcond,
+      psi_k95_at0.1 = px_estimates$p95_atmaxcond
       ),
     # attributes
     mod.type = model_type
@@ -150,9 +161,8 @@ fit_nonlinear <- function(input_df,
 
   }
 
-#' @rdname fit_cond_model
 
-px_estimates <- function(params, px_fx,
+estimate_pxs <- function(params, px_fx,
                          px = list(0.20,0.50,0.80,0.95),
                          max_cond_at = 0.1){
 
@@ -168,6 +178,7 @@ px_estimates <- function(params, px_fx,
   params["max_cond_at"] <- max_cond_at
 
   pl_atmaxcond[kx] <- do.call(px_fx, params)[["psi.px"]]
+  maxc_atmaxpsi <- do.call(px_fx, params)[["max_c"]]
 
   params$max_cond_at <- NULL
 
@@ -181,8 +192,10 @@ px_estimates <- function(params, px_fx,
   p20_atmaxcond = pl_atmaxcond[[1]],
   p50_atmaxcond = pl_atmaxcond[[2]],
   p80_atmaxcond = pl_atmaxcond[[3]],
-  p95_atmaxcond = pl_atmaxcond[[4]]
+  p95_atmaxcond = pl_atmaxcond[[4]],
+  max_c_atmaxpsi = maxc_atmaxpsi
   ))
 
   return(pl_output)
 }
+# test idea if max_cond_at input is 0 the two pl_outputs should be the same
