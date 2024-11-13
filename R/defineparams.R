@@ -1,7 +1,8 @@
 #' Define parameter values
 #'
 #' @param input_df Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations
-#' @param model_type
+#' @param model_type Specify model type to define parameters for.
+
 #' @return Parameter values to be used in setting predicting the best fit parameters
 #'
 #' @description Functions used here set initial, lower and upper limits to parameter estimates

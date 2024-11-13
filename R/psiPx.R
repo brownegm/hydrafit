@@ -21,6 +21,10 @@
 
 psiPx <- function(fx_type = character()) {
 
+  if(!fx_type %in% c("Linear", "exp", "exp2", "log", "sig")){
+    stop(paste(fx_type, "is not a known model type."))
+  }
+
   if (fx_type == "Linear") {
 
     \(A, B, px = 0.5, max_cond_at = 0) {
@@ -53,7 +57,7 @@ psiPx <- function(fx_type = character()) {
 
       max_c <- C + (A * exp(-B * max_cond_at))
 
-      psi_px <- -((log(((px_op * max_c) - C) / A)) / (B))
+      psi.px <- -((log(((px_op * max_c) - C) / A)) / (B))
 
       return(list(psi.px=psi.px, max_c= max_c))
 
@@ -66,12 +70,12 @@ psiPx <- function(fx_type = character()) {
 
       max_c <- (A) / (1 + (max_cond_at / C) ^ B)
 
-      psi_px <- (C) * (((A) / (px_op * max_c) - 1) ^ (1 / B))
+      psi.px <- (C) * (((A) / (px_op * max_c) - 1) ^ (1 / B))
 
       return(list(psi.px=psi.px, max_c= max_c))
     }
 
-  } else{
+  } else if (fx_type=="sig"){
     #if sigmoidal
 
     \(A, B, C, px = 0.5, max_cond_at = 0) {
@@ -80,7 +84,7 @@ psiPx <- function(fx_type = character()) {
 
       max_c <- (A) / (1 + exp(-((max_cond_at - C) / B)))
 
-      psi_px <- -B * (A - (px_op * max_c) - log(px_op * max_c)) + C
+      psi.px <- -B * (A - (px_op * max_c) - log(px_op * max_c)) + C
 
       return(list(psi.px=psi.px, max_c= max_c))
 

@@ -4,7 +4,7 @@
 \alias{fit_linear}
 \title{fit_linear}
 \usage{
-fit_linear(input_df, model_type = hydrafit::Linear, plot = F, ...)
+fit_linear(input_df, model_type = "Linear", plot = F, ...)
 }
 \arguments{
 \item{input_df}{Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations}

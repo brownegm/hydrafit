@@ -36,8 +36,8 @@ fit_nonlinear <- function(input_df,
   par_estimates <- define_pars(input_df, model_type = model_type)
 
   pars = par_estimates[[1]]
-  pars_low_i = par_estimates[[2]]
-  pars_high_i = par_estimates[[3]]
+  pars_low = par_estimates[[2]]
+  pars_high = par_estimates[[3]]
 
     var <- list(
       psi = "psi",
@@ -52,8 +52,8 @@ fit_nonlinear <- function(input_df,
         par = pars,
         source_data = input_df,
         var = var,
-        par_lo = pars_low_i,
-        par_hi = pars_high_i,
+        par_lo = pars_low,
+        par_hi = pars_high,
         dep_var = "kl",
         pdf = dnorm,#pdf stands for probability density function
         max_iter = 8000,
@@ -85,8 +85,18 @@ fit_nonlinear <- function(input_df,
 
     D <- ifelse(model_type=="exp", NA, res$best_pars$D|>as.numeric())
     D.se <- ifelse(model_type=="exp", NA, sterror[[4]]|>as.numeric())
-# create function to calculate water potential at X% max conductance
-    px_fx <- hydrafit::psiPx(fx_type = model_type)
+
+    # create function to calculate water potential at X% max conductance
+    px_fx <- hydrafit:::psiPx(fx_type = model_type)
+
+    if(model_type =="Linear"){
+    est_params <- list(A=A,
+                       B=B)
+    }else{
+      est_params <- list(A=A,
+                         B=B,
+                         C=C)
+    }
 
     parvecLog <- structure(list(
       species = paste(input_df[1, 1]),
@@ -139,3 +149,40 @@ fit_nonlinear <- function(input_df,
     return(parvecLog)
 
   }
+
+#' @rdname fit_cond_model
+
+px_estimates <- function(params, px_fx,
+                         px = list(0.20,0.50,0.80,0.95),
+                         max_cond_at = 0.1){
+
+  pl <- list()
+  pl_atmaxcond <- list()
+
+  for (kx in seq_along(px)){
+
+  params["px"] <- px[[kx]]
+
+  pl[kx] <- do.call(px_fx, params)[["psi.px"]]
+
+  params["max_cond_at"] <- max_cond_at
+
+  pl_atmaxcond[kx] <- do.call(px_fx, params)[["psi.px"]]
+
+  params$max_cond_at <- NULL
+
+  }
+
+  pl_output <- structure(list(
+  p20 = pl[[1]],
+  p50 = pl[[2]],
+  p80 = pl[[3]],
+  p95 = pl[[4]],
+  p20_atmaxcond = pl_atmaxcond[[1]],
+  p50_atmaxcond = pl_atmaxcond[[2]],
+  p80_atmaxcond = pl_atmaxcond[[3]],
+  p95_atmaxcond = pl_atmaxcond[[4]]
+  ))
+
+  return(pl_output)
+}
