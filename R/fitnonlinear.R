@@ -3,7 +3,7 @@
 #' @details See r/fitfunctions.R for functional types and see R/defineparams.R for parameter definitions.
 #'
 #' @param input_df input folder with kl and psi values
-#' @param model_type select appropriate model type here i.e., "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types
+#' @param model_type select appropriate model type here i.e., "Linear" for linear, "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types
 #' @param max_cond_at water potential which pX should be based upon.
 #' @param plot True or false for plotting model parameters
 #' @param ... Plotting parameters passed to \code{plot()} if plot=TRUE
@@ -25,7 +25,7 @@
 #' @export
 
 
-fit_nonlinear <- function(input_df,
+fit_vuln_curve <- function(input_df,
                           model_type,
                           max_cond_at,
                           plot = F, ...) {
@@ -59,9 +59,9 @@ fit_nonlinear <- function(input_df,
         par_hi = pars_high,
         dep_var = "kl",
         pdf = dnorm,#pdf stands for probability density function
-        max_iter = 8000,
-        show_display = F,
-        temp_red = 0.001, initial_temp = 100
+        max_iter = 5000,
+        show_display = F#,
+        #temp_red = 0.1, initial_temp = 100
       )
 
     #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
