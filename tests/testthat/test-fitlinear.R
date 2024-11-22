@@ -20,10 +20,9 @@ test_df <- data.frame(species = species, psi=psi, kl=kl)
 # })
 suppressWarnings({
   linear_fits = fit_nonlinear(input_df = test_df, model_type = "Linear", max_cond_at = 0.1)
-
 })
 
-linear_fits = fit_nonlinear(input_df = test_df, model_type = "Linear", max_cond_at = 0.1)
+# linear_fits = fit_nonlinear(input_df = test_df, model_type = "Linear", max_cond_at = 0.1)
 # Test that the function predicts the correct values
 Apred = round(linear_fits[["A"]], 1)
 Bpred = round(linear_fits[["B"]], 1)

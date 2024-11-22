@@ -19,7 +19,7 @@ test_df_exp2 <- data.frame(psi=psi, kl= kl_exp2)
 test_df_sig <- data.frame(psi=psi, kl=kl_sig)
 test_df_log <- data.frame(psi=psi, kl=kl_log)
 
-cebe_test <- hydrafit::scof2012|>dplyr::filter(species=="cebe")
+#cebe_test <- hydrafit:::scof2012|>dplyr::filter(species=="cebe")
 # Run fit_linear function
 suppressWarnings(### TRY USING "TRY()" HERE
 try({

@@ -96,7 +96,7 @@ fit_vuln_curve <- function(input_df,
     # create function to calculate water potential at X% max conductance
     px_fx <- hydrafit:::psiPx(fx_type = model_type)
 
-    if(model_type =="Linear"){
+    if(model_type%in%c("exp","Linear")){
     est_params <- list(A=A,
                        B=B)
     }else{
@@ -154,7 +154,7 @@ fit_vuln_curve <- function(input_df,
 
       lines(for_plotting[, 1], for_plotting[, 2], col = "blue")
 
-      title(paste(input_df[1, 1], input_df[1, 2], model_type))
+      title(paste(input_df[1, 1], model_type))
 
     }
     return(parvecLog)

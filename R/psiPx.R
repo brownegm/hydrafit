@@ -19,13 +19,13 @@
 #' psi_at_p50_linear
 #' @export
 
-psiPx <- function(fx_type = character()) {
+psiPx <- function(model_type = character()) {
 
-  if(!fx_type %in% c("Linear", "exp", "exp2", "log", "sig")){
-    stop(paste(fx_type, "is not a known model type."))
+  if(!model_type %in% c("Linear", "exp", "exp2", "log", "sig")){
+    stop(paste(model_type, "is not a known model type."))
   }
 
-  if (fx_type == "Linear") {
+  if (model_type == "Linear") {
 
     \(A, B, px = 0.5, max_cond_at = 0) {
       px_op <- 1-px
@@ -38,7 +38,7 @@ psiPx <- function(fx_type = character()) {
 
     }
 
-  } else if (fx_type == "exp") {
+  } else if (model_type == "exp") {
     \(A, B, px = 0.5, max_cond_at = 0) {
 
       px_op <- 1-px
@@ -50,7 +50,7 @@ psiPx <- function(fx_type = character()) {
       return(list(psi.px=psi.px, max_c= max_c))
     }
 
-  } else if (fx_type == "exp2") {
+  } else if (model_type == "exp2") {
     \(A, B, C, px = 0.5, max_cond_at = 0) {
 
       px_op <- 1-px
@@ -63,7 +63,7 @@ psiPx <- function(fx_type = character()) {
 
     }
 
-  } else if (fx_type == "log") {
+  } else if (model_type == "log") {
     \(A, B, C, px = 0.5, max_cond_at = 0) {
 
       px_op <- 1-px
@@ -75,7 +75,7 @@ psiPx <- function(fx_type = character()) {
       return(list(psi.px=psi.px, max_c= max_c))
     }
 
-  } else if (fx_type=="sig"){
+  } else if (model_type=="sig"){
     #if sigmoidal
 
     \(A, B, C, px = 0.5, max_cond_at = 0) {

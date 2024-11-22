@@ -12,7 +12,7 @@
 #'
 #'
 #' @param df input data frame containing best fit models, parameter estimates and their SDs
-#' @param fx_type Best fitting model
+#' @param mod_type Best fitting model
 #' @param px Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)
 #' @param sims Number of simulated values to generate
 #' @param psi_max estimate px based on what value of psi
@@ -24,17 +24,17 @@
 
 
 bootPX<-function(df,
-                 fx_type=character(),
+                 mod_type=character(),
                  px=0.5,
                  sims=1000,
                  psi_max=numeric()){
 
   if(length(psi_max)<1){ stop("Value for psi_max must be provided.")}
 
-  psi_px<-vector()
+  psi_px <- vector()
 
   #check conditions
-  fx_with_param3<-fx_type%in%c("exp2", "log", "sig")
+  fx_with_param3<-model_type%in%c("exp2", "log", "sig")
   #fx_with_A<-fx_type%in%c("exp2","Linear")
 
   #define model parameters
@@ -43,12 +43,12 @@ bootPX<-function(df,
 
   A<-df[,"A"]; B<-df[,"B"] #parameter estimates
 
-  A.sd<-df[,"sterror1"];B.sd<-df[,"sterror2"]#sd of parameter estimates
+  A.sd<-df[,"sterrorA"];B.sd<-df[,"sterrorB"]#sd of parameter estimates
 
   if(fx_with_param3==T){#only create the third parameter if fx_typein fx_with_param3
 
     param_3<-df[,"C"]
-    param_3.sd<-df[,"sterror3"]
+    param_3.sd<-df[,"sterrorC"]
 
     }
 
@@ -79,7 +79,7 @@ bootPX<-function(df,
 
   }
 
-  psi_px_boot <- psiPx(fx_type=fx_type)
+  psi_px_boot <- psiPx(model_type=model_type)
 
   if (fx_with_param3==T){
 
