@@ -24,7 +24,7 @@ define_parslin(input_df)
 \arguments{
 \item{input_df}{Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations}
 
-\item{model_type}{Model type to define parameters}
+\item{model_type}{Model type to define parameter}
 }
 \value{
 Parameter values to be used in setting predicting the best fit parameters
