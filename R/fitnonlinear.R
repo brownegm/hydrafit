@@ -82,7 +82,9 @@ fit_nonlinear <- function(input_df,
     N <- length(res$source_data$kl)
 
     max_cond <- res$best_pars$A|>as.numeric()
-
+    A = res$best_pars[[1]]|>as.numeric()
+    B = res$best_pars[[2]]|>as.numeric()
+    C = res$best_pars[[3]]|>as.numeric()
     D <- ifelse(model_type=="exp", NA, res$best_pars$D|>as.numeric())
     D.se <- ifelse(model_type=="exp", NA, sterror[[4]]|>as.numeric())
 # create function to calculate water potential at X% max conductance
@@ -91,9 +93,9 @@ fit_nonlinear <- function(input_df,
     parvecLog <- structure(list(
       species = paste(input_df[1, 1]),
       data.type = model_type,
-      A = res$best_pars[[1]]|>as.numeric(),
-      B = res$best_pars[[2]]|>as.numeric(),
-      C = res$best_pars[[3]]|>as.numeric(),
+      A = A,
+      B = B,
+      C = C,
       D = D,
       loglikeli = res$max_likeli,
       rsq = rsq,

@@ -10,7 +10,7 @@
 #' \item{kl}{Leaf hydraulic conductance measured via evaporative flux. Units : mmol m^-2 s^-1 }
 #' }
 #' @source Extracted from Scoffoni et al. 2011: \url{https://academic.oup.com/plphys/article/156/2/832/6108859}
-#' @export
+#'
 #'
 "cebe_efm"
 
@@ -29,6 +29,6 @@
 #' @details The data contains vulnerability curve data for Cercocarpus betuloides, Hedera canariensis, Quercus agrifolia, Lantana camara, and Heteromeles arbutifolia
 #'
 #' @source Extracted from Scoffoni et al. 2011: \url{https://academic.oup.com/plphys/article/156/2/832/6108859}
-#' @export
+#'
 #'
 "scof2012"
