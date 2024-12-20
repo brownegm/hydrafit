@@ -4,12 +4,18 @@
 \alias{bootPX}
 \title{Tool for estimating confidence intervals for percent loss in conductance.}
 \usage{
-bootPX(df, mod_type = character(), px = 0.5, sims = 1000, psi_max = numeric())
+bootPX(
+  df,
+  model_type = character(),
+  px = 0.5,
+  sims = 1000,
+  psi_max = numeric()
+)
 }
 \arguments{
 \item{df}{input data frame containing best fit models, parameter estimates and their SDs}
 
-\item{mod_type}{Best fitting model}
+\item{model_type}{Best fitting model}
 
 \item{px}{Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)}
 

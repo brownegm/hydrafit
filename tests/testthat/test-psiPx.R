@@ -2,7 +2,7 @@
 testthat::test_that("Psi Px predicts correct values", {
 
 # Linear
- psi.px <- psiPx(fx_type = "Linear")
+ psi.px <- psiPx(model_type = "Linear")
 
  A <- 2
  B <- 0.5
@@ -14,7 +14,7 @@ expect_equal(psi_at_p50_linear$max_c, A)
 # Something a little harder
 # Sigmoidal
 
-psi.px.sig <- psiPx(fx_type = "sig")
+psi.px.sig <- psiPx(model_type = "sig")
 
 A <- 2
 B <- 0.5

@@ -4,13 +4,13 @@
 #' Creates a function that estimates the percent loss in conductance assuming maximum conductance at a chosen leaf water potential.
 #' @details The functions within the functional are anonymous themselves, hence the "\(params)" structure.
 #' @keywords internal
-#' @param fx_type Function type. See ?Exponential for function options.
+#' @param model_type Function type. See ?Exponential for function options.
 #'
 #' @return Returns a function which takes model parameters,"px", and "max_cond_at" as parameters.
 #'
 #' @examples
 #' # create function for estimating pX with linear formula
-#' psi.px <- psiPx(fx_type = "Linear")
+#' psi.px <- psiPx(model_type = "Linear")
 #' A <- 2
 #' B <- 0.5
 #'
@@ -22,7 +22,7 @@
 psiPx <- function(model_type = character()) {
 
   if(!model_type %in% c("Linear", "exp", "exp2", "log", "sig")){
-    stop(paste(model_type, "is not a known model type."))
+    stop(paste("'", model_type, "'", "is not a known model type."))
   }
 
   if (model_type == "Linear") {

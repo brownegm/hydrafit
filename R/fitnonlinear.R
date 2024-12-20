@@ -20,21 +20,36 @@
 #'
 #' @return Returns best fitting model parameters for each species for nonlinear fits
 #'
-#' @importFrom likelihood anneal
 #'
 #' @export
 
 
 fit_vuln_curve <- function(input_df,
                           model_type,
-                          max_cond_at,
+                          max_cond_at = 0.1,
                           plot = F, ...) {
 
-  mod <- ifelse(model_type=="log", hydrafit::Logistic,
-                        ifelse(model_type=="exp", hydrafit::Exponential,
-                               ifelse(model_type=="exp2",hydrafit::Exponential2,
-                                      ifelse(model_type=="sig", hydrafit::Sigmoidal,
-                                             hydrafit::Linear))))
+  if(!model_type %in% c("log","exp","exp2", "sig", "Linear")){
+    stop("Model type not in expected options.")
+  }
+
+  if(max_cond_at %in% c(NULL,0)){
+    stop("max_cond_at parameter is either not provided or equals zero.\n Models default to 0, so max_cond_at must be > 0.")
+  }
+  # mod <- ifelse(model_type=="log", Logistic,
+  #                       ifelse(model_type=="exp", Exponential,
+  #                              ifelse(model_type=="exp2", Exponential2,
+  #                                     ifelse(model_type=="sig", Sigmoidal,
+  #                                            Linear))))
+  #print(mod)
+  mod <- switch(model_type,
+         "log" = hydrafit::Logistic,
+         "exp" = hydrafit::Exponential,
+         "exp2" = hydrafit::Exponential2,
+         "sig" = hydrafit::Sigmoidal,
+         hydrafit::Linear)
+
+
 
   par_estimates <- define_pars(input_df, model_type = model_type)
 
@@ -49,8 +64,16 @@ fit_vuln_curve <- function(input_df,
       log = TRUE
     )
 
+    # # List functions in the global environment
+    # function_objects <- sapply(ls(.GlobalEnv), function(x) {
+    #   is.function(get(x, envir = .GlobalEnv, inherits = FALSE))
+    # })
+    #
+    # # Print out the function objects
+    # print(paste("fx names are:", names(function_objects)[function_objects]))
+
     res <-
-      anneal(
+      hydrafit:::anneal(
         model = mod,
         par = pars,
         source_data = input_df,
@@ -94,7 +117,7 @@ fit_vuln_curve <- function(input_df,
     D.se <- ifelse(model_type%in%c("exp","Linear"), NA, sterror[[4]]|>as.numeric())
 
     # create function to calculate water potential at X% max conductance
-    px_fx <- hydrafit:::psiPx(fx_type = model_type)
+    px_fx <- hydrafit::psiPx(model_type = model_type)
 
     if(model_type%in%c("exp","Linear")){
     est_params <- list(A=A,

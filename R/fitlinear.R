@@ -5,7 +5,6 @@
 #' @param input_df Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations
 #' @param model_type Select appropriate model function. Here the default is linear
 #' @param plot True or false for plotting model parameters
-#' @param silent Suppress warnings from fit
 #' @param ... Additional plotting parameters if plot==T (e.g., xlab, ylab)
 #'
 #'

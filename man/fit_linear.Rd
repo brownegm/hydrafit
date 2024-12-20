@@ -14,8 +14,6 @@ fit_linear(input_df, model_type = "Linear", plot = F, ...)
 \item{plot}{True or false for plotting model parameters}
 
 \item{...}{Additional plotting parameters if plot==T (e.g., xlab, ylab)}
-
-\item{silent}{Suppress warnings from fit}
 }
 \value{
 Returns best fitting model parameters for each species for nonlinear fits

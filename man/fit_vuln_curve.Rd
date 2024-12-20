@@ -4,7 +4,7 @@
 \alias{fit_vuln_curve}
 \title{Compute the best fit likelihood parameters for each species for each model type}
 \usage{
-fit_vuln_curve(input_df, model_type, max_cond_at, plot = F, ...)
+fit_vuln_curve(input_df, model_type, max_cond_at = 0.1, plot = F, ...)
 }
 \arguments{
 \item{input_df}{input folder with kl and psi values}

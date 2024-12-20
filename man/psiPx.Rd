@@ -4,10 +4,10 @@
 \alias{psiPx}
 \title{psiPX: Estimate plrc at a given maximum conductance}
 \usage{
-psiPx(fx_type = character())
+psiPx(model_type = character())
 }
 \arguments{
-\item{fx_type}{Function type. See ?Exponential for function options.}
+\item{model_type}{Function type. See ?Exponential for function options.}
 }
 \value{
 Returns a function which takes model parameters,"px", and "max_cond_at" as parameters.
@@ -20,7 +20,7 @@ The functions within the functional are anonymous themselves, hence the "\(param
 }
 \examples{
 # create function for estimating pX with linear formula
-psi.px <- psiPx(fx_type = "Linear")
+psi.px <- psiPx(model_type = "Linear")
 A <- 2
 B <- 0.5
 
