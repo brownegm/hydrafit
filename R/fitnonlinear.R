@@ -7,7 +7,7 @@
 #' @param max_cond_at water potential which pX should be based upon.
 #' @param plot True or false for plotting model parameters
 #' @param ... Plotting parameters passed to \code{plot()} if plot=TRUE
-#'
+#' @param pdf probability density function. Default is dnorm.
 #'
 #' @details This function utilizes the `anneal` function of the likelihood package \code{citation('likelihood')}. Within this function there are few assumptions about how we expect the annealing and fitting process is run:
 #'
@@ -20,13 +20,15 @@
 #'
 #' @return Returns best fitting model parameters for each species for nonlinear fits
 #'
-#'
 #' @export
+#' @import likelihood
+#' @importFrom stats dnorm
+#' @importFrom graphics lines title
 
 
 fit_vuln_curve <- function(input_df,
                           model_type,
-                          max_cond_at = 0.1,
+                          max_cond_at = 0.1, pdf = stats::dnorm,
                           plot = F, ...) {
 
   if(!model_type %in% c("log","exp","exp2", "sig", "Linear")){
@@ -36,20 +38,22 @@ fit_vuln_curve <- function(input_df,
   if(max_cond_at %in% c(NULL,0)){
     stop("max_cond_at parameter is either not provided or equals zero.\n Models default to 0, so max_cond_at must be > 0.")
   }
-  # mod <- ifelse(model_type=="log", Logistic,
-  #                       ifelse(model_type=="exp", Exponential,
-  #                              ifelse(model_type=="exp2", Exponential2,
-  #                                     ifelse(model_type=="sig", Sigmoidal,
-  #                                            Linear))))
+  mod <- ifelse(model_type=="log", Logistic,
+                        ifelse(model_type=="exp", Exponential,
+                               ifelse(model_type=="exp2", Exponential2,
+                                      ifelse(model_type=="sig", Sigmoidal,
+                                             Linear))))
+
+  if (!is.function(mod)) {
+    stop("model is not a function.\n")
+  }
   #print(mod)
-  mod <- switch(model_type,
-         "log" = hydrafit::Logistic,
-         "exp" = hydrafit::Exponential,
-         "exp2" = hydrafit::Exponential2,
-         "sig" = hydrafit::Sigmoidal,
-         hydrafit::Linear)
-
-
+  # mod <- switch(model_type,
+  #        "log" = hydrafit::Logistic,
+  #        "exp" = hydrafit::Exponential,
+  #        "exp2" = hydrafit::Exponential2,
+  #        "sig" = hydrafit::Sigmoidal,
+  #        hydrafit::Linear)
 
   par_estimates <- define_pars(input_df, model_type = model_type)
 
@@ -64,6 +68,7 @@ fit_vuln_curve <- function(input_df,
       log = TRUE
     )
 
+    #pdf <- stats::dnorm
     # # List functions in the global environment
     # function_objects <- sapply(ls(.GlobalEnv), function(x) {
     #   is.function(get(x, envir = .GlobalEnv, inherits = FALSE))
@@ -73,7 +78,8 @@ fit_vuln_curve <- function(input_df,
     # print(paste("fx names are:", names(function_objects)[function_objects]))
 
     res <-
-      hydrafit:::anneal(
+     #hydrafit:::anneal_custom(input_pdf = stats::dnorm,
+     anneal(
         model = mod,
         par = pars,
         source_data = input_df,
@@ -81,7 +87,7 @@ fit_vuln_curve <- function(input_df,
         par_lo = pars_low,
         par_hi = pars_high,
         dep_var = "kl",
-        pdf = dnorm,#pdf stands for probability density function
+        pdf = pdf,#pdf stands for probability density function
         max_iter = 5000,
         show_display = F#,
         #temp_red = 0.1, initial_temp = 100

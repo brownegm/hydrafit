@@ -4,7 +4,14 @@
 \alias{fit_vuln_curve}
 \title{Compute the best fit likelihood parameters for each species for each model type}
 \usage{
-fit_vuln_curve(input_df, model_type, max_cond_at = 0.1, plot = F, ...)
+fit_vuln_curve(
+  input_df,
+  model_type,
+  max_cond_at = 0.1,
+  pdf = stats::dnorm,
+  plot = F,
+  ...
+)
 }
 \arguments{
 \item{input_df}{input folder with kl and psi values}
@@ -12,6 +19,8 @@ fit_vuln_curve(input_df, model_type, max_cond_at = 0.1, plot = F, ...)
 \item{model_type}{select appropriate model type here i.e., "Linear" for linear, "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types}
 
 \item{max_cond_at}{water potential which pX should be based upon.}
+
+\item{pdf}{probability density function. Default is dnorm.}
 
 \item{plot}{True or false for plotting model parameters}
 

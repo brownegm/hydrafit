@@ -29,3 +29,4 @@ Bpred = round(linear_fits[["B"]], 1)
 expect_equal(Apred, A)
 expect_equal(Bpred, B)
 })
+
