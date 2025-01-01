@@ -48,12 +48,12 @@ fit_vuln_curve <- function(input_df,
     stop("model is not a function.\n")
   }
   #print(mod)
-  # mod <- switch(model_type,
-  #        "log" = hydrafit::Logistic,
-  #        "exp" = hydrafit::Exponential,
-  #        "exp2" = hydrafit::Exponential2,
-  #        "sig" = hydrafit::Sigmoidal,
-  #        hydrafit::Linear)
+  mod <- switch(model_type,
+         "log" = hydrafit::Logistic,
+         "exp" = hydrafit::Exponential,
+         "exp2" = hydrafit::Exponential2,
+         "sig" = hydrafit::Sigmoidal,
+         hydrafit::Linear)
 
   par_estimates <- define_pars(input_df, model_type = model_type)
 
@@ -77,22 +77,45 @@ fit_vuln_curve <- function(input_df,
     # # Print out the function objects
     # print(paste("fx names are:", names(function_objects)[function_objects]))
 
-    res <-
-     #hydrafit:::anneal_custom(input_pdf = stats::dnorm,
-     anneal(
-        model = mod,
-        par = pars,
-        source_data = input_df,
-        var = var,
-        par_lo = pars_low,
-        par_hi = pars_high,
-        dep_var = "kl",
-        pdf = pdf,#pdf stands for probability density function
-        max_iter = 5000,
-        show_display = F#,
-        #temp_red = 0.1, initial_temp = 100
-      )
+# anneal_params <- list(model = mod,
+#                par = pars,
+#                source_data = input_df,
+#                var = var,
+#                par_lo = pars_low,
+#                par_hi = pars_high,
+#                dep_var = "kl",
+#                pdf = dnorm,#pdf stands for probability density function
+#                max_iter = 5000,
+#                show_display = F)
 
+#env <- parent.frame()
+res <- anneal(model = mod,
+            par = pars,
+            source_data = input_df,
+            var = var,
+            par_lo = pars_low,
+            par_hi = pars_high,
+            dep_var = "kl",
+            pdf = dnorm,#pdf stands for probability density function
+            max_iter = 5000,
+            show_display = F)
+#res <- eval()
+    # res <-
+    #  #hydrafit:::anneal_custom(input_pdf = stats::dnorm,
+    #  anneal(
+    #     model = mod,
+    #     par = pars,
+    #     source_data = input_df,
+    #     var = var,
+    #     par_lo = pars_low,
+    #     par_hi = pars_high,
+    #     dep_var = "kl",
+    #     pdf = pdf,#pdf stands for probability density function
+    #     max_iter = 5000,
+    #     show_display = F#,
+    #     #temp_red = 0.1, initial_temp = 100
+    #   )
+print(res$pdf)
     #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
     #helped a lot. You can watch the fitting proceed with show_display,
     #but I've never found it very informative
