@@ -68,27 +68,6 @@ fit_vuln_curve <- function(input_df,
       log = TRUE
     )
 
-    #pdf <- stats::dnorm
-    # # List functions in the global environment
-    # function_objects <- sapply(ls(.GlobalEnv), function(x) {
-    #   is.function(get(x, envir = .GlobalEnv, inherits = FALSE))
-    # })
-    #
-    # # Print out the function objects
-    # print(paste("fx names are:", names(function_objects)[function_objects]))
-
-# anneal_params <- list(model = mod,
-#                par = pars,
-#                source_data = input_df,
-#                var = var,
-#                par_lo = pars_low,
-#                par_hi = pars_high,
-#                dep_var = "kl",
-#                pdf = dnorm,#pdf stands for probability density function
-#                max_iter = 5000,
-#                show_display = F)
-
-#env <- parent.frame()
 res <- anneal(model = mod,
             par = pars,
             source_data = input_df,
@@ -99,23 +78,7 @@ res <- anneal(model = mod,
             pdf = dnorm,#pdf stands for probability density function
             max_iter = 5000,
             show_display = F)
-#res <- eval()
-    # res <-
-    #  #hydrafit:::anneal_custom(input_pdf = stats::dnorm,
-    #  anneal(
-    #     model = mod,
-    #     par = pars,
-    #     source_data = input_df,
-    #     var = var,
-    #     par_lo = pars_low,
-    #     par_hi = pars_high,
-    #     dep_var = "kl",
-    #     pdf = pdf,#pdf stands for probability density function
-    #     max_iter = 5000,
-    #     show_display = F#,
-    #     #temp_red = 0.1, initial_temp = 100
-    #   )
-print(res$pdf)
+
     #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
     #helped a lot. You can watch the fitting proceed with show_display,
     #but I've never found it very informative

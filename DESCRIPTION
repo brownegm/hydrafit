@@ -8,8 +8,7 @@ Description: The functions provided in this package used for estimating hydrauli
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-Depends: 
-    likelihood,
+Depends:
     R (>= 3.5)
 RoxygenNote: 7.3.2
 Suggests: 
@@ -17,7 +16,9 @@ Suggests:
     rmarkdown,
     dplyr,
     testthat (>= 3.0.0)
+Imports:
+    likelihood
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 Remotes:  
-    github::brownegm/likelihood
+    brownegm/likelihood
