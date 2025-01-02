@@ -17,50 +17,32 @@ fx_select <- function(.df_lin,
                       .df_sig,
                       .df_exp1,
                       .df_exp2) {
-  #establish objects
-  output <-
-    data.frame(
-      species = as.character(),
-      data.type = as.character(),
-      A = numeric(),
-      B = numeric(),
-      C = numeric(),
-      D = numeric(),
-      loglikeli = numeric(),
-      rsq = numeric(),
-      slope = numeric(),
-      AIC = numeric(),
-      AICcorr = numeric(),
-      sterror1 = numeric(),
-      sterror2 = numeric(),
-      sterror3 = numeric(),
-      sterror4 = numeric(),
-      N = numeric(),
-      max_cond = numeric(),
-      psi_k20 = numeric(),
-      psi_k50 = numeric(),
-      psi_k80 = numeric(),
-      psi_k95 = numeric(),
-      max_cond_at0.1=numeric(),
-      psi_k20_at0.1 = numeric(),
-      psi_k50_at0.1 = numeric(),
-      psi_k80_at0.1 = numeric(),
-      psi_k95_at0.1 = numeric()
-    )
 
-  rows <- dim(.df_lin)[1]#how many species rows are there
+  #establish objects
+  ## create empty dataframe to store output with names matching input dataframes.
+  output <- .df_lin|> apply( MARGIN = c(1,2), FUN = \(x) x<-NA)
+
+  ## determine number of rows in input dataframes
+  rows <- dim(.df_lin)[1]
+
+  ## create list of input dataframes
   dfs <-
-    list(.df_lin, .df_log, .df_sig, .df_exp1, .df_exp2)#list of the function objects containing modeled outputs
+    list(.df_lin,
+         .df_log,
+         .df_sig,
+         .df_exp1,
+         .df_exp2)
 
   for(i in 1:rows){
-
-    minAIC=min(c(.df_lin[i,"AICcorr"], #what's the lowest AICc for each species row for each model
+## determine the lowest AICc for each species across each model
+    minAIC=min(c(.df_lin[i,"AICcorr"],
                  .df_log[i,"AICcorr"],
                  .df_sig[i,"AICcorr"],
                  .df_exp1[i,"AICcorr"],
                  .df_exp2[i,"AICcorr"]))
 
-    lowestAICc<-lapply(dfs, function(df) #select the row from the appropriate df to add to output
+    ## select the row from the appropriate df to add to output
+    lowestAICc<-lapply(dfs, function(df)
 
       if(df[[i,"AICcorr"]]==minAIC){
 
@@ -70,9 +52,11 @@ fx_select <- function(.df_lin,
 
         }
     )
-    lowestAICc[sapply(lowestAICc, is.null)] <- NULL#lapply creates NULLs in the list; remove here
-
-    output[i,]<-unlist(lowestAICc)#save row for given species from appropriate df in the output
+    # clean output
+    ## lapply creates NULLs in the list; remove here
+    lowestAICc[sapply(lowestAICc, is.null)] <- NULL#
+   ## save row for given species from appropriate df in the output
+    output[i,]<-unlist(lowestAICc)#
   }
   return(output)
 }
