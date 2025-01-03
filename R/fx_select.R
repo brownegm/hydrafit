@@ -54,9 +54,10 @@ fx_select <- function(.df_lin,
     )
     # clean output
     ## lapply creates NULLs in the list; remove here
-    lowestAICc[sapply(lowestAICc, is.null)] <- NULL#
+    lowestAICc[sapply(lowestAICc, is.null)] <- NULL
    ## save row for given species from appropriate df in the output
     output[i,]<-unlist(lowestAICc)#
   }
+
   return(output)
 }
