@@ -14,18 +14,18 @@ fx_select(
 )
 }
 \arguments{
-\item{linear_fits}{dataframe of linear fits}
+\item{linear_fits}{List of linear fits}
 
-\item{logistic_fits}{dataframe of logistic fits}
+\item{logistic_fits}{List of logistic fits}
 
-\item{sigmoidal_fits}{dataframe of sigmoidal fits}
+\item{sigmoidal_fits}{List of sigmoidal fits}
 
-\item{exp1_fits}{dataframe of first exponential fits}
+\item{exp1_fits}{List of first exponential fits}
 
-\item{exp2_fits}{dataframe of second exponential fits}
+\item{exp2_fits}{List of second exponential fits}
 }
 \value{
-Returns a dataframe with the best fit models. Note: D here is the third parameter for Exp2 or Sigmoidal models.
+Returns a list with the best fitting (i.e., lowest AICc) models.
 }
 \description{
 Requires that you input all of the fitting parameter data frames from `hydrafit::fit_vuln_curve()`.

@@ -2,13 +2,14 @@
 #'
 #' @description Requires that you input all of the fitting parameter data frames from `hydrafit::fit_vuln_curve()`.
 #'
-#' @param linear_fits dataframe of linear fits
-#' @param logistic_fits dataframe of logistic fits
-#' @param sigmoidal_fits dataframe of sigmoidal fits
-#' @param exp1_fits dataframe of first exponential fits
-#' @param exp2_fits dataframe of second exponential fits
+#' @param linear_fits List of linear fits
+#' @param logistic_fits List of logistic fits
+#' @param sigmoidal_fits List of sigmoidal fits
+#' @param exp1_fits List of first exponential fits
+#' @param exp2_fits List of second exponential fits
 #'
-#' @return Returns a dataframe with the best fit models. Note: D here is the third parameter for Exp2 or Sigmoidal models.
+#' @return Returns a list with the best fitting (i.e., lowest AICc) models.
+#'
 #' @export fx_select
 #'
 
@@ -21,7 +22,6 @@ fx_select <- function(linear_fits,
 
   #establish objects
   ## create empty dataframe to store output with names matching input dataframes.
-  # output <- .df_lin|> apply( MARGIN = c(1,2), FUN = \(x) x<-NA)
   # Combine all conditions into a list
   all_models <- list(linear_fits,
                              logistic_fits,
