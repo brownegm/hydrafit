@@ -4,27 +4,20 @@
 \alias{bootPX}
 \title{Tool for estimating confidence intervals for percent loss in conductance.}
 \usage{
-bootPX(
-  df,
-  model_type = character(),
-  px = 0.5,
-  sims = 1000,
-  psi_max = numeric()
-)
+bootPX(fit, model_type, px = 0.5, psi_max, seed = 123, sims = 1000)
 }
 \arguments{
-\item{df}{input data frame containing best fit models, parameter estimates and their SDs}
+\item{fit}{Fit object from `fit_vuln_curve()`}
 
 \item{model_type}{Best fitting model}
 
-\item{px}{Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)}
+\item{px}{Percent loss in conductance. Default is 0.5.}
 
-\item{sims}{Number of simulated values to generate}
+\item{psi_max}{Value of psi at which to estimate maximum conductance.}
 
-\item{psi_max}{estimate px based on what value of psi}
-}
-\value{
-Returns a list of simulations predicted PX values the length of the number `sims`.
+\item{seed}{Value for reproducibility}
+
+\item{sims}{Number of simulations to run. Default is 1000.}
 }
 \description{
 Tool for estimating confidence intervals for percent loss in conductance.

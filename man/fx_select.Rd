@@ -4,22 +4,29 @@
 \alias{fx_select}
 \title{Select the best fitting function for each species based on the lowest AICc score.}
 \usage{
-fx_select(.df_lin, .df_log, .df_sig, .df_exp1, .df_exp2)
+fx_select(
+  linear_fits,
+  logistic_fits,
+  sigmoidal_fits,
+  exp1_fits,
+  exp2_fits,
+  quiet = TRUE
+)
 }
 \arguments{
-\item{.df_lin}{dataframe of linear fits}
+\item{linear_fits}{dataframe of linear fits}
 
-\item{.df_log}{dataframe of logistic fits}
+\item{logistic_fits}{dataframe of logistic fits}
 
-\item{.df_sig}{dataframe of sigmoidal fits}
+\item{sigmoidal_fits}{dataframe of sigmoidal fits}
 
-\item{.df_exp1}{dataframe of first exponential fits}
+\item{exp1_fits}{dataframe of first exponential fits}
 
-\item{.df_exp2}{dataframe of second exponential fits}
+\item{exp2_fits}{dataframe of second exponential fits}
 }
 \value{
 Returns a dataframe with the best fit models. Note: D here is the third parameter for Exp2 or Sigmoidal models.
 }
 \description{
-Requires that you input all of the fitting parameter data frames from `hydrafit::fitlinear()` and `hydrafit::fit_nonlinear()`.
+Requires that you input all of the fitting parameter data frames from `hydrafit::fit_vuln_curve()`.
 }
