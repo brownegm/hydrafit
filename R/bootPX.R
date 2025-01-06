@@ -66,8 +66,8 @@ output <- vector(mode = "list", length = length(fit))
 for(i in seq_along(fit)){
 
   fit_resample <- resamplePX(fit,
-                        fx_type = fit$data.type,
-                        px = px, psi_max = psi_max)#%>%unlist()# suppressing warnings here can help if errors resulting from NAs stop you from moving forward.
+                        px = px, psi_max = psi_max)
+  #suppressing warnings here can help if errors resulting from NAs stop you from moving forward.
   finite_values <- sapply(fit_resample, function(x) is.finite(x[[1]]))
   boot_vals <- fit_resample[finite_values]|>unlist()
 
@@ -99,7 +99,7 @@ for(i in seq_along(fit)){
 
 }
 
-return(output_boot)
+return(output)
 
 }
 

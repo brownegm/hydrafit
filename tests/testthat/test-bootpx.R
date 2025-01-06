@@ -10,6 +10,7 @@ exp1_fits <- list()
 exp2_fits <- list()
 
 # fit the models
+suppressWarnings({
 for (ii in seq_along(unique(data$species))){
   subset(data, data$species == unique(data$species)[ii], select = c(1:ncol(data))) -> data_by_sp
 
@@ -23,7 +24,7 @@ for (ii in seq_along(unique(data$species))){
 
   exp2_fits[[ii]] = fit_vuln_curve(data_by_sp,model_type= "exp2", plot=F)
 }
-
+})
 # run resample
 best_model <- fx_select(linear_fits, logistic_fits, sigmoidal_fits, exp1_fits, exp2_fits)
 
