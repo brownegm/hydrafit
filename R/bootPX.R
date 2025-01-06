@@ -10,7 +10,7 @@
 #'    \item Github page: \url{https://github.com/cran/likelihood/blob/master/R/anneal.R}. See lines 742-797 specifically within the code.
 #' }
 
-#' @param fit Fit object from `fit_vuln_curve()`
+#' @param fit Fit object(s) from `fit_vuln_curve()`
 #' @param model_type Best fitting model
 #' @param px Percent loss in conductance. Default is 0.5.
 #' @param psi_max Value of psi at which to estimate maximum conductance.
@@ -19,11 +19,16 @@
 #'
 #' @export bootPX
 #'
-bootPX <- function(fit, model_type, px = 0.5, psi_max, seed = 123, sims = 1000){
+bootPX <- function(fit, px = 0.5, psi_max, seed = 123, sims = 1000){
+
+  px_char <- as.character(px)
+  px_est <- switch(px_char,
+                   "0.5"=fit$psi_k50,
+                   "0.8"=fit$psi_k80)
 
   #check if the model type is valid
-  if(!model_type%in%c("exp2", "log", "sig", "lin", "exp")){
-    stop("Model type must be one of the following: exp2, log, sig, lin, exp")
+  if(!model_type%in%c("exp2", "log", "sig", "Linear", "exp")){
+    stop("Model type must be one of the following: exp2, log, sig, Linear, exp")
   }
 
   #check if the percent loss in conductance is valid
@@ -36,18 +41,19 @@ bootPX <- function(fit, model_type, px = 0.5, psi_max, seed = 123, sims = 1000){
     stop("Value for psi_max must be greater than 0")
   }
 
-  #check if the fit object is a data frame
-  if(!is.data.frame(fit)){
-    stop("Fit object must be a data frame")
-  }
+  # #check if the fit object is a data frame
+  # if(!is.data.frame(fit)){
+  #   stop("Fit object must be a data frame")
+  # }
 
-  #check if the fit object has the correct columns
-  if(!all(c("species", "A", "B", "C", "sterrorA", "sterrorB", "sterrorC", "data.type", "psi_k50")%in%colnames(fit))){
-    stop("Fit object must have the following columns: species, A, B, C, sterrorA, sterrorB, sterrorC, data.type, psi_k50")
-  }
+  # #check if the fit object has the correct columns
+  # if(!all(c("species", "A", "B", "C", "sterrorA", "sterrorB", "sterrorC", "data.type", "psi_k50", "psi_k80")%in%names(fit))){
+  # missing_names <- which(!names(fit)%in%c("species", "A", "B", "C", "sterrorA", "sterrorB", "sterrorC", "data.type", "psi_k50", "psi_k80"))
+  #   stop("Column(s) missing. Fit object must have the following columns: species, A, B, C, sterrorA, sterrorB, sterrorC, data.type, psi_k50.")
+  # }
 
   #check if the psi_k50 value is valid
-  if(any(fit$psi_k50<0)){
+  if(any(px_est<0)){
     stop("Values for psi_k50 must be greater than 0")
   }
 
@@ -55,12 +61,15 @@ alpha = 0.05
 
 set.seed(seed) #  For reproducibility
 
-for(i in 1:dim(fit)[1]){
+output <- vector(mode = "list", length = length(fit))
 
-  boot_vals_tmp<-resamplePX(mod_bestfit,
-                        fx_type=mod_bestfit[i,"data.type"],
-                        px=px, psi_max = psi_max)%>%unlist()# suppressing warnings here can help if errors resulting from NAs stop you from moving forward.
-  boot_vals <- is.finite(boot_vals_tmp)
+for(i in seq_along(fit)){
+
+  fit_resample <- resamplePX(fit,
+                        fx_type = fit$data.type,
+                        px = px, psi_max = psi_max)#%>%unlist()# suppressing warnings here can help if errors resulting from NAs stop you from moving forward.
+  finite_values <- sapply(fit_resample, function(x) is.finite(x[[1]]))
+  boot_vals <- fit_resample[finite_values]|>unlist()
 
   boot_mean <- mean(boot_vals, na.rm=T) # this values *is not * the same are the actual psi at X% loss in hydraulic conductance
 
@@ -74,22 +83,23 @@ for(i in 1:dim(fit)[1]){
 
   margin_error <- t_score*boot_se
 
-  conf.low<-mod_bestfit[i,"psi_k50"]-margin_error # using the predicted pX value to make the error make sense
-  conf.high<-mod_bestfit[i,"psi_k50"]+margin_error
+  conf.low <- px_est-margin_error # using the predicted pX value to make the error make sense
+  conf.high <- px_est+margin_error
 
 # save out of the results
-  output_boot <- structure(list(species=fit$species,
-                                psi_PX = numeric(),
+  output[[i]] <- structure(list(species=fit$species,
+                                psi_PX = ifelse(px_char=="0.5", "PLC 50%", "PLC 80%" ),
                                 boot_mean=boot_mean,
                                 boot_median=boot_median,
                                 boot_se=boot_se,
+                                deg_of_freedom = deg_of_freedom,
                                 margin_error=margin_error,
                                 conf.low=conf.low,
-                                conf.high=conf.high), class="data.frame")
+                                conf.high=conf.high))# class="data.frame"
 
 }
 
-output_boot
+return(output_boot)
 
 }
 
@@ -108,39 +118,49 @@ output_boot
 
 
 resamplePX <- function(fit,
-                 model_type = character(),
+                 #model_type = character(),
                  px=0.5, seed,
                  sims=1000,
                  psi_max = numeric()){
 
   if(length(psi_max)<1){stop("Value for psi_max must be provided.")}
 
-  psi_px <- vector()
+  if(!fit$data.type%in%c("Linear","exp1", "exp2", "log", "sig")){stop("Model type must be one of the following: Linear, exp1, exp2, log, sig")}
+
+  psi_px <- vector("list", length = sims) #initialize list to store results
+  model_type <- fit$data.type
 
   #check conditions
   fx_with_param3 <- model_type%in%c("exp2", "log", "sig")
 
   #define model parameters
-  A<-df[,"A"]; B<-df[,"B"] #parameter estimates
+  A<-fit$A
+  B<-fit$B
 
-  A.sd<-df[,"sterrorA"];B.sd<-df[,"sterrorB"]#sd of parameter estimates
+  #sd of parameter estimates
+  A.sd <- fit$sterrorA
+  B.sd <- fit$sterrorB
 
   if(fx_with_param3==F){# linear and exponential
 
     param_samples <- lapply(c(1:sims), #create X samples of paired values
 
-                            function(x){
-
-                              lapply(1, function(y) c(sample(rnorm(1000, A, A.sd), size=1,replace=T),#sample for A
-                                                      sample(rnorm(1000, B, B.sd), size=1,replace=T) #sample for B
-                                                      ))
+                            function(x) {
+                              lapply(1, function(y)
+                                c(
+                                  sample(rnorm(1000, A, A.sd), size = 1, replace = T),
+                                  #sample for A
+                                  sample(rnorm(1000, B, B.sd), size =
+                                           1, replace = T) #sample for B
+                                ))
 
                             })
 
   }else{#exponential2, logistic, and sigmoidal
+
  # define the third parameter for models with 3 parameters...C or Xo
-    param_3<-df[,"C"]
-    param_3.sd<-df[,"sterrorC"]
+    param_3<-fit$C
+    param_3.sd<-fit$sterrorC
 
     param_samples <- lapply(c(1:sims), #create X samples of paired values
 
@@ -160,20 +180,19 @@ resamplePX <- function(fit,
 
     for(i in 1:sims){# this is a lot to look at!!! Only way to index this list of lists since unlist makes this unusable
 
-
-        psi_px[i] <- psi_px_boot(A=param_samples[[i]][[1]][1],
+        psi_px[[i]] <- psi_px_boot(A=param_samples[[i]][[1]][1],
                               B=param_samples[[i]][[1]][2],
                               C=param_samples[[i]][[1]][3],
-                              px = px, max_cond_at = psi_max)
+                              px = px, max_cond_at = psi_max)$psi.px
 
     }
       }else{
 
     for(i in 1:sims){
 
-      psi_px[i] <- psi_px_boot(A=param_samples[[i]][[1]][1],
+      psi_px[[i]] <- psi_px_boot(A=param_samples[[i]][[1]][1],
                               B=param_samples[[i]][[1]][2],
-                              px = px, max_cond_at= psi_max)
+                              px = px, max_cond_at= psi_max)$psi.px
 
       }
 

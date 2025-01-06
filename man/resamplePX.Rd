@@ -4,18 +4,9 @@
 \alias{resamplePX}
 \title{Resample PX}
 \usage{
-resamplePX(
-  fit,
-  model_type = character(),
-  px = 0.5,
-  seed,
-  sims = 1000,
-  psi_max = numeric()
-)
+resamplePX(fit, px = 0.5, seed, sims = 1000, psi_max = numeric())
 }
 \arguments{
-\item{model_type}{Best fitting model}
-
 \item{px}{Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)}
 
 \item{seed}{Seed for reproducibility.}
@@ -25,6 +16,8 @@ resamplePX(
 \item{psi_max}{estimate px based on what value of psi}
 
 \item{df}{input data frame containing best fit models, parameter estimates and their SDs}
+
+\item{model_type}{Best fitting model}
 }
 \value{
 Returns a list of simulations predicted PX values the length of the number `sims`.

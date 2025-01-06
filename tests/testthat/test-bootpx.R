@@ -27,6 +27,18 @@ for (ii in seq_along(unique(data$species))){
 # run resample
 best_model <- fx_select(linear_fits, logistic_fits, sigmoidal_fits, exp1_fits, exp2_fits)
 
+# set parameters for the resamples
+fit <- best_model[[1]]
+
+psi_max = 0.1
+px = 0.5
+seed = 123
+sims = 1000
+
+fit_resample <- resamplePX(fit, px=px, seed=seed, sims=sims, psi_max = psi_max)
+
+
+
 
 
 

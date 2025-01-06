@@ -4,12 +4,10 @@
 \alias{bootPX}
 \title{Tool for estimating confidence intervals for percent loss in conductance.}
 \usage{
-bootPX(fit, model_type, px = 0.5, psi_max, seed = 123, sims = 1000)
+bootPX(fit, px = 0.5, psi_max, seed = 123, sims = 1000)
 }
 \arguments{
-\item{fit}{Fit object from `fit_vuln_curve()`}
-
-\item{model_type}{Best fitting model}
+\item{fit}{Fit object(s) from `fit_vuln_curve()`}
 
 \item{px}{Percent loss in conductance. Default is 0.5.}
 
@@ -18,6 +16,8 @@ bootPX(fit, model_type, px = 0.5, psi_max, seed = 123, sims = 1000)
 \item{seed}{Value for reproducibility}
 
 \item{sims}{Number of simulations to run. Default is 1000.}
+
+\item{model_type}{Best fitting model}
 }
 \description{
 Tool for estimating confidence intervals for percent loss in conductance.
