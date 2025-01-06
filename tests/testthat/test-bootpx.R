@@ -36,9 +36,9 @@ px = 0.5
 seed = 123
 sims = 1000
 
-fit_resample <- resamplePX(fit, px=px, seed=seed, sims=sims, psi_max = psi_max)
+#fit_resample <- resamplePX(fit, px=px, seed=seed, sims=sims, psi_max = psi_max)
 
-
+bootstrap<-bootPX(fit)
 
 
 
