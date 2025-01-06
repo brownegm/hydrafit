@@ -38,9 +38,6 @@ sims = 1000
 
 #fit_resample <- resamplePX(fit, px=px, seed=seed, sims=sims, psi_max = psi_max)
 
-bootstrap<-bootPX(fit)
-
-
-
+bootstrap<-bootPX(fit, psi_max=0.1)
 
 })
