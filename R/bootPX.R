@@ -27,7 +27,7 @@ bootPX <- function(fit, px = 0.5, psi_max, seed = 123, sims = 1000){
                    "0.8"=fit$psi_k80)
 
   #check if the model type is valid
-  if(!model_type%in%c("exp2", "log", "sig", "Linear", "exp")){
+  if(!fit$data.type%in%c("exp2", "log", "sig", "Linear", "exp")){
     stop("Model type must be one of the following: exp2, log, sig, Linear, exp")
   }
 
