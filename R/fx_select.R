@@ -7,7 +7,7 @@
 #' @param sigmoidal_fits List of sigmoidal fits
 #' @param exp1_fits List of first exponential fits
 #' @param exp2_fits List of second exponential fits
-#'
+#' @param quiet Logical. If TRUE, suppresses output.
 #' @return Returns a list with the best fitting (i.e., lowest AICc) models.
 #'
 #' @export fx_select

@@ -11,12 +11,12 @@
 #' }
 
 #' @param fit Fit object(s) from `fit_vuln_curve()`
-#' @param model_type Best fitting model
 #' @param px Percent loss in conductance. Default is 0.5.
 #' @param psi_max Value of psi at which to estimate maximum conductance.
 #' @param seed Value for reproducibility
 #' @param sims Number of simulations to run. Default is 1000.
 #'
+#' @importFrom stats qt sd median
 #' @export bootPX
 #'
 bootPX <- function(fit, px = 0.5, psi_max, seed = 123, sims = 1000){
@@ -44,11 +44,6 @@ bootPX <- function(fit, px = 0.5, psi_max, seed = 123, sims = 1000){
   #check if the psi_max value is valid
   if(psi_max<0){
     stop("Value for psi_max must be greater than 0")
-  }
-
-  #check if the psi_k50 value is valid
-  if(any(px_est<0)){
-    stop("Values for psi_k50 must be greater than 0")
   }
 
 alpha = 0.05
@@ -114,8 +109,7 @@ if(n_fit==1) {
 
 #' Resample PX
 #' @details Resampling is done by sampling from a normal distribution based on the mean and standard deviation of the parameter
-#' @param df input data frame containing best fit models, parameter estimates and their SDs
-#' @param model_type Best fitting model
+#' @param fit Best fitting model containing best fit models, parameter estimates and their SDs
 #' @param px Choose what percent loss in K/gs you are solving for PX (e.g., P50, P80 etc)
 #' @param sims Number of simulated values to generate
 #' @param psi_max estimate px based on what value of psi

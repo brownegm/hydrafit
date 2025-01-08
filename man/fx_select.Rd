@@ -23,6 +23,8 @@ fx_select(
 \item{exp1_fits}{List of first exponential fits}
 
 \item{exp2_fits}{List of second exponential fits}
+
+\item{quiet}{Logical. If TRUE, suppresses output.}
 }
 \value{
 Returns a list with the best fitting (i.e., lowest AICc) models.

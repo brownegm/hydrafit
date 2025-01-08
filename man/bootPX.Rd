@@ -16,8 +16,6 @@ bootPX(fit, px = 0.5, psi_max, seed = 123, sims = 1000)
 \item{seed}{Value for reproducibility}
 
 \item{sims}{Number of simulations to run. Default is 1000.}
-
-\item{model_type}{Best fitting model}
 }
 \description{
 Tool for estimating confidence intervals for percent loss in conductance.
