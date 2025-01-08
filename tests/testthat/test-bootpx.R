@@ -22,7 +22,7 @@ for (ii in seq_along(unique(data$species))){
 
   exp1_fits[[ii]] = fit_vuln_curve(data_by_sp, model_type = "exp", plot=F)
 
-  exp2_fits[[ii]] = fit_vuln_curve(data_by_sp,model_type= "exp2", plot=F)
+  exp2_fits[[ii]] = fit_vuln_curve(data_by_sp, model_type= "exp2", plot=F)
  }
 })
 
@@ -34,15 +34,18 @@ testthat::expect_equal(attr(best_model, "fit.list"), TRUE)
 fit <- best_model[[1]]
 testthat::expect_equal(attr(fit, "fit.list"), FALSE)
 
-# run resample
+# run bootstrap for single fit and list of fits
 psi_max = 0.1
 px = 0.5
 seed = 123
 sims = 1000
 
-#fit_resample <- resamplePX(fit, px=px, seed=seed, sims=sims, psi_max = psi_max)
-
 bootstrap<-bootPX(fit, psi_max=0.1)
 
 bootstrap_list <- bootPX(best_model, psi_max=0.1)
+
+expect_equal(length(bootstrap), 9)
+expect_equal(length(bootstrap_list), length(unique(data$species)))
+
+expect_equal(bootstrap[1])
 })

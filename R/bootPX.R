@@ -21,19 +21,19 @@
 #'
 bootPX <- function(fit, px = 0.5, psi_max, seed = 123, sims = 1000){
 
-  if(attr(fit, "fit.list")==F){
-    n_fit <- 1
-  }else{
-    n_fit <- length(fit)
-  }
-  px_char <- as.character(px)
-  px_est <- switch(px_char,
-                   "0.5"=fit$psi_k50,
-                   "0.8"=fit$psi_k80)
+  fit.list <- attr(fit, "fit.list")
 
-  #check if the model type is valid
-  if(!fit$data.type%in%c("exp2", "log", "sig", "Linear", "exp")){
-    stop("Model type must be one of the following: exp2, log, sig, Linear, exp")
+  if(fit.list){
+    n_fit <- length(fit)
+    model.test <- lapply(seq_len(n_fit), \(x) fit[[x]]$data.type) %in% c("exp2", "log", "sig", "Linear", "exp")
+  }else{
+    n_fit <- 1
+    model.test <- fit$data.type %in% c("exp2", "log", "sig", "Linear", "exp")
+  }
+
+  #check if the model type(s) is/are valid
+  if (any(!model.test)) {
+    stop("Bootstrap: Model type(s) must be one of the following: exp2, log, sig, Linear, exp")
   }
 
   #check if the percent loss in conductance is valid
@@ -46,17 +46,6 @@ bootPX <- function(fit, px = 0.5, psi_max, seed = 123, sims = 1000){
     stop("Value for psi_max must be greater than 0")
   }
 
-  # #check if the fit object is a data frame
-  # if(!is.data.frame(fit)){
-  #   stop("Fit object must be a data frame")
-  # }
-
-  # #check if the fit object has the correct columns
-  # if(!all(c("species", "A", "B", "C", "sterrorA", "sterrorB", "sterrorC", "data.type", "psi_k50", "psi_k80")%in%names(fit))){
-  # missing_names <- which(!names(fit)%in%c("species", "A", "B", "C", "sterrorA", "sterrorB", "sterrorC", "data.type", "psi_k50", "psi_k80"))
-  #   stop("Column(s) missing. Fit object must have the following columns: species, A, B, C, sterrorA, sterrorB, sterrorC, data.type, psi_k50.")
-  # }
-
   #check if the psi_k50 value is valid
   if(any(px_est<0)){
     stop("Values for psi_k50 must be greater than 0")
@@ -66,16 +55,22 @@ alpha = 0.05
 
 set.seed(seed) #  For reproducibility
 
-if(attr(fit, "fit.list")==F){
-  output <- vector(mode = "list", length = n_fit)
-}else{
-  output <- vector(mode = "list", length = n_fit)
-}
+output <- vector(mode = "list", length = n_fit)
 
+for(i in seq_len(n_fit)){
 
-for(i in seq_along(n_fit)){
+  if(fit.list){
+    fit_temp <- fit[[i]]
+  }else{
+    fit_temp <- fit
+  }
 
-  fit_resample <- resamplePX(fit,
+  px_char <- as.character(px)
+  px_est <- switch(px_char,
+                   "0.5"=fit_temp$psi_k50,
+                   "0.8"=fit_temp$psi_k80)
+
+  fit_resample <- resamplePX(fit = fit_temp, sims = sims,
                         px = px, psi_max = psi_max)
   #suppressing warnings here can help if errors resulting from NAs stop you from moving forward.
   finite_values <- sapply(fit_resample, function(x) is.finite(x[[1]]))
@@ -97,7 +92,7 @@ for(i in seq_along(n_fit)){
   conf.high <- px_est+margin_error
 
 # save out of the results
-  output[[i]] <- structure(list(species=fit$species,
+  output[[i]] <- structure(list(species=fit_temp$species,
                                 psi_PX = ifelse(px_char=="0.5", "PLC@50%", "PLC@80%" ),
                                 boot_mean=boot_mean,
                                 boot_median=boot_median,
@@ -109,7 +104,11 @@ for(i in seq_along(n_fit)){
 
 }
 
-return(output)
+if(n_fit==1) {
+  return(unlist(output, recursive = FALSE))
+} else{
+  return(output)
+}
 
 }
 
@@ -134,8 +133,6 @@ resamplePX <- function(fit,
                  psi_max = numeric()){
 
   if(length(psi_max)<1){stop("Value for psi_max must be provided.")}
-
-  if(!fit$data.type%in%c("Linear","exp1", "exp2", "log", "sig")){stop("Model type must be one of the following: Linear, exp1, exp2, log, sig")}
 
   psi_px <- vector("list", length = sims) #initialize list to store results
   model_type <- fit$data.type
