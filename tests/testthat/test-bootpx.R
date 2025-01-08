@@ -44,8 +44,10 @@ bootstrap<-bootPX(fit, psi_max=0.1)
 
 bootstrap_list <- bootPX(best_model, psi_max=0.1)
 
+# check if the bootstrap results are the expected size
 expect_equal(length(bootstrap), 9)
 expect_equal(length(bootstrap_list), length(unique(data$species)))
 
-expect_equal(bootstrap[1])
+# check if the bootstrap results are the same
+testthat::expect_equal(bootstrap$margin_error, bootstrap_list[[1]]$margin_error)
 })
