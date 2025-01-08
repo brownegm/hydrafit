@@ -153,7 +153,8 @@ res <- anneal(model = mod,
       psi_k95_at0.1 = px_estimates$p95_atmaxcond
       ),
     # attributes
-    mod.type = model_type
+    mod.type = model_type,
+    fit.list = FALSE
     )
 
     #plot the fit

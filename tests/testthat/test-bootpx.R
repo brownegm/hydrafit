@@ -1,4 +1,4 @@
-test_that("bootstrap check ", {
+test_that("bootstrap check", {
 
 data <- scof2012
 
@@ -25,12 +25,16 @@ for (ii in seq_along(unique(data$species))){
   exp2_fits[[ii]] = fit_vuln_curve(data_by_sp,model_type= "exp2", plot=F)
  }
 })
+
 # run resample
 best_model <- fx_select(linear_fits, logistic_fits, sigmoidal_fits, exp1_fits, exp2_fits)
+testthat::expect_equal(attr(best_model, "fit.list"), TRUE)
 
 # set parameters for the resamples
 fit <- best_model[[1]]
+testthat::expect_equal(attr(fit, "fit.list"), FALSE)
 
+# run resample
 psi_max = 0.1
 px = 0.5
 seed = 123
@@ -40,4 +44,5 @@ sims = 1000
 
 bootstrap<-bootPX(fit, psi_max=0.1)
 
+bootstrap_list <- bootPX(best_model, psi_max=0.1)
 })

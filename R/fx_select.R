@@ -36,6 +36,8 @@ fx_select <- function(linear_fits,
     values[[which.min(sapply(values, function(x) x$AICcorr))]]
   }, all_models, SIMPLIFY = FALSE))
 
+ attr(lowest_elements, "fit.list") <- TRUE
+
   return(lowest_elements)
 }
 

@@ -21,6 +21,11 @@
 #'
 bootPX <- function(fit, px = 0.5, psi_max, seed = 123, sims = 1000){
 
+  if(attr(fit, "fit.list")==F){
+    n_fit <- 1
+  }else{
+    n_fit <- length(fit)
+  }
   px_char <- as.character(px)
   px_est <- switch(px_char,
                    "0.5"=fit$psi_k50,
@@ -61,9 +66,14 @@ alpha = 0.05
 
 set.seed(seed) #  For reproducibility
 
-output <- vector(mode = "list", length = length(fit))
+if(attr(fit, "fit.list")==F){
+  output <- vector(mode = "list", length = n_fit)
+}else{
+  output <- vector(mode = "list", length = n_fit)
+}
 
-for(i in seq_along(fit)){
+
+for(i in seq_along(n_fit)){
 
   fit_resample <- resamplePX(fit,
                         px = px, psi_max = psi_max)
