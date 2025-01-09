@@ -5,6 +5,7 @@
 #' @param input_df input folder with kl and psi values
 #' @param model_type select appropriate model type here i.e., "Linear" for linear, "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types
 #' @param max_cond_at water potential which pX should be based upon.
+#' @param bootstrap True or false for bootstrapping of P50 at your chosen max_cond_at
 #' @param plot True or false for plotting model parameters
 #' @param ... Plotting parameters passed to \code{plot()} if plot=TRUE
 #' @param pdf probability density function. Default is dnorm.
@@ -24,11 +25,14 @@
 #' @import likelihood
 #' @importFrom stats dnorm
 #' @importFrom graphics lines title
+#' @importFrom ggplot2 ggplot geom_point geom_line labs
+#' @importFrom rlang .data
 
 
 fit_vuln_curve <- function(input_df,
                           model_type,
                           max_cond_at = 0.1, pdf = stats::dnorm,
+                          bootstrap = F,
                           plot = F, ...) {
 
   if(!model_type %in% c("log","exp","exp2", "sig", "Linear")){
@@ -76,7 +80,7 @@ res <- anneal(model = mod,
             par_hi = pars_high,
             dep_var = "kl",
             pdf = dnorm,#pdf stands for probability density function
-            max_iter = 5000,
+            max_iter = 5000, temp_red = 0.8,
             show_display = F)
 
     #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
@@ -124,7 +128,7 @@ res <- anneal(model = mod,
                                  px_fx = px_fx,
                                  max_cond_at = max_cond_at)
 
-    parvecLog <- structure(list(
+    parlist_out <- structure(list(
       species = paste(input_df[1, 1]),
       data.type = model_type,
       A = A,
@@ -157,23 +161,37 @@ res <- anneal(model = mod,
     fit.list = FALSE
     )
 
+    if (bootstrap == T){
+      par_bootstrap <- bootPX(parlist_out, px = 0.5, psi_max = 0.1)
+      parlist_out$conf.low <- par_bootstrap$conf.low
+      parlist_out$conf.high <- par_bootstrap$conf.high
+    }
     #plot the fit
 
     if (plot == T) {
-      plot(res$source_data$psi,
-           res$source_data$kl,
-           ...)
+      plotdata <- res$source_data
 
-      cbind(res$source_data$psi, res$source_data$predicted) -> for_plotting
+      fitplot <- ggplot2::ggplot(ggplot2::aes(x=.data$psi, y=.data$kl), data=plotdata) +
+        ggplot2::geom_point(size = 2) +
+        ggplot2::geom_line(ggplot2::aes(x=.data$psi, y=.data$predicted), color="red") +
+        ggplot2::labs(title = paste(parlist_out$species, model_type))+
+        theme_classic(base_size = 14)
 
-      for_plotting[order(for_plotting[, 1]), ] -> for_plotting
-
-      lines(for_plotting[, 1], for_plotting[, 2], col = "blue")
-
-      title(paste(input_df[1, 1], model_type))
+      parlist_out$plot <- fitplot
+      # plot(res$source_data$psi,
+      #      res$source_data$kl,
+      #      ...)
+      #
+      # cbind(res$source_data$psi, res$source_data$predicted) -> for_plotting
+      #
+      # for_plotting[order(for_plotting[, 1]), ] -> for_plotting
+      #
+      # lines(for_plotting[, 1], for_plotting[, 2], col = "blue")
+      #
+      # title(paste(input_df[1, 1], model_type))
 
     }
-    return(parvecLog)
+    return(parlist_out)
 
   }
 

@@ -5,11 +5,11 @@
 \title{Select the best fitting function for each species based on the lowest AICc score.}
 \usage{
 fx_select(
-  linear_fits,
-  logistic_fits,
-  sigmoidal_fits,
-  exp1_fits,
-  exp2_fits,
+  linear_fits = NULL,
+  logistic_fits = NULL,
+  sigmoidal_fits = NULL,
+  exp1_fits = NULL,
+  exp2_fits = NULL,
   quiet = TRUE
 )
 }

@@ -13,11 +13,11 @@
 #' @export fx_select
 #'
 
-fx_select <- function(linear_fits,
-                      logistic_fits,
-                      sigmoidal_fits,
-                      exp1_fits,
-                      exp2_fits,
+fx_select <- function(linear_fits=NULL,
+                      logistic_fits=NULL,
+                      sigmoidal_fits=NULL,
+                      exp1_fits=NULL,
+                      exp2_fits=NULL,
                       quiet = TRUE) {
 
   #establish objects

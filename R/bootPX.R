@@ -46,6 +46,9 @@ bootPX <- function(fit, px = 0.5, psi_max, seed = 123, sims = 1000){
     stop("Value for psi_max must be greater than 0")
   }
 
+
+px_char <- paste0(as.character(px), "@", as.character(psi_max))
+
 alpha = 0.05
 
 set.seed(seed) #  For reproducibility
@@ -60,10 +63,11 @@ for(i in seq_len(n_fit)){
     fit_temp <- fit
   }
 
-  px_char <- as.character(px)
   px_est <- switch(px_char,
-                   "0.5"=fit_temp$psi_k50,
-                   "0.8"=fit_temp$psi_k80)
+                   "0.5@"=fit_temp$psi_k50,
+                   "0.8@"=fit_temp$psi_k80,
+                   "0.5@0.1"=fit_temp$psi_k50_at0.1,
+                   "0.8@0.1"=fit_temp$psi_k80_at0.1)
 
   fit_resample <- resamplePX(fit = fit_temp, sims = sims,
                         px = px, psi_max = psi_max)

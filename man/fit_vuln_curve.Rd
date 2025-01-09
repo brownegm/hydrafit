@@ -9,6 +9,7 @@ fit_vuln_curve(
   model_type,
   max_cond_at = 0.1,
   pdf = stats::dnorm,
+  bootstrap = F,
   plot = F,
   ...
 )
@@ -21,6 +22,8 @@ fit_vuln_curve(
 \item{max_cond_at}{water potential which pX should be based upon.}
 
 \item{pdf}{probability density function. Default is dnorm.}
+
+\item{bootstrap}{True or false for bootstrapping of P50 at your chosen max_cond_at}
 
 \item{plot}{True or false for plotting model parameters}
 
