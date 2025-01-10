@@ -4,13 +4,12 @@
 #'
 #' @param input_df input folder with kl and psi values
 #' @param model_type select appropriate model type here i.e., "Linear" for linear, "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types
-#' @param max_cond_at water potential which pX should be based upon.
+#' @param max_cond_at Water potential which pX should be based upon.
 #' @param bootstrap True or false for bootstrapping of P50 at your chosen max_cond_at
 #' @param plot True or false for plotting model parameters
-#' @param ... Plotting parameters passed to \code{plot()} if plot=TRUE
 #' @param pdf probability density function. Default is dnorm.
 #'
-#' @details This function utilizes the `anneal` function of the likelihood package \code{citation('likelihood')}. Within this function there are few assumptions about how we expect the annealing and fitting process is run:
+#' @details This function utilizes the `anneal` function of the likelihood package \code{citation('likelihood')}. This function will always return the hydraulic parameters assuming that maximum conductance is at 0 MPa. However, the data Within this function there are few assumptions about how we expect the annealing and fitting process is run:
 #'
 #' \itemize{
 #' \item It looks weird that kl is the x variable here, but anneal calculates the slope and R2 of the fit using the predicted kl values as the y and the observed kl values as the x
@@ -33,7 +32,7 @@ fit_vuln_curve <- function(input_df,
                           model_type,
                           max_cond_at = 0.1, pdf = stats::dnorm,
                           bootstrap = F,
-                          plot = F, ...) {
+                          plot = F) {
 
   if(!model_type %in% c("log","exp","exp2", "sig", "Linear")){
     stop("Model type not in expected options.")
@@ -51,7 +50,7 @@ fit_vuln_curve <- function(input_df,
   if (!is.function(mod)) {
     stop("model is not a function.\n")
   }
-  #print(mod)
+
   mod <- switch(model_type,
          "log" = hydrafit::Logistic,
          "exp" = hydrafit::Exponential,
