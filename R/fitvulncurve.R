@@ -175,7 +175,7 @@ res <- anneal(model = mod,
         ggplot2::geom_point(size = 2) +
         ggplot2::geom_line(ggplot2::aes(x=.data$psi, y=.data$predicted), color="red") +
         ggplot2::labs(title = paste(parlist_out$species, model_type))+
-        theme_classic(base_size = 14)
+        ggplot2::theme_classic(base_size = 14)
 
       parlist_out$plot <- fitplot
       # plot(res$source_data$psi,

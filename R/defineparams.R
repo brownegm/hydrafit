@@ -19,6 +19,7 @@
 #' \item Linear
 #' }
 #'
+#' @importFrom stats lm
 #' @family internal
 
 #' @rdname define_pars

@@ -92,7 +92,7 @@ for(i in seq_len(n_fit)){
 
 # save out of the results
   output[[i]] <- structure(list(species=fit_temp$species,
-                                psi_PX = ifelse(px_char=="0.5", "PLC@50%", "PLC@80%" ),
+                                psi_PX = px_char,
                                 boot_mean=boot_mean,
                                 boot_median=boot_median,
                                 boot_se=boot_se,
