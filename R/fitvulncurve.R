@@ -177,18 +177,6 @@ res <- anneal(model = mod,
         ggplot2::theme_classic(base_size = 14)
 
       parlist_out$plot <- fitplot
-      # plot(res$source_data$psi,
-      #      res$source_data$kl,
-      #      ...)
-      #
-      # cbind(res$source_data$psi, res$source_data$predicted) -> for_plotting
-      #
-      # for_plotting[order(for_plotting[, 1]), ] -> for_plotting
-      #
-      # lines(for_plotting[, 1], for_plotting[, 2], col = "blue")
-      #
-      # title(paste(input_df[1, 1], model_type))
-
     }
     return(parlist_out)
 
