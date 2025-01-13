@@ -37,17 +37,31 @@ testthat::expect_equal(attr(fit, "fit.list"), FALSE)
 # run bootstrap for single fit and list of fits
 psi_max = 0.1
 px = 0.5
-seed = 123
 sims = 1000
 
-bootstrap<-bootPX(fit, psi_max=0.1)
+bootstrap<-bootPX(fit, psi_max=0.1, seed= 12)
 
 bootstrap_list <- bootPX(best_model, psi_max=0.1)
 
 # check if the bootstrap results are the expected size
-expect_equal(length(bootstrap), 9)
-expect_equal(length(bootstrap_list), length(unique(data$species)))
+testthat::expect_equal(length(bootstrap), 9)
+testthat::expect_equal(length(bootstrap_list), length(unique(data$species)))
 
 # check if the bootstrap results are the same
 testthat::expect_equal(bootstrap$margin_error, bootstrap_list[[1]]$margin_error)
+
+updated_bootstrap_list <- bootstrap_list
+
+# check if the bootstrap results are the same when one is changed
+updated_bootstrap_list[[3]] <- exp2_fits[[3]]
+
+#check the change
+testthat::expect_equal(updated_bootstrap_list[[3]]$margin_error, exp2_fits[[3]]$margin_error)
+
+# check the others are the same
+upd_nonchanged <- updated_bootstrap_list[c(1,2,4,5)]
+bootlist_nonchanged <- bootstrap_list[c(1,2,4,5)]
+
+testthat::expect_identical(upd_nonchanged,bootlist_nonchanged)
+
 })
