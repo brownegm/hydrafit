@@ -24,16 +24,14 @@ The goal of hydrafit is to fit line parameters using a likelihood frame work for
 
 You can install the development version of hydrafit from [GitHub](https://github.com/) with:
 
-```{r}
-# install.packages("devtools") #only done if not already downloaded
+```{r eval=FALSE}
 devtools::install_github("brownegm/hydrafit", build_vignettes = T)
 ```
 
 ## Example
-
 An example of the use of the functions is available as a vignette. 
-```{r}
+```{r eval=FALSE}
 browseVignettes(package = "hydrafit")
 ```
-The unrendered vignette is also available in /vignettes. 
+The unrendered vignette is also available in vignettes folder as a .qmd file. 
 
