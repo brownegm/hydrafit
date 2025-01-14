@@ -39,7 +39,7 @@ psi_max = 0.1
 px = 0.5
 sims = 1000
 
-bootstrap<-bootPX(fit, psi_max=0.1, seed= 12)
+bootstrap<-bootPX(fit, psi_max=0.1)
 
 bootstrap_list <- bootPX(best_model, psi_max=0.1)
 
@@ -64,4 +64,8 @@ bootlist_nonchanged <- bootstrap_list[c(1,2,4,5)]
 
 testthat::expect_identical(upd_nonchanged,bootlist_nonchanged)
 
+# try again to make sure you still get the same answer
+bootstrap2.0<-bootPX(fit, psi_max=0.1)
+
+testthat::expect_identical(bootstrap,bootstrap2.0)
 })

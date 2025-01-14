@@ -10,7 +10,7 @@ fx_select(
   sigmoidal_fits = NULL,
   exp1_fits = NULL,
   exp2_fits = NULL,
-  quiet = TRUE
+  silent = TRUE
 )
 }
 \arguments{
@@ -24,7 +24,7 @@ fx_select(
 
 \item{exp2_fits}{List of second exponential fits}
 
-\item{quiet}{Logical. If TRUE, suppresses output.}
+\item{silent}{Logical. If TRUE, suppresses alternative model output.}
 }
 \value{
 Returns a list with the best fitting (i.e., lowest AICc) models.

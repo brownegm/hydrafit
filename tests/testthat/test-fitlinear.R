@@ -18,8 +18,8 @@ test_df <- data.frame(species = species, psi=psi, kl=kl)
 suppressWarnings({
   linear_fits = hydrafit::fit_vuln_curve(input_df = test_df, model_type = "Linear", max_cond_at = 0.1)
 })
-print(linear_fits$A)
-print(linear_fits$B)
+# print(linear_fits$A)
+# print(linear_fits$B)
 # Test that the function predicts the correct values
 Apred = round(linear_fits[["A"]], 1)
 Bpred = round(linear_fits[["B"]], 1)

@@ -69,7 +69,7 @@ function_output <- fx_select( all_lists[[1]],
                               all_lists[[2]],
                               all_lists[[3]],
                               all_lists[[4]],
-                              all_lists[[5]])|>
+                              all_lists[[5]], silent=T)|>
   lapply(function(x) unlist(x))
 
 # expected_message <- "The following species have alternative models within 2 AICc units:

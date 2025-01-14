@@ -153,9 +153,9 @@ resamplePX <- function(fit,
                             function(x) {
                               lapply(1, function(y)
                                 c(
-                                  sample(rnorm(1000, A, A.sd), size = 1, replace = T),
+                                  sample(rnorm(sims, A, A.sd), size = 1, replace = T),
                                   #sample for A
-                                  sample(rnorm(1000, B, B.sd), size =
+                                  sample(rnorm(sims, B, B.sd), size =
                                            1, replace = T) #sample for B
                                 ))
 
@@ -171,9 +171,9 @@ resamplePX <- function(fit,
 
                             function(x){
 
-                              lapply(1, function(y) c(sample(rnorm(1000, A, A.sd), size=1,replace=T),#sample for A
-                                                      sample(rnorm(1000, B, B.sd), size=1,replace=T), #sample for B
-                                                      sample(rnorm(1000, param_3, param_3.sd), size=1, replace=T)))#sample for Xo or C
+                              lapply(1, function(y) c(sample(rnorm(sims, A, A.sd), size=1,replace=T),#sample for A
+                                                      sample(rnorm(sims, B, B.sd), size=1,replace=T), #sample for B
+                                                      sample(rnorm(sims, param_3, param_3.sd), size=1, replace=T)))#sample for Xo or C
 
                             })
 

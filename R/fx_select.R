@@ -7,7 +7,7 @@
 #' @param sigmoidal_fits List of sigmoidal fits
 #' @param exp1_fits List of first exponential fits
 #' @param exp2_fits List of second exponential fits
-#' @param quiet Logical. If TRUE, suppresses output.
+#' @param silent Logical. If TRUE, suppresses alternative model output.
 #' @return Returns a list with the best fitting (i.e., lowest AICc) models.
 #'
 #' @export fx_select
@@ -18,7 +18,7 @@ fx_select <- function(linear_fits=NULL,
                       sigmoidal_fits=NULL,
                       exp1_fits=NULL,
                       exp2_fits=NULL,
-                      quiet = TRUE) {
+                      silent = TRUE) {
 
   #establish objects
   ## create empty dataframe to store output with names matching input dataframes.
@@ -73,6 +73,7 @@ fx_select <- function(linear_fits=NULL,
  models_with_alternatives <- models_with_alternatives[!sapply(models_with_alternatives, is.null)]
 
  # Print report for user
+if(silent==F){
  if (length(models_with_alternatives) > 0) {
    cat("Note: The following species have alternative models within 2 AICc units:\n")
    for (entry in models_with_alternatives) {
@@ -81,7 +82,9 @@ fx_select <- function(linear_fits=NULL,
  } else {
    cat("No models have viable alternatives within 2 AIC units.\n")
  }
+}else{
 
+}
   return(lowest_elements)
 }
 
