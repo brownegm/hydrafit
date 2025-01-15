@@ -28,11 +28,16 @@
 #' @importFrom rlang .data
 
 
-fit_vuln_curve <- function(input_df,
+fit_vuln_curve <- function(formula,
+                          input_df,
                           model_type,
                           max_cond_at = 0.1, pdf = stats::dnorm,
                           bootstrap = F,
                           plot = F) {
+
+  if(!class(formula)=="formula"|is.null(formula)){
+    stop("Formula is not of class 'formula' or is not provided")
+  }
 
   if(!model_type %in% c("log","exp","exp2", "sig", "Linear")){
     stop("Model type not in expected options.")
@@ -41,11 +46,6 @@ fit_vuln_curve <- function(input_df,
   if(max_cond_at %in% c(NULL,0)){
     stop("max_cond_at parameter is either not provided or equals zero.\n Models default to 0, so max_cond_at must be > 0.")
   }
-  mod <- ifelse(model_type=="log", Logistic,
-                        ifelse(model_type=="exp", Exponential,
-                               ifelse(model_type=="exp2", Exponential2,
-                                      ifelse(model_type=="sig", Sigmoidal,
-                                             Linear))))
 
   if (!is.function(mod)) {
     stop("model is not a function.\n")

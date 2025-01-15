@@ -5,6 +5,7 @@
 \title{Compute the best fit likelihood parameters for each species for each model type}
 \usage{
 fit_vuln_curve(
+  formula,
   input_df,
   model_type,
   max_cond_at = 0.1,
