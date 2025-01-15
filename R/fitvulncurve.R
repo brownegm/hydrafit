@@ -47,9 +47,7 @@ fit_vuln_curve <- function(formula,
     stop("max_cond_at parameter is either not provided or equals zero.\n Models default to 0, so max_cond_at must be > 0.")
   }
 
-  if (!is.function(mod)) {
-    stop("model is not a function.\n")
-  }
+  mod.terms <- stats::terms(formula)
 
   mod <- switch(model_type,
          "log" = hydrafit::Logistic,
@@ -57,6 +55,19 @@ fit_vuln_curve <- function(formula,
          "exp2" = hydrafit::Exponential2,
          "sig" = hydrafit::Sigmoidal,
          hydrafit::Linear)
+
+  if (!is.function(mod)) {
+    stop("model is not a function.\n")
+  }
+
+  input_variables <- all.vars(formula)
+
+  var_check <- all(input_variables %in% names(input_df))
+
+   if(!var_check){
+     v <- which(!input_variables %in% names(input_df))
+     stop(paste("The variable(s):", input_variables[v], " not found in input dataframe."))
+   }
 
   par_estimates <- define_pars(input_df, model_type = model_type)
 
