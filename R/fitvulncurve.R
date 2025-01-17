@@ -1,7 +1,7 @@
 #' Compute the best fit likelihood parameters for each species for each model type
 
 #' @details See r/fitfunctions.R for functional types and see R/defineparams.R for parameter definitions.
-#'
+#' @param formula Formula indicating the
 #' @param input_df input folder with kl and psi values
 #' @param model_type select appropriate model type here i.e., "Linear" for linear, "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types
 #' @param max_cond_at Water potential which pX should be based upon.
@@ -9,7 +9,7 @@
 #' @param plot True or false for plotting model parameters
 #' @param pdf probability density function. Default is dnorm.
 #'
-#' @details This function utilizes the `anneal` function of the likelihood package \code{citation('likelihood')}. This function will always return the hydraulic parameters assuming that maximum conductance is at 0 MPa. However, the data Within this function there are few assumptions about how we expect the annealing and fitting process is run:
+#' @details This function utilizes the `anneal` function of the likelihood package \code{citation('likelihood')}. This function will always return the hydraulic parameters assuming that maximum conductance is at 0 MPa. However, it may be more physiologically relevant for parameters to be estimated at 0.1MPa due to the presence of a driving force for hydraulic conductance. Within this function there are few assumptions about how we expect the annealing and fitting process is run:
 #'
 #' \itemize{
 #' \item It looks weird that kl is the x variable here, but anneal calculates the slope and R2 of the fit using the predicted kl values as the y and the observed kl values as the x
@@ -35,7 +35,7 @@ fit_vuln_curve <- function(formula,
                           bootstrap = F,
                           plot = F) {
 
-  if(!class(formula)=="formula"|is.null(formula)){
+  if(!inherits(formula,"formula")|is.null(formula)){
     stop("Formula is not of class 'formula' or is not provided")
   }
 
@@ -46,8 +46,6 @@ fit_vuln_curve <- function(formula,
   if(max_cond_at %in% c(NULL,0)){
     stop("max_cond_at parameter is either not provided or equals zero.\n Models default to 0, so max_cond_at must be > 0.")
   }
-
-  mod.terms <- stats::terms(formula)
 
   mod <- switch(model_type,
          "log" = hydrafit::Logistic,
@@ -64,10 +62,21 @@ fit_vuln_curve <- function(formula,
 
   var_check <- all(input_variables %in% names(input_df))
 
-   if(!var_check){
-     v <- which(!input_variables %in% names(input_df))
-     stop(paste("The variable(s):", input_variables[v], " not found in input dataframe."))
-   }
+  if (!var_check) {
+    v <- which(!input_variables %in% names(input_df))
+    if (length(v) > 1) {
+      stop(paste(
+        "'",
+        input_variables[v[1]],"'","and","'",input_variables[v[2]],"'",
+        "are not found in input dataframe."
+      ))
+    }
+    stop(paste(
+      "'",
+      input_variables[v],"'",
+      "is not found in input dataframe."
+    ))
+  }
 
   par_estimates <- define_pars(input_df, model_type = model_type)
 
@@ -76,8 +85,8 @@ fit_vuln_curve <- function(formula,
   pars_high = par_estimates[[3]]
 
     var <- list(
-      psi = "psi",
-      x = "kl",
+      psi = input_variables[2], # independent variable
+      x = input_variables[1], # dependent variable
       mean = "predicted",
       log = TRUE
     )
@@ -88,7 +97,7 @@ res <- anneal(model = mod,
             var = var,
             par_lo = pars_low,
             par_hi = pars_high,
-            dep_var = "kl",
+            dep_var = input_variables[1],
             pdf = dnorm,#pdf stands for probability density function
             max_iter = 5000, temp_red = 0.8,
             show_display = F)

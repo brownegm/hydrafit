@@ -15,6 +15,8 @@ fit_vuln_curve(
 )
 }
 \arguments{
+\item{formula}{Formula indicating the}
+
 \item{input_df}{input folder with kl and psi values}
 
 \item{model_type}{select appropriate model type here i.e., "Linear" for linear, "sig" for sigmoidal, "exp" and "exp2" for Exponentials and "log" for Logistic. See R/fitfunctions.R for functional types}
@@ -36,7 +38,7 @@ Compute the best fit likelihood parameters for each species for each model type
 \details{
 See r/fitfunctions.R for functional types and see R/defineparams.R for parameter definitions.
 
-This function utilizes the `anneal` function of the likelihood package \code{citation('likelihood')}. This function will always return the hydraulic parameters assuming that maximum conductance is at 0 MPa. However, the data Within this function there are few assumptions about how we expect the annealing and fitting process is run:
+This function utilizes the `anneal` function of the likelihood package \code{citation('likelihood')}. This function will always return the hydraulic parameters assuming that maximum conductance is at 0 MPa. However, it may be more physiologically relevant for parameters to be estimated at 0.1MPa due to the presence of a driving force for hydraulic conductance. Within this function there are few assumptions about how we expect the annealing and fitting process is run:
 
 \itemize{
 \item It looks weird that kl is the x variable here, but anneal calculates the slope and R2 of the fit using the predicted kl values as the y and the observed kl values as the x
