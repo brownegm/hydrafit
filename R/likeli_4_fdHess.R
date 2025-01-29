@@ -16,6 +16,19 @@
 # Author:  Lora Murphy, Cary Institute of Ecosystem Studies
 # murphyl@caryinstitute.org
 ##################################################
+#' Title
+#'
+#' @param par_2_analyze
+#' @param model
+#' @param par
+#' @param var
+#' @param source_data
+#' @param pdf
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 likeli_4_fdHess<-function(par_2_analyze, model, par, var, source_data, pdf) {
   k = 1
   for (i in 1:length(par)) {

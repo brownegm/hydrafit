@@ -80,41 +80,67 @@
 ######################################################
 #' Anneal
 #'
+#' @author Lora Murphy, Cary Institute of Ecosystem Studies
+#' @citation Murphy L (2023). likelihood: Methods for Maximum Likelihood Estimation_. R package version 1.9, <https://CRAN.R-project.org/package=likelihood>.
+
+## Parameters
 #' @param model model function to parameterize. Arguments to this function will #' be provided from par, var, and source_data.
 #' @param par list of parameters for which we are using simulated annealing to
 #' find maximum likelihood estimates.  Each par element name matches an
 #' argument in a function (either model or pdf). All values listed in par
 #' must be numeric vectors.  Vectors of length greater than one have each of
 #' their elements treated separately as individual parameters to estimate.
-#' @param var
-#' @param source_data
-#' @param par_lo
-#' @param par_hi
-#' @param pdf
-#' @param dep_var
-#' @param initial_temp
-#' @param temp_red
-#' @param ns
-#' @param nt
-#' @param max_iter
-#' @param min_change
-#' @param min_drops
-#' @param hessian
-#' @param delta
-#' @param slimit
-#' @param c
-#' @param note
+#' @param var list of other variables and data needed by the model and pdf
+# functions, any type as needed.  These will be kept constant.
+#' @param source_data data frame with dependent variable and associated
+# independent variables.
+#' @param par_lo list of lower bounds for each parameter.  Each element must match
+#' an element in par in both name and size.  Ommitted values are assumed to be
+#' negative infinity.
+#' @param par_hi list of upper bounds for each parameter.  Each element must match
+#' an element in par in both name and size.  Ommitted values are assumed to
+#' be positive infinity.
+#' @param pdf probability density function. Make sure to use a function such as
+#' dnorm that can calculate log probability.
+#' @param dep_var dependent variable label in source_data.
+#' @param initial_temp temperature at which to start annealing.
+#' @param temp_red interval by which to reduce temperature.
+#' @param ns interval between drops in temperature
+#' @param nt interval between changes in range
+#' @param max_iter maximum iterations, where one iteration is one varying of each
+#' parameter to parameterize.  The annealing will run for this many
+#' iterations, unless alternate conditions have been specified (see min_change
+#' and min_drops).
+#' @param min_change an alternate way to specify quitting conditions. This is the
+#' minimum amount of change in likelihood in min_drop number of temperature
+#' drops.  If the change is less, execution stops.
+#' @param min_drops the companion to min_change for alternate quitting conditions.
+#' This is the number of temperature drops over which the likelihood must
+#' have changed more than min_change for execution to continue.
+#' @param hessian if TRUE, include the standard errors and the Hessian matrix
+#' in the output.  If FALSE, do not.
+#' @param delta when calculating support limits, the number of pieces into which
+#' to divide each parameter.  This is the size of the "step" the function
+#' takes in trying to find the support limits.
+#' @param slimit when calculating support limits, the number of likelihood
+#' units less than the optimum likelihood for which the support intervals
+#' will be calculated.  2 units is semi-standard.  1.92 units corresponds
+#' roughly to a 95% confidence interval.
+#' @param c range reduction parameter
+#' @param note any note to self the user wants to make.  This will be
+#' included in the output.
 #' @param show_display
-#' @param ...
-#'
+#' @param ... additional arguments to model, pdf, etc. This is not a recommended
+#' way to pass additional arguments but I have chosen to support it.
 #' @returns A list with the results of annealing
 #' @export
 #' @importFrom nlme fdHess
 #'
-anneal<-function(model, par, var, source_data, par_lo = NULL,
+anneal <- function(model, par, var, source_data, par_lo = NULL,
 par_hi = NULL, pdf, dep_var, initial_temp = 3, temp_red = 0.95,
 ns = 20, nt = 100, max_iter = 50000, min_change = 0, min_drops = 100,
-hessian = TRUE, delta = 100, slimit = 2, c = 2, note = "", show_display = TRUE, ...) {
+hessian = TRUE, delta = 100, slimit = 2, c = 2, note = "",
+show_display = TRUE, ...) {
 
   ##
   ## Error checking

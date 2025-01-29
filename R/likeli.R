@@ -23,6 +23,19 @@
 # murphyl@caryinstitute.org
 ######################################################
 
+#' Title
+#'
+#' @param model
+#' @param par
+#' @param var
+#' @param source_data
+#' @param pdf
+#' @param ...
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 likeli <- function(model, par, var, source_data, pdf, ...) {
 
   ##
@@ -64,7 +77,7 @@ likeli <- function(model, par, var, source_data, pdf, ...) {
 
   # This is where to put the predicted
   predicted <- NULL
-  
+
   # Put together var and par
   var <- c(par,var)
 
@@ -101,7 +114,7 @@ likeli <- function(model, par, var, source_data, pdf, ...) {
           # one level
           level <- level - 1
         }
-      }  
+      }
       else {
         # The current level has pre-evals - before evaluating the current level,
         # go down a level to the first of its pre-evals
@@ -109,8 +122,8 @@ likeli <- function(model, par, var, source_data, pdf, ...) {
         curr_index[[level]] <- 1
         max_index[[level]] <- length(pre_evals[[level]][[curr_index[[level]]]]$pre_eval)
         pre_evals[[level]] <- pre_evals[[level]][[curr_index[[level]]]]$pre_eval
-      }        
-    }    
+      }
+    }
   }
   eval_results <- as.list(eval_results)
 
@@ -134,13 +147,13 @@ likeli <- function(model, par, var, source_data, pdf, ...) {
       if (is.null(pre_evals[[level]][[curr_index[[level]]]]$pre_eval)) {
         eval_results[[pre_evals[[level]][[curr_index[[level]]]]$parname]]<-do.call(pre_evals[[level]][[curr_index[[level]]]]$fun, pre_evals[[level]][[curr_index[[level]]]]$call)
         curr_index[[level]]<-curr_index[[level]]+1
-      
+
         if (curr_index[[level]] > max_index[[level]]) {
           # We've evaluated all the pre-evals in this level - back up
           # one level
           level <- level - 1
         }
-      }  
+      }
       else {
         # The current level has pre-evals - before evaluating the current level,
         # go down a level to the first of its pre-evals
@@ -148,7 +161,7 @@ likeli <- function(model, par, var, source_data, pdf, ...) {
         curr_index[[level]] <- 1
         max_index[[level]] <- length(pre_evals[[level]][[curr_index[[level]]]]$pre_eval)
         pre_evals[[level]] <- pre_evals[[level]][[curr_index[[level]]]]$pre_eval
-      }        
+      }
     }
   }
   eval_results <- as.list(eval_results)

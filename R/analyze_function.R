@@ -1,10 +1,30 @@
-analyze_function<-function(fun, par, parname, datasets, ...) {
+#' Analyze function
+#'
+#' @author Lora Murphy, Cary Institute of Ecosystem Studies
+#' @citation Murphy L (2023). likelihood: Methods for Maximum Likelihood Estimation_. R package version 1.9, <https://CRAN.R-project.org/package=likelihood>.
+
+#' @param fun function to analyze and find arguments for
+#' @param par list, where item "varname" is the variable name and "value" 
+#' is another list in which to look for arguments
+#' @param parname name of function in parameter list (NULL if 
+#' top-level function)
+#' @param datasets array of lists; for each array item (which is a
+#'list), item "varname" is the variable name and "value" is a
+#'data frame in which to look for data sources of function arguments
+#' @param ... any additional arguments in which to look for
+#' function arguments
+#'
+#' @returns a nested list representing function representing
+#' function dependencies.
+#'
+
+analyze_function <- function(fun, par, parname, datasets, ...) {
 
   ##########################################
   ##
   ## Analyzes a function and extracts its arguments
-  ## from a parameter list to make a function call.  
-  ## This will recursively create a function call for 
+  ## from a parameter list to make a function call.
+  ## This will recursively create a function call for
   ## every function argument that is itself a function.
   ##
   ## Arguments:
@@ -14,7 +34,7 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
   ## parname = name of function in parameter list (NULL if
   ## top-level function)
   ## dataset = array of lists; for each array item (which is a
-  ## list), item "varname" is the variable name and "value" is a 
+  ## list), item "varname" is the variable name and "value" is a
   ## data frame in which to look for data sources
   ## of function arguments
   ## ... = any additional arguments in which to look for
@@ -48,8 +68,8 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
   ## results$call[[1]]$pre_eval[[1]]$pre_eval = NULL
   ##
   ##########################################
-  
-  
+
+
   # Get the list of function arguments
   parnames<-names(par$value)
   default_checker <- formals(fun)
@@ -60,7 +80,7 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
   }
   extra_args<-list(...)
   extra_arg_names<-names(extra_args)
-  
+
   # Here's where we'll assemble the arguments for calling the function
   results<-list(parname=parname, fun=fun, pre_eval=NULL)
   results$call<-list()
@@ -68,7 +88,7 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
 
   if (is.null(fun_args)) {
     return(results)
-  } 
+  }
 
   # Build the call to model by finding each argument in the parameter list
   for (i in 1:length(fun_args)) {
@@ -81,22 +101,22 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
       used <- fun_args[[i]]==parnames
       if(any(used)) {
         if(is.function(par$value[used][[1]])) {
-          
+
           # One of the arguments is a function - recursively analyze it
           results$pre_eval[[length(results$pre_eval)+1]]<-analyze_function(par$value[used][[1]], par, fun_args[[i]], datasets, ...)
           results$call[[fun_args[[i]]]]<-parse(text=paste("eval_results$", fun_args[[i]],sep=""))[[1]]
-          
+
         }
         else {
           # This parameter is not a function - see if we can find it amongst
-          # the parameters or source data    
+          # the parameters or source data
 
           if (is.character(par$value[used][[1]])) {
 
             # Check to see if this is referencing the predicted value
             if (par$value[used][[1]]=="predicted") {
               results$call[[fun_args[[i]]]]<-quote(predicted)
-            } 
+            }
 
             else {
 
@@ -104,16 +124,16 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
               if (mode(default_checker[[i]]) == "character") {
                 results$call[[fun_args[[i]]]]<-parse(text=paste(par$varname, "$", fun_args[[i]],sep=""))[[1]]
               }
-              else {               
+              else {
 
                 # Look for this in the dataset(s)
                 found <- FALSE
-                for (j in 1:length(cols)) { 
+                for (j in 1:length(cols)) {
                   if(any(par$value[used][[1]]==cols[[j]])) {
                     # We found the argument in the data - add it referencing the data column
                     results$call[[fun_args[[i]]]]<-parse(text=paste(datasets[[j]]$varname, "$", par$value[used][[1]], sep=""))[[1]]
                     found<-TRUE
-                    break 
+                    break
                   }
                 }
                 if (!found) {
@@ -122,7 +142,7 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
                   results$call[[fun_args[[i]]]]<-parse(text=paste(par$varname, "$", fun_args[[i]],sep=""))[[1]]
                 }
               }
-            } 
+            }
           }
           else {
             # Non-character value - presumably numeric and to be passed as-is from par
@@ -138,18 +158,18 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
           if (!any(fun_args=="...")) {
             if(is.function(extra_args[used][[1]])) {
               results$pre_eval[[length(results$pre_eval)+1]]<-analyze_function(extra_args[used][[1]], par, fun_args[[i]], datasets, ...)
-              results$call[[fun_args[[i]]]]<-parse(text=paste("eval_results$", fun_args[[i]],sep=""))[[1]]              
+              results$call[[fun_args[[i]]]]<-parse(text=paste("eval_results$", fun_args[[i]],sep=""))[[1]]
             }
             else {
               # This parameter is not a function - see if we can find it amongst
-              # the parameters or source data    
+              # the parameters or source data
 
               if (is.character(extra_args[used][[1]])) {
 
                 # Check to see if this is referencing the predicted value
                 if (extra_args[used][[1]]=="predicted") {
                   results$call[[fun_args[[i]]]]<-quote(predicted)
-                } 
+                }
 
                 else {
 
@@ -157,18 +177,18 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
                   if (mode(default_checker[[i]]) == "character") {
                     results$call[[fun_args[[i]]]]<-parse(text=paste("list(...)$", fun_args[[i]],sep=""))[[1]]
                   }
-                  else {               
+                  else {
 
                     # Look for this in the dataset
 
                     # Look for this in the dataset(s)
                     found <- FALSE
-                    for (j in 1:length(cols)) { 
+                    for (j in 1:length(cols)) {
                       if(any(extra_args[used][[1]]==cols[[j]])) {
                         # We found the argument in the data - add it referencing the data column
                         results$call[[fun_args[[i]]]]<-parse(text=paste(datasets[[j]]$varname, "$", extra_args[used][[1]], sep=""))[[1]]
                         found<-TRUE
-                        break 
+                        break
                       }
                     }
                     if (!found) {
@@ -177,7 +197,7 @@ analyze_function<-function(fun, par, parname, datasets, ...) {
                       results$call[[fun_args[[i]]]]<-parse(text=paste("list(...)$", fun_args[[i]],sep=""))[[1]]
                     }
                   }
-                } 
+                }
               }
               else {
                 # Non-character value - presumably numeric and to be passed as-is from extra_args

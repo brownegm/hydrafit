@@ -37,6 +37,22 @@
 # Author:  Lora Murphy, Cary Institute of Ecosystem Studies
 # murphyl@caryinstitute.org
 ########################################################
+#' Title
+#'
+#' @param model
+#' @param par
+#' @param var
+#' @param source_data
+#' @param pdf
+#' @param par_lo
+#' @param par_hi
+#' @param delta
+#' @param slimit
+#'
+#' @returns
+#' @export
+#'
+#' @examples
 support_limits<-function(model, par, var, source_data, pdf, par_lo = NULL,
    par_hi = NULL, delta = 100, slimit = 2) {
 
@@ -159,7 +175,7 @@ support_limits<-function(model, par, var, source_data, pdf, par_lo = NULL,
             lhdiff <- best_lh - lhood
           }
         }
-        
+
         upper_limit[[i]][[j]] <- par[[i]][[j]] - step
 
         # Set the parameter back to the optimum
@@ -207,7 +223,7 @@ support_limits<-function(model, par, var, source_data, pdf, par_lo = NULL,
           par[[i]][[j]] <- par[[i]][[j]] + step
           # Reduce the step size by one order of magnitude
           step <- step / 10
-          # It is possible to have a step size so small that subtracting it 
+          # It is possible to have a step size so small that subtracting it
           # produces a number indistinguishable from the previous value. If
           # this is the case, quit.
           if (!((par[[i]][[j]] - step) < par[[i]][[j]])) {
@@ -226,7 +242,7 @@ support_limits<-function(model, par, var, source_data, pdf, par_lo = NULL,
             lhdiff <- best_lh - lhood
           }
         }
-          
+
         lower_limit[[i]][[j]] <- par[[i]][[j]]+step
 
         # Set the parameter back to the optimum
