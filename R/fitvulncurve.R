@@ -21,7 +21,6 @@
 #' @return Returns best fitting model parameters for each species for nonlinear fits
 #'
 #' @export
-#' @import likelihood
 #' @importFrom stats dnorm
 #' @importFrom graphics lines title
 #' @importFrom ggplot2 ggplot geom_point geom_line labs
