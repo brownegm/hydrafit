@@ -1,12 +1,12 @@
 #' Analyze function
 #'
 #' @author Lora Murphy, Cary Institute of Ecosystem Studies
-#' @citation Murphy L (2023). likelihood: Methods for Maximum Likelihood Estimation_. R package version 1.9, <https://CRAN.R-project.org/package=likelihood>.
+#' @references Murphy L (2023). likelihood: Methods for Maximum Likelihood Estimation_. R package version 1.9, <https://CRAN.R-project.org/package=likelihood>.
 
 #' @param fun function to analyze and find arguments for
-#' @param par list, where item "varname" is the variable name and "value" 
+#' @param par list, where item "varname" is the variable name and "value"
 #' is another list in which to look for arguments
-#' @param parname name of function in parameter list (NULL if 
+#' @param parname name of function in parameter list (NULL if
 #' top-level function)
 #' @param datasets array of lists; for each array item (which is a
 #'list), item "varname" is the variable name and "value" is a

@@ -23,19 +23,28 @@
 # murphyl@caryinstitute.org
 ######################################################
 
-#' Title
+#' Likeli
 #'
-#' @param model
-#' @param par
-#' @param var
-#' @param source_data
-#' @param pdf
-#' @param ...
+#' @param model model function for which to calculate likelihood.
+#' Arguments to this function will be provided from par
+#' and source_data.
+#' @param par list of parameters.  If this were simulated annealing,
+#' these would be the varying parameters.  Doesn't make too
+#' much sense in this context but this makes it match anneal.
+#' Each par element name matches an argument in a function
+#' (either model or pdf). All values listed in par must be
+#' numeric vectors.
+#' @param var list of other variables and data needed by the model
+#' and pdf functions, any type as needed.
+#' @param source_data data frame with dependent variable and
+#' associated independent variables
+#' @param pdf probability density function.  To calculate
+#' negative log likelihood, use a function such as
+#' dnorm that can calculate log probability.
+#' @param ... additional arguments to be passed to analyze_function
 #'
-#' @returns
-#' @export
-#'
-#' @examples
+#' @returns sum of the log likelihood
+
 likeli <- function(model, par, var, source_data, pdf, ...) {
 
   ##

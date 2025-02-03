@@ -37,22 +37,36 @@
 # Author:  Lora Murphy, Cary Institute of Ecosystem Studies
 # murphyl@caryinstitute.org
 ########################################################
-#' Title
+#' Support limits
 #'
-#' @param model
-#' @param par
-#' @param var
-#' @param source_data
-#' @param pdf
-#' @param par_lo
-#' @param par_hi
-#' @param delta
-#' @param slimit
+#' @param model the function which contains the model statement whose parameters
+# were optimized.
+#' @param par the parameter list as it was used in likeli and/or neighanneal,
+#' with the best values for the varying parameters.
+#' @param var list of other variables and data needed by the model
+#' and pdf functions, any type as needed.
+#' @param source_data the source data as it was passed to likeli and/or
+#' neighanneal.
+#' @param pdf the probability distribution function as it was passed to likeli
+#' and/or neighanneal.
+#' @param par_lo list containing the lower limits of the varying parameters.  Can
+#' be a ragged array but no more than 2 dimensions.  The names of the list
+#' members must match those in par. Any values ommitted are assumed to be
+#' negative infinity.
+#' @param par_hi list containing the upper limits of the varying parameters.  Can
+#' be a ragged array but no more than 2 dimensions.  The names of the list
+#' members must match those in par. Any values ommitted are assumed to be
+#' infinity.
+#' @param delta the number of pieces into which to divide each parameter.  This
+#' is the size of the "step" the function takes in trying to find the support
+#' limits.
+#' @param slimit the number of likelihood units less than the optimum
+#' likelihood for which the support intervals will be calculated.  So if
+#' the max likelihood is -98, then for each parameter we change it in steps
+#' of delta until we reach a likelihood of -100.
 #'
-#' @returns
-#' @export
-#'
-#' @examples
+#' @returns support limits for the varying parameters
+
 support_limits<-function(model, par, var, source_data, pdf, par_lo = NULL,
    par_hi = NULL, delta = 100, slimit = 2) {
 

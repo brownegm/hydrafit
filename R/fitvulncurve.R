@@ -98,8 +98,7 @@ res <- anneal(model = mod,
             par_hi = pars_high,
             dep_var = input_variables[1],
             pdf = dnorm,#pdf stands for probability density function
-            max_iter = 5000, temp_red = 0.8,
-            show_display = F)
+            max_iter = 5000, temp_red = 0.8)
 
     #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
     #helped a lot. You can watch the fitting proceed with show_display,

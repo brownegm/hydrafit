@@ -1,146 +1,54 @@
 #####################################################
 # Performs simulated annealing to find maximum likelihood
 # estimates for a set of parameters.
-#
-# Arguments:
-# model = model function to parameterize. Arguments to this function will be
-# provided from par, var, and source_data.
-#
-# par = list of parameters for which we are using simulated annealing to
-# find maximum likelihood estimates.  Each par element name matches an
-# argument in a function (either model or pdf). All values listed in par
-# must be numeric vectors.  Vectors of length greater than one have each of
-# their elements treated separately as individual parameters to estimate.
-#
-# var = list of other variables and data needed by the model and pdf
-# functions, any type as needed.  These will be kept constant.
-#
-# source_data = data frame with dependent variable and associated
-# independent variables.
-#
-# par_lo = list of lower bounds for each parameter.  Each element must match
-# an element in par in both name and size.  Ommitted values are assumed to be
-# negative infinity.
-#
-# par_hi = list of upper bounds for each parameter.  Each element must match
-# an element in par in both name and size.  Ommitted values are assumed to
-# be positive infinity.
-#
-# pdf = probability density function. Make sure to use a function such as
-# dnorm that can calculate log probability.
-#
-# dep_var = dependent variable label in source_data.
-#
-# initial_temp = temperature at which to start annealing.
-#
-# temp_red = interval by which to reduce temperature.
-#
-# max_iter = maximum iterations, where one iteration is one varying of each
-# parameter to parameterize.  The annealing will run for this many
-# iterations, unless alternate conditions have been specified (see min_change
-# and min_drops).
-#
-# dep_var = label of model dependent variable
-#
-# ns = interval between changes in range
-#
-# nt = interval between drops in temperature
-#
-# min_change = an alternate way to specify quitting conditions. This is the
-# minimum amount of change in likelihood in min_drop number of temperature
-# drops.  If the change is less, execution stops.
-#
-# min_drops = the companion to min_change for alternate quitting conditions.
-# This is the number of temperature drops over which the likelihood must
-# have changed more than min_change for execution to continue.
-#
-# hessian = if TRUE, include the standard errors and the Hessian matrix
-# in the output.  If FALSE, do not.
-#
-# delta = when calculating support limits, the number of pieces into which
-# to divide each parameter.  This is the size of the "step" the function
-# takes in trying to find the support limits.
-#
-# slimit = when calculating support limits, the number of likelihood
-# units less than the optimum likelihood for which the support intervals
-# will be calculated.  2 units is semi-standard.  1.92 units corresponds
-# roughly to a 95% confidence interval.
-#
-# c = range reduction parameter
-#
-# note = any note to self the user wants to make.  This will be
-# included in the output.
-#
-# ... = additional arguments to model, pdf, etc. This is not a recommended
-# way to pass additional arguments but I have chosen to support it.
-#
+
 # Author:  Lora Murphy, Cary Institute of Ecosystem Studies
 # murphyl@caryinstitute.org
 #
-######################################################
+
 #' Anneal
 #'
-#' @author Lora Murphy, Cary Institute of Ecosystem Studies
-#' @citation Murphy L (2023). likelihood: Methods for Maximum Likelihood Estimation_. R package version 1.9, <https://CRAN.R-project.org/package=likelihood>.
-
+#' @description Performs simulated annealing to find maximum likelihood estimates for a set of parameters.
 ## Parameters
 #' @param model model function to parameterize. Arguments to this function will #' be provided from par, var, and source_data.
-#' @param par list of parameters for which we are using simulated annealing to
-#' find maximum likelihood estimates.  Each par element name matches an
-#' argument in a function (either model or pdf). All values listed in par
-#' must be numeric vectors.  Vectors of length greater than one have each of
-#' their elements treated separately as individual parameters to estimate.
-#' @param var list of other variables and data needed by the model and pdf
-# functions, any type as needed.  These will be kept constant.
-#' @param source_data data frame with dependent variable and associated
-# independent variables.
+#' @param par list of parameters for which we are using simulated annealing to find maximum likelihood estimates.  Each par element name matches an argument in a function (either model or pdf). All values listed in par must be numeric vectors.  Vectors of length greater than one have each of their elements treated separately as individual parameters to estimate.
+#' @param var list of other variables and data needed by the model and pdf functions, any type as needed.  These will be kept constant.
+#' @param source_data data frame with dependent variable and associated independent variables.
 #' @param par_lo list of lower bounds for each parameter.  Each element must match
 #' an element in par in both name and size.  Ommitted values are assumed to be
 #' negative infinity.
-#' @param par_hi list of upper bounds for each parameter.  Each element must match
-#' an element in par in both name and size.  Ommitted values are assumed to
-#' be positive infinity.
-#' @param pdf probability density function. Make sure to use a function such as
-#' dnorm that can calculate log probability.
+#' @param par_hi list of upper bounds for each parameter.  Each element must match an element in par in both name and size.  Ommitted values are assumed to be positive infinity.
+#' @param pdf probability density function. Make sure to use a function such as dnorm that can calculate log probability.
 #' @param dep_var dependent variable label in source_data.
 #' @param initial_temp temperature at which to start annealing.
 #' @param temp_red interval by which to reduce temperature.
 #' @param ns interval between drops in temperature
 #' @param nt interval between changes in range
-#' @param max_iter maximum iterations, where one iteration is one varying of each
-#' parameter to parameterize.  The annealing will run for this many
-#' iterations, unless alternate conditions have been specified (see min_change
-#' and min_drops).
-#' @param min_change an alternate way to specify quitting conditions. This is the
-#' minimum amount of change in likelihood in min_drop number of temperature
-#' drops.  If the change is less, execution stops.
-#' @param min_drops the companion to min_change for alternate quitting conditions.
-#' This is the number of temperature drops over which the likelihood must
-#' have changed more than min_change for execution to continue.
-#' @param hessian if TRUE, include the standard errors and the Hessian matrix
-#' in the output.  If FALSE, do not.
-#' @param delta when calculating support limits, the number of pieces into which
-#' to divide each parameter.  This is the size of the "step" the function
-#' takes in trying to find the support limits.
-#' @param slimit when calculating support limits, the number of likelihood
-#' units less than the optimum likelihood for which the support intervals
-#' will be calculated.  2 units is semi-standard.  1.92 units corresponds
-#' roughly to a 95% confidence interval.
+#' @param max_iter maximum iterations, where one iteration is one varying of each parameter to parameterize.  The annealing will run for this many iterations, unless alternate conditions have been specified (see min_change and min_drops).
+#' @param min_change an alternate way to specify quitting conditions. This is the minimum amount of change in likelihood in min_drop number of temperature drops.  If the change is less, execution stops.
+#' @param min_drops the companion to min_change for alternate quitting conditions.This is the number of temperature drops over which the likelihood must have changed more than min_change for execution to continue.
+#' @param hessian if TRUE, include the standard errors and the Hessian matrix in the output.  If FALSE, do not.
+#' @param delta when calculating support limits, the number of pieces into which to divide each parameter.  This is the size of the "step" the function takes in trying to find the support limits.
+#' @param slimit when calculating support limits, the number of likelihood units less than the optimum likelihood for which the support intervals will be calculated.  2 units is semi-standard.  1.92 units corresponds roughly to a 95 percent confidence interval.
 #' @param c range reduction parameter
-#' @param note any note to self the user wants to make.  This will be
-#' included in the output.
-#' @param show_display
-#' @param ... additional arguments to model, pdf, etc. This is not a recommended
-#' way to pass additional arguments but I have chosen to support it.
+#' @param note any note to self the user wants to make.  This will be included in the output.
+# @param show_display if TRUE, display the likelihood graphically.
+#'
 #' @returns A list with the results of annealing
+#'
 #' @export
 #' @importFrom nlme fdHess
+#' @importFrom stats dnorm dbeta
+#' @importFrom stats runif
+#'
+#' @author Lora Murphy, Cary Institute of Ecosystem Studies
+#' @references Murphy L (2023). likelihood: Methods for Maximum Likelihood Estimation_. R package version 1.9, <https://CRAN.R-project.org/package=likelihood>.
 #'
 anneal <- function(model, par, var, source_data, par_lo = NULL,
 par_hi = NULL, pdf, dep_var, initial_temp = 3, temp_red = 0.95,
 ns = 20, nt = 100, max_iter = 50000, min_change = 0, min_drops = 100,
-hessian = TRUE, delta = 100, slimit = 2, c = 2, note = "",
-show_display = TRUE, ...) {
+hessian = TRUE, delta = 100, slimit = 2, c = 2, note = ""#show_display = TRUE,...
+) {
 
   ##
   ## Error checking
@@ -279,10 +187,10 @@ show_display = TRUE, ...) {
   # Set up the PDF call - set it up to use a copy of par
   datasets<-NULL
   datasets[[1]]<-list(value=source_data, varname="source_data")
-  pdf_call<-analyze_function(pdf, list(value=par, varname="par_copy"), NULL, datasets, ...)
+  pdf_call<-analyze_function(pdf, list(value=par, varname="par_copy"), NULL, datasets)#, ...)
 
   # Set up the model call - set it up to use a copy of par
-  model_call<-analyze_function(model, list(value=par, varname="par_copy"), NULL, datasets, ...)
+  model_call<-analyze_function(model, list(value=par, varname="par_copy"), NULL, datasets)#, ...)
 
   # Initialize support limits to zeroes before we "flatten" arrays
   upper_limit<-list()
@@ -489,11 +397,11 @@ show_display = TRUE, ...) {
 
   # Setup output display and show it for the first time
   # Create a window so likdisplay will default to showing the graphics
-  if (show_display) {
-    plot(x=1,y=1)
-    layout(matrix(c(1,2), 2, 1, byrow = TRUE)) # this makes a two-part graph
-    likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
-  }
+  # if (show_display) {
+  #   plot(x=1,y=1)
+  #   layout(matrix(c(1,2), 2, 1, byrow = TRUE)) # this makes a two-part graph
+  #   likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
+  # }
 
   tryCatch ({
     ##
@@ -635,9 +543,9 @@ show_display = TRUE, ...) {
             lhistpar[[length(lhistpar) + 1]] <- temppar
 
             # Display
-            if (show_display) {
-              likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
-            }
+            # if (show_display) {
+            #   likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
+            # }
           }
         }
         else {
@@ -684,9 +592,9 @@ show_display = TRUE, ...) {
           for (q in 1:length(parnames)) temppar[[parnames[q]]] <- best_par[[parnames[q]]]
           lhistpar[[length(lhistpar) + 1]] <- temppar
           # Update display
-          if (show_display) {
-            likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
-          }
+          # if (show_display) {
+          #   likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
+          # }
 
           # Check to see if likelihood has changed sufficiently to keep going,
           # if the user has specified alternate quitting conditions
@@ -707,9 +615,9 @@ show_display = TRUE, ...) {
           temppar <- list()
           for (q in 1:length(parnames)) temppar[[parnames[q]]] <- best_par[[parnames[q]]]
           lhistpar[[length(lhistpar) + 1]] <- temppar
-          if (show_display) {
-            likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
-          }
+          # if (show_display) {
+          #   likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
+          # }
         }
 
         if (using == numpars) using <- 1 else using <- using + 1
@@ -739,9 +647,9 @@ show_display = TRUE, ...) {
     for (q in 1:length(parnames)) temppar[[parnames[q]]] <- best_par[[parnames[q]]]
     lhistpar[[length(lhistpar)]] <- temppar
     lhisttemp[length(lhisttemp)] <- temp
-    if (show_display) {
-      likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
-    }
+    # if (show_display) {
+    #   likdisplay(lhistcycles, lhisthood, slp, R2, aiccorr, temp, max_iter)
+    # }
 
   }, finally={
 
@@ -769,24 +677,24 @@ show_display = TRUE, ...) {
 
     # Find out what PDF was used
     if (identical(pdf, dbeta)) pdfname<-"dbeta"
-      else if (identical(pdf, dbinom)) pdfname<-"dbinom"
-        else if (identical(pdf, dcauchy)) pdfname<-"dcauchy"
-          else if (identical(pdf, dchisq)) pdfname<-"dchisq"
+      # else if (identical(pdf, dbinom)) pdfname<-"dbinom"
+      #   else if (identical(pdf, dcauchy)) pdfname<-"dcauchy"
+      #     else if (identical(pdf, dchisq)) pdfname<-"dchisq"
             else if (identical(pdf, dnorm)) pdfname<-"dnorm"
-              else if (identical(pdf, dexp)) pdfname<-"dexp"
-                else if (identical(pdf, df)) pdfname<-"df"
-                  else if (identical(pdf, dgamma)) pdfname<-"dgamma"
-                    else if (identical(pdf, dgeom)) pdfname<-"dgeom"
-                      else if (identical(pdf, dhyper)) pdfname<-"dhyper"
-                        else if (identical(pdf, dlnorm)) pdfname<-"dlnorm"
-                          else if (identical(pdf, dlogis)) pdfname<-"dlogis"
-                            else if (identical(pdf, dnbinom)) pdfname<-"dnbinom"
-                              else if (identical(pdf, dnorm)) pdfname<-"dnorm"
-                                else if (identical(pdf, dpois)) pdfname<-"dpois"
-                                  else if (identical(pdf, dt)) pdfname<-"dt"
-                                    else if (identical(pdf, dunif)) pdfname<-"dunif"
-                                      else if (identical(pdf, dweibull)) pdfname<-"dweibull"
-                                        else if (identical(pdf, dwilcox)) pdfname<-"dwilcox"
+              # else if (identical(pdf, dexp)) pdfname<-"dexp"
+              #   else if (identical(pdf, df)) pdfname<-"df"
+              #     else if (identical(pdf, dgamma)) pdfname<-"dgamma"
+              #       else if (identical(pdf, dgeom)) pdfname<-"dgeom"
+              #         else if (identical(pdf, dhyper)) pdfname<-"dhyper"
+              #           else if (identical(pdf, dlnorm)) pdfname<-"dlnorm"
+              #             else if (identical(pdf, dlogis)) pdfname<-"dlogis"
+              #               else if (identical(pdf, dnbinom)) pdfname<-"dnbinom"
+              #
+              #                   else if (identical(pdf, dpois)) pdfname<-"dpois"
+              #                     else if (identical(pdf, dt)) pdfname<-"dt"
+              #                       else if (identical(pdf, dunif)) pdfname<-"dunif"
+              #                         else if (identical(pdf, dweibull)) pdfname<-"dweibull"
+              #                           else if (identical(pdf, dwilcox)) pdfname<-"dwilcox"
                                           else pdfname<-"User-defined function"
 
     # Find out what the user called the model

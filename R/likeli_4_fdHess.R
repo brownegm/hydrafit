@@ -16,19 +16,17 @@
 # Author:  Lora Murphy, Cary Institute of Ecosystem Studies
 # murphyl@caryinstitute.org
 ##################################################
-#' Title
+#' likeli_4_fdHess
 #'
-#' @param par_2_analyze
-#' @param model
-#' @param par
-#' @param var
-#' @param source_data
-#' @param pdf
+#' @param par_2_analyze numeric vector of parameters to be analyzed
+#' @param model Model object
+#' @param par parameters
+#' @param var Variables to be analyzed
+#' @param source_data  Data source
+#' @param pdf propability density function
 #'
-#' @returns
-#' @export
-#'
-#' @examples
+#' @returns This will transfer the values in par_2_analyze to par for transfer to likeli.
+
 likeli_4_fdHess<-function(par_2_analyze, model, par, var, source_data, pdf) {
   k = 1
   for (i in 1:length(par)) {
