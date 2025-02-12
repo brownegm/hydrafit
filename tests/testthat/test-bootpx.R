@@ -70,3 +70,9 @@ bootstrap2.0<-bootPX(fit, psi_max=0.1)
 
 testthat::expect_identical(bootstrap,bootstrap2.0)
 })
+
+test_that("Psi_max is provided to the resample function", {
+
+  expect_error(resamplePX(c("this", "is", "a", "fake", "fit"), seed=123, psi_max = NULL))
+
+})

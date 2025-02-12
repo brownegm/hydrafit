@@ -132,6 +132,8 @@ resamplePX <- function(fit,
 
   if(length(psi_max)<1){stop("Value for psi_max must be provided.")}
 
+  set.seed(seed)
+
   psi_px <- vector("list", length = sims) #initialize list to store results
   model_type <- fit$data.type
 
