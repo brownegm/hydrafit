@@ -51,8 +51,6 @@ px_char <- paste0(as.character(px), "@", as.character(psi_max))
 
 alpha = 0.05
 
-set.seed(seed) #  For reproducibility
-
 output <- vector(mode = "list", length = n_fit)
 
 for(i in seq_len(n_fit)){
@@ -70,7 +68,7 @@ for(i in seq_len(n_fit)){
                    "0.8@0.1"=fit_temp$psi_k80_at0.1)
 
   fit_resample <- resamplePX(fit = fit_temp, sims = sims,
-                        px = px, psi_max = psi_max)
+                        px = px, psi_max = psi_max, seed = seed)
   #suppressing warnings here can help if errors resulting from NAs stop you from moving forward.
   finite_values <- sapply(fit_resample, function(x) is.finite(x[[1]]))
   boot_vals <- fit_resample[finite_values]|>unlist()
@@ -122,6 +120,7 @@ if(n_fit==1) {
 #' @return Returns a list of simulations predicted PX values the length of the number `sims`.
 #'
 #' @importFrom stats rnorm
+#' @importFrom withr with_seed
 
 
 resamplePX <- function(fit,
@@ -132,7 +131,7 @@ resamplePX <- function(fit,
 
   if(length(psi_max)<1){stop("Value for psi_max must be provided.")}
 
-  set.seed(seed)
+  withr::local_seed(seed=seed)
 
   psi_px <- vector("list", length = sims) #initialize list to store results
   model_type <- fit$data.type
