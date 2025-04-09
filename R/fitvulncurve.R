@@ -191,7 +191,8 @@ res <- anneal(model = mod,
       fitplot <- ggplot2::ggplot(ggplot2::aes(x=.data$psi, y=.data$kl), data=plotdata) +
         ggplot2::geom_point(size = 2) +
         ggplot2::geom_line(ggplot2::aes(x=.data$psi, y=.data$predicted), color="red") +
-        ggplot2::labs(title = paste(parlist_out$species, model_type))+
+        ggplot2::labs(title = parlist_out$species,
+                      subtitle = paste("Model:", model_type))+
         ggplot2::theme_classic(base_size = 14)
 
       parlist_out$plot <- fitplot
@@ -237,4 +238,4 @@ estimate_pxs <- function(params, px_fx,
 
   return(pl_output)
 }
-# test idea if max_cond_at input is 0 the two pl_outputs should be the same
+
