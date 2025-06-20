@@ -97,7 +97,8 @@ for(i in seq_len(n_fit)){
                                 deg_of_freedom = deg_of_freedom,
                                 margin_error=margin_error,
                                 conf.low=conf.low,
-                                conf.high=conf.high))# class="data.frame"
+                                conf.high=conf.high,
+                                bootvals = boot_vals))# class="data.frame"
 
 }
 
