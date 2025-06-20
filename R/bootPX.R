@@ -102,6 +102,16 @@ for(i in seq_len(n_fit)){
 
 }
 
+if(pairwise == T){
+  # if pairwise comparisons are requested, then run them among the fits
+  output <- lapply(output, function(x) {
+    x$pairwise <- pairwise_bootstrap_comparisons(x$bootvals,
+                                                 species_col = "species",
+                                                 boot_col = "boot_id", pred_col = "psi_PX")
+    return(x)
+  })
+}
+
 if(n_fit==1) {
   return(unlist(output, recursive = FALSE))
 } else{

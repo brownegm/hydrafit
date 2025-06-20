@@ -1,9 +1,6 @@
 #' Pairwise Bootstrap Comparisons of Species Predictions
 #'
-#' @param df A data frame containing bootstrap predictions for different species.
-#' @param species_col The name of the column containing species names.
-#' @param boot_col The name of the column containing bootstrap identifiers.
-#' @param pred_col The name of the column containing prediction values.
+#' @param bootstraps A list containing bootstrap predictions for different species based on best fitting model.
 #' @param conf_level Confidence level for the confidence intervals (default is 0.95).
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr select mutate summarise
@@ -12,17 +9,16 @@
 #' @return A data frame with pairwise comparisons between species, including the proportion of times one species has a higher prediction than another, confidence intervals for the differences, and p-values from a binomial test.
 #'
 #'
-pairwise_bootstrap_comparisons <- function(df,
-                                           species_col = "species",
-                                           boot_col = "boot_id",
-                                           pred_col = "prediction",
+pairwise_bootstrap_comparison <- function(bootstraps,
                                            conf_level = 0.95) {
-  # Reshape to wide format: one row per bootstrap, columns for each species
-  df_wide <- df %>%
-    select(all_of(c(boot_col, species_col, pred_col))) %>%
-    pivot_wider(names_from = all_of(species_col), values_from = all_of(pred_col)) %>%
-    drop_na()
 
+  # Check if the input is a fit.list
+  stopifnot(class(bootstraps) == "list")
+
+  # Get species names
+  species_names <- sapply(seq_along(bootstraps),\(bb) bootstraps[[bb]]$species)
+
+  # Create a data frame from the bootstraps
   # Identify all species combinations
   species <- setdiff(names(df_wide), boot_col)
   combos <- combn(species, 2, simplify = FALSE)
