@@ -28,30 +28,34 @@
 
 
 fit_vuln_curve <- function(formula,
-                          input_df,
-                          model_type,
-                          max_cond_at = 0.1, pdf = stats::dnorm,
-                          bootstrap = F,
-                          plot = F) {
-
-  if(!inherits(formula,"formula")|is.null(formula)){
+                           input_df,
+                           model_type,
+                           max_cond_at = 0.1,
+                           pdf = stats::dnorm,
+                           bootstrap = F,
+                           plot = F) {
+  if (!inherits(formula, "formula") | is.null(formula)) {
     stop("Formula is not of class 'formula' or is not provided")
   }
 
-  if(!model_type %in% c("log","exp","exp2", "sig", "Linear")){
+  if (!model_type %in% c("log", "exp", "exp2", "sig", "Linear")) {
     stop("Model type not in expected options.")
   }
 
-  if(max_cond_at %in% c(NULL,0)){
-    stop("max_cond_at parameter is either not provided or equals zero.\n Models default to 0, so max_cond_at must be > 0.")
+  if (max_cond_at %in% c(NULL, 0)) {
+    stop(
+      "max_cond_at parameter is either not provided or equals zero.\n Models default to 0, so max_cond_at must be > 0."
+    )
   }
 
-  mod <- switch(model_type,
-         "log" = hydrafit::Logistic,
-         "exp" = hydrafit::Exponential,
-         "exp2" = hydrafit::Exponential2,
-         "sig" = hydrafit::Sigmoidal,
-         hydrafit::Linear)
+  mod <- switch(
+    model_type,
+    "log" = hydrafit::Logistic,
+    "exp" = hydrafit::Exponential,
+    "exp2" = hydrafit::Exponential2,
+    "sig" = hydrafit::Sigmoidal,
+    hydrafit::Linear
+  )
 
   if (!is.function(mod)) {
     stop("model is not a function.\n")
@@ -64,17 +68,20 @@ fit_vuln_curve <- function(formula,
   if (!var_check) {
     v <- which(!input_variables %in% names(input_df))
     if (length(v) > 1) {
-      stop(paste(
-        "'",
-        input_variables[v[1]],"'","and","'",input_variables[v[2]],"'",
-        "are not found in input dataframe."
-      ))
+      stop(
+        paste(
+          "'",
+          input_variables[v[1]],
+          "'",
+          "and",
+          "'",
+          input_variables[v[2]],
+          "'",
+          "are not found in input dataframe."
+        )
+      )
     }
-    stop(paste(
-      "'",
-      input_variables[v],"'",
-      "is not found in input dataframe."
-    ))
+    stop(paste("'", input_variables[v], "'", "is not found in input dataframe."))
   }
 
   par_estimates <- define_pars(input_df, model_type = model_type)
@@ -83,69 +90,88 @@ fit_vuln_curve <- function(formula,
   pars_low = par_estimates[[2]]
   pars_high = par_estimates[[3]]
 
-    var <- list(
-      psi = input_variables[2], # independent variable
-      x = input_variables[1], # dependent variable
-      mean = "predicted",
-      log = TRUE
-    )
+  var <- list(
+    psi = input_variables[2],
+    # independent variable
+    x = input_variables[1],
+    # dependent variable
+    mean = "predicted",
+    log = TRUE
+  )
 
-res <- anneal(model = mod,
-            par = pars,
-            source_data = input_df,
-            var = var,
-            par_lo = pars_low,
-            par_hi = pars_high,
-            dep_var = input_variables[1],
-            pdf = dnorm,#pdf stands for probability density function
-            max_iter = 5000, temp_red = 0.8)
+  res <- tryCatch({
+    result <- suppressWarnings({
+      # suppress and control NaN warnings
+      anneal(
+        model = mod,
+        par = pars,
+        source_data = input_df,
+        var = var,
+        par_lo = pars_low,
+        par_hi = pars_high,
+        dep_var = input_variables[1],
+        pdf = dnorm,
+        max_iter = 5000,
+        temp_red = 0.8
+      )
+    })
+    result
+  }, warning = function(w) {
+    message("Warning caught during annealing: ", conditionMessage(w))
+    return(result)  # or NULL or a custom result object
+  }, error = function(e) {
+    message("Error during annealing: ", conditionMessage(e))
+    return(NA)  # or NULL or a custom result object
+  })
 
-    #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
-    #helped a lot. You can watch the fitting proceed with show_display,
-    #but I've never found it very informative
+  #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
+  #helped a lot. You can watch the fitting proceed with show_display,
+  #but I've never found it very informative
 
-    # organize output
-    A = res$best_pars[[1]]|>as.numeric()
-    B = res$best_pars[[2]]|>as.numeric()
-    C = res$best_pars[[3]]|>as.numeric()
-    #AIC formula: -2LL + 2*parameters (incl nuisance, i.e.,sd)
+  # organize output
+  A = res$best_pars[[1]] |> as.numeric()
+  B = res$best_pars[[2]] |> as.numeric()
+  C = res$best_pars[[3]] |> as.numeric()
+  #AIC formula: -2LL + 2*parameters (incl nuisance, i.e.,sd)
 
-    AIC <- res$aic|>as.numeric()
+  AIC <- res$aic |> as.numeric()
 
-    #AICcorr formula: -2LL + (2*n*parameters (incl nuisance, i.e.,sd)/(n-parameters-1))
+  #AICcorr formula: -2LL + (2*n*parameters (incl nuisance, i.e.,sd)/(n-parameters-1))
 
-    AICcorr <- res$aic_corr|>as.numeric()
+  AICcorr <- res$aic_corr |> as.numeric()
 
-    slope <- res$slope|>as.numeric()
+  slope <- res$slope |> as.numeric()
 
-    rsq <- res$R2|>as.numeric()
+  rsq <- res$R2 |> as.numeric()
 
-    sterror <- res$std_errs
+  sterror <- res$std_errs
 
-    N <- length(res$source_data$kl)
+  N <- length(res$source_data$kl)
 
-    max_cond <- res$best_pars$A|>as.numeric()
+  max_cond <- res$best_pars$A |> as.numeric()
 
-    D <- ifelse(model_type%in%c("exp","Linear"), NA, res$best_pars$D|>as.numeric())
-    D.se <- ifelse(model_type%in%c("exp","Linear"), NA, sterror[[4]]|>as.numeric())
+  D <- ifelse(model_type %in% c("exp", "Linear"),
+              NA,
+              res$best_pars$D |> as.numeric())
+  D.se <- ifelse(model_type %in% c("exp", "Linear"),
+                 NA,
+                 sterror[[4]] |> as.numeric())
 
-    # create function to calculate water potential at X% max conductance
-    px_fx <- hydrafit::psiPx(model_type = model_type)
+  # create function to calculate water potential at X% max conductance
+  px_fx <- hydrafit::psiPx(model_type = model_type)
 
-    if(model_type%in%c("exp","Linear")){
-    est_params <- list(A=A,
-                       B=B)
-    }else{
-    est_params <- list(A=A,
-                         B=B,
-                         C=C)
-    }
+  if (model_type %in% c("exp", "Linear")) {
+    est_params <- list(A = A, B = B)
+  } else{
+    est_params <- list(A = A, B = B, C = C)
+  }
 
-    px_estimates <- estimate_pxs(params = est_params,
-                                 px_fx = px_fx,
-                                 max_cond_at = max_cond_at)
+  px_estimates <- estimate_pxs(params = est_params,
+                               px_fx = px_fx,
+                               max_cond_at = max_cond_at)
 
-    parlist_out <- structure(list(
+  parlist_out <- structure(
+    list(
       species = paste(input_df[1, 1]),
       data.type = model_type,
       A = A,
@@ -157,9 +183,9 @@ res <- anneal(model = mod,
       slope = slope,
       AIC = AIC,
       AICcorr = AICcorr,
-      sterrorA = sterror[[1]]|>as.numeric(),
-      sterrorB = sterror[[2]]|>as.numeric(),
-      sterrorC = sterror[[3]]|>as.numeric(),
+      sterrorA = sterror[[1]] |> as.numeric(),
+      sterrorB = sterror[[2]] |> as.numeric(),
+      sterrorC = sterror[[3]] |> as.numeric(),
       sterrorD = D.se,
       N = N,
       maxCond = max_cond,
@@ -172,70 +198,72 @@ res <- anneal(model = mod,
       psi_k50_at0.1 = px_estimates$p50_atmaxcond,
       psi_k80_at0.1 = px_estimates$p80_atmaxcond,
       psi_k95_at0.1 = px_estimates$p95_atmaxcond
-      ),
+    ),
     # attributes
     mod.type = model_type,
     fit.list = FALSE
-    )
+  )
 
-    if (bootstrap == T){
-      par_bootstrap <- bootPX(parlist_out, px = 0.5, psi_max = 0.1)
-      parlist_out$conf.low <- par_bootstrap$conf.low
-      parlist_out$conf.high <- par_bootstrap$conf.high
-    }
-    #plot the fit
-
-    if (plot == T) {
-      plotdata <- res$source_data
-
-      fitplot <- ggplot2::ggplot(ggplot2::aes(x=.data$psi, y=.data$kl), data=plotdata) +
-        ggplot2::geom_point(size = 2) +
-        ggplot2::geom_line(ggplot2::aes(x=.data$psi, y=.data$predicted), color="red") +
-        ggplot2::labs(title = parlist_out$species,
-                      subtitle = paste("Model:", model_type))+
-        ggplot2::theme_classic(base_size = 14)
-
-      parlist_out$plot <- fitplot
-    }
-    return(parlist_out)
-
+  if (bootstrap == T) {
+    par_bootstrap <- bootPX(parlist_out, px = 0.5, psi_max = 0.1)
+    parlist_out$conf.low <- par_bootstrap$conf.low
+    parlist_out$conf.high <- par_bootstrap$conf.high
   }
+  #plot the fit
+
+  if (plot == T) {
+    plotdata <- res$source_data
+
+    fitplot <- ggplot2::ggplot(ggplot2::aes(x = .data$psi, y = .data$kl), data =
+                                 plotdata) +
+      ggplot2::geom_point(size = 2) +
+      ggplot2::geom_line(ggplot2::aes(x = .data$psi, y = .data$predicted), color =
+                           "red") +
+      ggplot2::labs(title = parlist_out$species,
+                    subtitle = paste("Model:", model_type)) +
+      ggplot2::theme_classic(base_size = 14)
+
+    parlist_out$plot <- fitplot
+  }
+  return(parlist_out)
+
+}
 
 
-estimate_pxs <- function(params, px_fx,
-                         px = list(0.20,0.50,0.80,0.95),
-                         max_cond_at = 0.1){
-
+estimate_pxs <- function(params,
+                         px_fx,
+                         px = list(0.20, 0.50, 0.80, 0.95),
+                         max_cond_at = 0.1) {
   pl <- list()
   pl_atmaxcond <- list()
 
-  for (kx in seq_along(px)){
+  for (kx in seq_along(px)) {
+    params["px"] <- px[[kx]]
 
-  params["px"] <- px[[kx]]
+    pl[kx] <- do.call(px_fx, params)[["psi.px"]]
 
-  pl[kx] <- do.call(px_fx, params)[["psi.px"]]
+    params["max_cond_at"] <- max_cond_at
 
-  params["max_cond_at"] <- max_cond_at
+    pl_atmaxcond[kx] <- do.call(px_fx, params)[["psi.px"]]
+    maxc_atmaxpsi <- do.call(px_fx, params)[["max_c"]]
 
-  pl_atmaxcond[kx] <- do.call(px_fx, params)[["psi.px"]]
-  maxc_atmaxpsi <- do.call(px_fx, params)[["max_c"]]
-
-  params$max_cond_at <- NULL
+    params$max_cond_at <- NULL
 
   }
 
-  pl_output <- structure(list(
-  p20 = pl[[1]],
-  p50 = pl[[2]],
-  p80 = pl[[3]],
-  p95 = pl[[4]],
-  p20_atmaxcond = pl_atmaxcond[[1]],
-  p50_atmaxcond = pl_atmaxcond[[2]],
-  p80_atmaxcond = pl_atmaxcond[[3]],
-  p95_atmaxcond = pl_atmaxcond[[4]],
-  max_c_atmaxpsi = maxc_atmaxpsi
-  ))
+  pl_output <- structure(
+    list(
+      p20 = pl[[1]],
+      p50 = pl[[2]],
+      p80 = pl[[3]],
+      p95 = pl[[4]],
+      p20_atmaxcond = pl_atmaxcond[[1]],
+      p50_atmaxcond = pl_atmaxcond[[2]],
+      p80_atmaxcond = pl_atmaxcond[[3]],
+      p95_atmaxcond = pl_atmaxcond[[4]],
+      max_c_atmaxpsi = maxc_atmaxpsi
+    )
+  )
 
   return(pl_output)
 }
-

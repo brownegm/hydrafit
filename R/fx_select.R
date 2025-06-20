@@ -83,7 +83,7 @@ if(silent==F){
    cat("No models have viable alternatives within 2 AIC units.\n")
  }
 }else{
-
+  cat("Note: To see alternative models within 2 AIC units, set silent = FALSE.\n")
 }
   return(lowest_elements)
 }
