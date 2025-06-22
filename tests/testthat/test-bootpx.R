@@ -70,8 +70,30 @@ bootstrap2.0<-bootPX(fit, psi_max=0.1, seed = 202)
 testthat::expect_identical(bootstrap,bootstrap2.0)
 })
 
+
 test_that("Psi_max is provided to the resample function", {
 
   expect_error(resamplePX(c("this", "is", "a", "fake", "fit"), seed=123, psi_max = NULL))
 
 })
+
+
+test_that("Run pairwise bootstrap comparisons", {
+
+  data <- scof2012
+
+  exp1_fits <- list()
+
+  exp1_fits[[ii]] = fit_vuln_curve(formula,data_by_sp, model_type = "exp", plot=F)
+
+  attr(exp1_fits, "fit.list") <- TRUE
+
+  psi_max = 0.1
+  px = 0.5
+  sims = 1000
+
+  bootstrap_list <- bootPX(exp1_fits, psi_max=0.1, seed= 202, pairwise = T)
+
+
+}
+  {})

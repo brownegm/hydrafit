@@ -4,7 +4,7 @@
 \alias{bootPX}
 \title{Tool for estimating confidence intervals for percent loss in conductance.}
 \usage{
-bootPX(fit, px = 0.5, psi_max, seed = 123, sims = 1000)
+bootPX(fit, px = 0.5, psi_max, seed = 123, sims = 1000, pairwise = F)
 }
 \arguments{
 \item{fit}{Fit object(s) from `fit_vuln_curve()`}
@@ -16,6 +16,8 @@ bootPX(fit, px = 0.5, psi_max, seed = 123, sims = 1000)
 \item{seed}{Value for reproducibility}
 
 \item{sims}{Number of simulations to run. Default is 1000.}
+
+\item{pairwise}{Perform pairwise test among species px values.}
 }
 \description{
 Tool for estimating confidence intervals for percent loss in conductance.
