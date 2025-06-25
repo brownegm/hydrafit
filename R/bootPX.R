@@ -344,22 +344,28 @@ print.boot_list <- function(x, ...) {
 }
 
 
+#' Summary Method for lists of bootstrap results
+#'
+#' @description Summarizes the bootstrap results for a list of bootstrapped models. This summary only applies to intergroup (e.g., among species) comparisons.
+#' @param  x Object of class 'boot_list'
+#' @param ... not used
+#'
+#' @returns A summary of the bootstrap results, including species names, and pairwise comparisons.
+#' @export
+
 summary.boot_list <- function(x,...) {
+
+  if(!inherits(x, "boot_list")) {
+    stop("Input must be of class 'boot_list'.")
+  }
 
   species_names <- sapply(x, \(boot) boot$species)
 
-    for (i in 1:length(x)) {
-      x_i <- x[[i]]
-      cat("Bootstrap Results (Group Summary):\n")
-      cat("Species Names:", x_i$species, "\n")
-      cat("PX:", x_i$psi_PX, "\n")
-      cat("Mean predicted PX:", x_i$boot_mean |> round(3), "\n")
-      cat("Median predicted PX:", x_i$boot_median |> round(3), "\n")
-      cat("Standard Error predicted PX:", x_i$boot_se |> round(3), "\n")
-      cat("Low CI:", x_i$conf.low |> round(3), "\n")
-      cat("High CI:", x_i$conf.high |> round(3), "\n")
-    }
-  } else {
-    print(x)
+  cat("Bootstrap Pairwise Summary:\n")
+  cat("----------------------------------------------------\n")
+  cat("Species:", species_names, "\n")
+  cat("PX:", x$psi_PX, "\n")
+  cat("----------------------------------------------------\n")
+  print(attr(x, "pairwise_comp"))
+
   }
-})

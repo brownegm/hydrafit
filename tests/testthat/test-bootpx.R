@@ -81,7 +81,7 @@ test_that("Psi_max is provided to the resample function", {
 
 test_that("Run pairwise bootstrap comparisons", {
 
-  data <- scof2012
+  data <- hydrafit::scof2012
 
   exp1_fits <- list()
   for(ii in unique(data$species)) {
