@@ -45,7 +45,7 @@ bootstrap_list <- bootPX(best_model, psi_max=0.1, seed= 202)
 
 bootstrap_listc <- bootPX(best_model, psi_max=0.1, seed= 202, pairwise = T)
 # check if the bootstrap results are the expected size
-testthat::expect_equal(length(bootstrap), 9)
+testthat::expect_equal(length(bootstrap), 10)
 testthat::expect_equal(length(bootstrap_list), length(unique(data$species)))
 
 # check if the bootstrap results are the same
@@ -95,5 +95,16 @@ test_that("Run pairwise bootstrap comparisons", {
 
   bootstrap_list <- bootPX(exp1_fits, psi_max=0.1, seed= 202, pairwise = T)
 
+  testthat::expect_equal(length(bootstrap_list), length(unique(data$species)))
+
+  bootstrap_list2 <- bootPX(exp1_fits, psi_max=0.1, seed= 202, pairwise = T)
+
+  # check that the bootstrap results are reproducible
+  testthat::expect_identical(bootstrap_list, bootstrap_list2)
+
+  # check the summary(has the correct number of values and outputs the PX value
+
+  bootstrap_summary <- summary(bootstrap_list)
+  testthat::expect_snapshot(bootstrap_summary)
 
 })

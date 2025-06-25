@@ -353,19 +353,23 @@ print.boot_list <- function(x, ...) {
 #' @returns A summary of the bootstrap results, including species names, and pairwise comparisons.
 #' @export
 
-summary.boot_list <- function(x,...) {
-
-  if(!inherits(x, "boot_list")) {
+summary.boot_list <- function(x, ...) {
+  if (!inherits(x, "boot_list")) {
     stop("Input must be of class 'boot_list'.")
   }
-
+  # Get species names
   species_names <- sapply(x, \(boot) boot$species)
+  species_names <- paste(species_names, collapse = ", ")
+
+  # What PX Value was bootstrapped?
+  px <- unique(sapply(x, \(boot) boot$psi_PX))
+  # Print summary of bootstrap results
 
   cat("Bootstrap Pairwise Summary:\n")
   cat("----------------------------------------------------\n")
   cat("Species:", species_names, "\n")
-  cat("PX:", x$psi_PX, "\n")
+  cat("PX:", px, "\n")
   cat("----------------------------------------------------\n")
   print(attr(x, "pairwise_comp"))
 
-  }
+}
