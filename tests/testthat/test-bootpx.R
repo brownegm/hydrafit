@@ -43,6 +43,7 @@ bootstrap <- bootPX(fit, psi_max=0.1, seed = 202)
 
 bootstrap_list <- bootPX(best_model, psi_max=0.1, seed= 202)
 
+bootstrap_listc <- bootPX(best_model, psi_max=0.1, seed= 202, pairwise = T)
 # check if the bootstrap results are the expected size
 testthat::expect_equal(length(bootstrap), 9)
 testthat::expect_equal(length(bootstrap_list), length(unique(data$species)))
@@ -83,17 +84,16 @@ test_that("Run pairwise bootstrap comparisons", {
   data <- scof2012
 
   exp1_fits <- list()
-
-  exp1_fits[[ii]] = fit_vuln_curve(formula,data_by_sp, model_type = "exp", plot=F)
+  for(ii in unique(data$species)) {
+    exp1_fits[[ii]] = fit_vuln_curve(kl ~ psi,
+                                            data |> dplyr::filter(species == ii),
+                                            model_type = "exp",
+                                            plot=F)
+  }
 
   attr(exp1_fits, "fit.list") <- TRUE
-
-  psi_max = 0.1
-  px = 0.5
-  sims = 1000
 
   bootstrap_list <- bootPX(exp1_fits, psi_max=0.1, seed= 202, pairwise = T)
 
 
-}
-  {})
+})

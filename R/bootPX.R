@@ -342,3 +342,24 @@ print.boot_list <- function(x, ...) {
     cat("----------------------------------------------------\n")
   }
 }
+
+
+summary.boot_list <- function(x,...) {
+
+  species_names <- sapply(x, \(boot) boot$species)
+
+    for (i in 1:length(x)) {
+      x_i <- x[[i]]
+      cat("Bootstrap Results (Group Summary):\n")
+      cat("Species Names:", x_i$species, "\n")
+      cat("PX:", x_i$psi_PX, "\n")
+      cat("Mean predicted PX:", x_i$boot_mean |> round(3), "\n")
+      cat("Median predicted PX:", x_i$boot_median |> round(3), "\n")
+      cat("Standard Error predicted PX:", x_i$boot_se |> round(3), "\n")
+      cat("Low CI:", x_i$conf.low |> round(3), "\n")
+      cat("High CI:", x_i$conf.high |> round(3), "\n")
+    }
+  } else {
+    print(x)
+  }
+})
