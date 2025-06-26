@@ -4,7 +4,8 @@
 #' @param conf_level Confidence level for the confidence intervals (default is 0.95).
 #' @importFrom tidyr pivot_wider
 #' @importFrom dplyr select mutate summarise
-#' @importFrom purrr map_dfr map
+#' @importFrom purrr map_dfr
+#' @importFrom utils combn
 #' @import stats
 #' @return A data frame with pairwise comparisons between species, including the proportion of times one species has a higher or lower prediction than another, confidence intervals for the differences, and p-values from a binomial test.
 #' @export
@@ -25,7 +26,7 @@ compare_sp_boot <- function(bootstraps,
   names(bootstraps_df) <- species_names
 
   # Identify all species combinations
-  combos <- combn(species_names, 2, simplify = FALSE)
+  combos <- utils::combn(species_names, 2, simplify = FALSE)
 
   # Loop through species pairs and compute comparison statistics
   results <- map_dfr(combos, function(pair) {

@@ -347,22 +347,22 @@ print.boot_list <- function(x, ...) {
 #' Summary Method for lists of bootstrap results
 #'
 #' @description Summarizes the bootstrap results for a list of bootstrapped models. This summary only applies to intergroup (e.g., among species) comparisons.
-#' @param  x Object of class 'boot_list'
+#' @param object Object of class 'boot_list'
 #' @param ... not used
 #'
 #' @returns A summary of the bootstrap results, including species names, and pairwise comparisons.
 #' @export
 
-summary.boot_list <- function(x, ...) {
-  if (!inherits(x, "boot_list")) {
+summary.boot_list <- function(object, ...) {
+  if (!inherits(object, "boot_list")) {
     stop("Input must be of class 'boot_list'.")
   }
   # Get species names
-  species_names <- sapply(x, \(boot) boot$species)
+  species_names <- sapply(object, \(boot) boot$species)
   species_names <- paste(species_names, collapse = ", ")
 
   # What PX Value was bootstrapped?
-  px <- unique(sapply(x, \(boot) boot$psi_PX))
+  px <- unique(sapply(object, \(boot) boot$psi_PX))
   # Print summary of bootstrap results
 
   cat("Bootstrap Pairwise Summary:\n")
@@ -370,6 +370,6 @@ summary.boot_list <- function(x, ...) {
   cat("Species:", species_names, "\n")
   cat("PX:", px, "\n")
   cat("----------------------------------------------------\n")
-  print(attr(x, "pairwise_comp"))
+  print(attr(object, "pairwise_comp"))
 
 }

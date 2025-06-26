@@ -4,10 +4,10 @@
 \alias{summary.boot_list}
 \title{Summary Method for lists of bootstrap results}
 \usage{
-\method{summary}{boot_list}(x, ...)
+\method{summary}{boot_list}(object, ...)
 }
 \arguments{
-\item{x}{Object of class 'boot_list'}
+\item{object}{Object of class 'boot_list'}
 
 \item{...}{not used}
 }
