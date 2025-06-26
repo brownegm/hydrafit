@@ -357,14 +357,15 @@ summary.boot_list <- function(object, ...) {
   if (!inherits(object, "boot_list")) {
     stop("Input must be of class 'boot_list'.")
   }
+
   # Get species names
   species_names <- sapply(object, \(boot) boot$species)
   species_names <- paste(species_names, collapse = ", ")
 
   # What PX Value was bootstrapped?
   px <- unique(sapply(object, \(boot) boot$psi_PX))
-  # Print summary of bootstrap results
 
+  # Print summary of bootstrap results
   cat("Bootstrap Pairwise Summary:\n")
   cat("----------------------------------------------------\n")
   cat("Species:", species_names, "\n")
