@@ -99,6 +99,17 @@ bootPX <- function(fit,
     boot_median <- median(boot_vals, na.rm = T)
 
     #determine confidence intervals
+    if(margin == "quantile"){
+
+      conf.int <- quantile(boot_vals,
+                           probs = c(alpha / 2, 1 - (alpha / 2)),
+                           na.rm = T)
+
+      conf.low <- conf.int[1]
+      conf.high <- conf.int[2]
+
+    }else if (margin == "tdist"){
+      # t-distribution method
     deg_of_freedom = length(boot_vals)
     t_score = qt(p = alpha / 2,
                  df = deg_of_freedom,
@@ -108,6 +119,7 @@ bootPX <- function(fit,
 
     conf.low <- px_est - margin_error # using the predicted pX value to make the error make sense
     conf.high <- px_est + margin_error
+    }
 
     # save out of the results
     output[[i]] <- structure(
@@ -128,11 +140,8 @@ bootPX <- function(fit,
   }
 
   if (pairwise == T) {
-    # stopifnot(length(output)>1)
-
     # if pairwise comparisons are requested, then run them among the fits
     pw_out <- compare_sp_boot(output, conf_level = 0.95)
-
   }
 
   if (n_fit == 1) {
@@ -266,7 +275,9 @@ resamplePX <- function(fit,
 
   if (fx_with_param3 == T) {
     for (i in 1:sims) {
-      # this is a lot to look at!!! Only way to index this list of lists since unlist makes this unusable
+      # this is a lot to look at!!!
+      # Only way to index this list of lists since unlist makes this unusable
+      # to be updated in future update
 
       psi_px[[i]] <- psi_px_boot(
         A = param_samples[[i]][[1]][1],
