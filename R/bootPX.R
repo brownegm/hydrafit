@@ -25,8 +25,13 @@ bootPX <- function(fit,
                    psi_max,
                    seed = 123,
                    sims = 1000,
-                   pairwise = F) {
+                   pairwise = F,
+                   margin = c("tdist", "quantile")) {
 
+  # get margin method
+  margin <- match.arg(margin)
+
+  # manage fit list vs single fit
   fit.list <- attr(fit, "fit.list")
 
   if (fit.list) {
@@ -284,7 +289,11 @@ resamplePX <- function(fit,
     }
 
   }#end for loop
-  return(psi_px)
+
+  psi_px_out <- structure(psi_px,
+                      model_parameters = param_samples)
+
+  return(psi_px_out)
 }
 
 
