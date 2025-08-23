@@ -4,7 +4,15 @@
 \alias{bootPX}
 \title{Tool for estimating confidence intervals for percent loss in conductance.}
 \usage{
-bootPX(fit, px = 0.5, psi_max, seed = 123, sims = 1000, pairwise = F)
+bootPX(
+  fit,
+  px = 0.5,
+  psi_max,
+  seed = 123,
+  sims = 1000,
+  pairwise = F,
+  margin = c("tdist", "quantile")
+)
 }
 \arguments{
 \item{fit}{Fit object(s) from `fit_vuln_curve()`}

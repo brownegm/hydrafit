@@ -105,11 +105,11 @@ bootPX <- function(fit,
     if(margin == "quantile"){
 
       conf.int <- quantile(boot_vals,
-                           probs = c(alpha / 2, 1 - (alpha / 2)),
+                           probs = c(alpha, 1 - (alpha)),
                            na.rm = T)
 
-      conf.low <- conf.int[1]
-      conf.high <- conf.int[2]
+      conf.low <- conf.int[[1]]
+      conf.high <- conf.int[[2]]
       deg_of_freedom = (length(boot_vals) - 1)
       margin_error <- (conf.high - conf.low) / 2
 

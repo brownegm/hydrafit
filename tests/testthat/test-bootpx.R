@@ -40,7 +40,7 @@ sims = 1000
 
 bootstrap <- bootPX(fit, psi_max=0.1, seed = 202, margin = "quantile")
 
-bootstrap_list <- bootPX(best_model, psi_max=0.1, seed= 202, margin = "quantile")
+bootstrap_list <- bootPX(best_model, psi_max=0.1, seed = 202, margin = "quantile")
 
 bootstrap_listc <- bootPX(best_model, psi_max=0.1, seed= 202, pairwise = T)
 # check if the bootstrap results are the expected size
