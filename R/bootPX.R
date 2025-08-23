@@ -87,12 +87,12 @@ bootPX <- function(fit,
       psi_max = psi_max,
       seed = seed
     )
-    #suppressing warnings here can help if errors resulting from NAs stop you from moving forward.
+
     finite_values <- sapply(fit_resample, function(x)
       is.finite(x[[1]]))
     boot_vals <- fit_resample[finite_values] |> unlist()
 
-    boot_mean <- mean(boot_vals, na.rm = T) # this values *is not * the same are the actual psi at X% loss in hydraulic conductance
+    boot_mean <- mean(boot_vals, na.rm = T)
 
     boot_se <- se(boot_vals)
 
