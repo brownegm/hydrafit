@@ -231,10 +231,10 @@ fit_vuln_curve <- function(formula,
 
 #' Estimate water potential at given percent loss of conductivity
 #'
-#' @param params
-#' @param px_fx
-#' @param px
-#' @param max_cond_at
+#' @param params parameters list
+#' @param px_fx function to calculate water potential at given percent loss of conductivity
+#' @param px percent loss of conductivity values to estimate (default is 20, 50, 80, 95%)
+#' @param max_cond_at water potential at which maximum conductance is assumed (default is 0.1 MPa)
 estimate_pxs <- function(params,
                          px_fx,
                          px = list(0.20, 0.50, 0.80, 0.95),

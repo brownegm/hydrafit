@@ -29,8 +29,12 @@ bootPX <- function(fit,
                    margin = c("tdist", "quantile")) {
 
   # get margin method
-  margin <- match.arg(margin)
-
+  if (missing(margin)) {
+    warning("No margin of error method provided. Defaulting to t-distribution reconstruction.")
+    margin <- "tdist"
+  } else{
+    margin <- match.arg(margin)
+  }
   # manage fit list vs single fit
   fit.list <- attr(fit, "fit.list")
 
@@ -57,7 +61,6 @@ bootPX <- function(fit,
   if (psi_max < 0) {
     stop("Value for psi_max must be greater than 0")
   }
-
 
   px_char <- paste0(as.character(px), "@", as.character(psi_max))
 
@@ -88,9 +91,9 @@ bootPX <- function(fit,
       seed = seed
     )
 
-    finite_values <- sapply(fit_resample, function(x)
-      is.finite(x[[1]]))
-    boot_vals <- fit_resample[finite_values] |> unlist()
+    finite_values <- sapply(fit_resample$psi_px, function(x) is.finite(x[[1]]))
+
+    boot_vals <- fit_resample$psi_px[finite_values] |> unlist()
 
     boot_mean <- mean(boot_vals, na.rm = T)
 
@@ -107,6 +110,8 @@ bootPX <- function(fit,
 
       conf.low <- conf.int[1]
       conf.high <- conf.int[2]
+      deg_of_freedom = (length(boot_vals) - 1)
+      margin_error <- (conf.high - conf.low) / 2
 
     }else if (margin == "tdist"){
       # t-distribution method
@@ -133,10 +138,9 @@ bootPX <- function(fit,
         margin_error = margin_error,
         conf.low = conf.low,
         conf.high = conf.high,
-        bootvals = boot_vals
-      )
-    )
-
+        bootvals = boot_vals,
+        model_params = fit_resample$model_params
+      ))
   }
 
   if (pairwise == T) {
@@ -151,6 +155,7 @@ bootPX <- function(fit,
         pw_out
       else
         NA,
+      margin = margin,
       class = c("boot_list", "list")
     ))
   } else{
@@ -160,6 +165,7 @@ bootPX <- function(fit,
         pw_out
       else
         NA,
+      margin = margin,
       class = c("boot_list", "list")
     ))
   }
@@ -301,8 +307,8 @@ resamplePX <- function(fit,
 
   }#end for loop
 
-  psi_px_out <- structure(psi_px,
-                      model_parameters = param_samples)
+  psi_px_out <- structure(list(psi_px = psi_px,
+                               model_params = param_samples))
 
   return(psi_px_out)
 }
