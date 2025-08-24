@@ -16,7 +16,7 @@
 #' @param seed Value for reproducibility
 #' @param sims Number of simulations to run. Default is 1000.
 #' @param pairwise Perform pairwise test among species px values.
-#'
+#' @param margin Choice of method to estimate margin of error. Options are "tdist" for t-distribution reconstruction or "quantile" for quantile based confidence intervals. Quantile is recommended.
 #' @importFrom stats qt sd median
 #' @export bootPX
 #'

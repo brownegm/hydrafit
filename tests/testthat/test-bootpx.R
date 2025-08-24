@@ -26,6 +26,7 @@ for (ii in seq_along(unique(data$species))){
  }
 
 # run resample
+
 best_model <- fx_select(linear_fits, logistic_fits, sigmoidal_fits, exp1_fits, exp2_fits)
 testthat::expect_equal(attr(best_model, "fit.list"), TRUE)
 
@@ -42,9 +43,9 @@ bootstrap <- bootPX(fit, psi_max=0.1, seed = 202, margin = "quantile")
 
 bootstrap_list <- bootPX(best_model, psi_max=0.1, seed = 202, margin = "quantile")
 
-bootstrap_listc <- bootPX(best_model, psi_max=0.1, seed= 202, pairwise = T)
+bootstrap_listc <- bootPX(best_model, psi_max=0.1, seed= 202, pairwise = T, margin = "quantile")
 # check if the bootstrap results are the expected size
-testthat::expect_equal(length(bootstrap), 10)
+testthat::expect_equal(length(bootstrap), 11)
 testthat::expect_equal(length(bootstrap_list), length(unique(data$species)))
 
 # check if the bootstrap results are the same
@@ -65,7 +66,7 @@ bootlist_nonchanged <- bootstrap_list[c(1,2,4,5)]
 testthat::expect_identical(upd_nonchanged,bootlist_nonchanged)
 
 # try again to make sure you still get the same answer
-bootstrap2.0<-bootPX(fit, psi_max=0.1, seed = 202)
+bootstrap2.0 <- bootPX(fit, psi_max=0.1, seed = 202, margin = "quantile")
 
 testthat::expect_identical(bootstrap,bootstrap2.0)
 })
@@ -92,11 +93,11 @@ test_that("Run pairwise bootstrap comparisons", {
 
   attr(exp1_fits, "fit.list") <- TRUE
 
-  bootstrap_list <- bootPX(exp1_fits, psi_max=0.1, seed= 202, pairwise = T)
+  bootstrap_list <- bootPX(exp1_fits, psi_max=0.1, seed= 202, pairwise = T, margin = "quantile")
 
   testthat::expect_equal(length(bootstrap_list), length(unique(data$species)))
 
-  bootstrap_list2 <- bootPX(exp1_fits, psi_max=0.1, seed= 202, pairwise = T)
+  bootstrap_list2 <- bootPX(exp1_fits, psi_max=0.1, seed= 202, pairwise = T, margin = "quantile")
 
   # check that the bootstrap results are reproducible
   testthat::expect_identical(bootstrap_list, bootstrap_list2)

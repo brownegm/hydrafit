@@ -26,6 +26,8 @@ bootPX(
 \item{sims}{Number of simulations to run. Default is 1000.}
 
 \item{pairwise}{Perform pairwise test among species px values.}
+
+\item{margin}{Choice of method to estimate margin of error. Options are "tdist" for t-distribution reconstruction or "quantile" for quantile based confidence intervals. Quantile is recommended.}
 }
 \description{
 Tool for estimating confidence intervals for percent loss in conductance.

@@ -2,19 +2,25 @@
 % Please edit documentation in R/fitvulncurve.R
 \name{estimate_pxs}
 \alias{estimate_pxs}
-\title{Estimate water potential at given percent loss of conductivity}
+\title{estimate_pxs}
 \usage{
-estimate_pxs(params, px_fx, px = list(0.2, 0.5, 0.8, 0.95), max_cond_at = 0.1)
+estimate_pxs(params, px_fx, px = c(0.2, 0.5, 0.8, 0.95), max_cond_at = 0.1)
 }
 \arguments{
 \item{params}{parameters list}
 
 \item{px_fx}{function to calculate water potential at given percent loss of conductivity}
 
-\item{px}{percent loss of conductivity values to estimate (default is 20, 50, 80, 95%)}
+\item{px}{percent loss of conductivity values to estimate (default is 0.20, 0.50, 0.80, 0.95)}
 
 \item{max_cond_at}{water potential at which maximum conductance is assumed (default is 0.1 MPa)}
 }
+\value{
+list of water potential estimates at given percent loss of conductivity
+}
 \description{
+This function estimates water potential at given percent loss of conductivity (px) using the provided function to calculate water potential at given percent loss of conductivity (px_fx) and the provided parameters (params) and a given max conductance value.
+}
+\details{
 Estimate water potential at given percent loss of conductivity
 }
