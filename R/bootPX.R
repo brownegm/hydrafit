@@ -105,7 +105,7 @@ bootPX <- function(fit,
     if(margin == "quantile"){
 
       conf.int <- quantile(boot_vals,
-                           probs = c(alpha, 1 - (alpha)),
+                           probs = c(alpha/2, 1 - (alpha/2)),
                            na.rm = T)
 
       conf.low <- conf.int[[1]]
