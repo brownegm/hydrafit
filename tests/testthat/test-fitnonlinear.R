@@ -20,9 +20,10 @@ test_df_sig <- data.frame(psi=psi, kl=kl_sig)
 test_df_log <- data.frame(psi=psi, kl=kl_log)
 
 #cebe_test <- hydrafit:::scof2012|>dplyr::filter(species=="cebe")
+# check that the max_cond_at error is working (it should be >0)
  expect_error(hydrafit::fit_vuln_curve(kl~psi,input_df = test_df_exp, model_type = "exp", max_cond_at = 0))
+ # check that the model type error is working (it should be one of the options above not test)
  expect_error(hydrafit::fit_vuln_curve(kl~psi, input_df = test_df_exp2, model_type = "test"))
-
 }
 )
 
