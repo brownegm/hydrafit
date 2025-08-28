@@ -91,11 +91,18 @@ bootPX <- function(fit,
       seed = seed
     )
 
+    # calculate diagnostic values
+
+    # remove non-finite values
     finite_values <- sapply(fit_resample$psi_px, function(x) is.finite(x[[1]]))
 
     boot_vals <- fit_resample$psi_px[finite_values] |> unlist()
 
     boot_mean <- mean(boot_vals, na.rm = T)
+
+    boot_bias <- boot_mean - px_est
+
+    boot_skew <- mean((boot_vals - boot_mean)^3, na.rm = T) / (sd(boot_vals, na.rm = T)^3)
 
     boot_se <- se(boot_vals)
 
@@ -146,6 +153,7 @@ bootPX <- function(fit,
         boot_mean = boot_mean,
         boot_median = boot_median,
         boot_se = boot_se,
+        boot_skew = boot_skew,
         deg_of_freedom = deg_of_freedom,
         margin_error = margin_error,
         conf.low = conf.low,
