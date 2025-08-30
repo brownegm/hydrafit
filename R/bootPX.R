@@ -36,7 +36,7 @@ bootPX <- function(fit,
     margin <- match.arg(margin)
   }
   # manage fit list vs single fit
-  fit.list <- attr(fit, "fit.list")
+  fit.list <- attr(fit, "fit.list") #TRUE or FALSE
 
   if (fit.list) {
     n_fit <- length(fit)
@@ -400,3 +400,28 @@ summary.boot_list <- function(object, ...) {
   print(attr(object, "pairwise_comp"))
 
 }
+
+
+
+
+get_boot_elements <- function(boot_list) {
+  if (!inherits(boot_list, "boot_list")) {
+    stop("Input must be of class 'boot_list'.")
+  }
+
+  # Get species names
+  species_names <- sapply(boot_list, \(boot) boot$species)
+
+  # Extract bootstrap values from each element in the list
+  vals_list <- purrr::map(boot_list, function(x) x$bootvals) |>
+    rlang::set_names(species_names)
+
+  params_list <- purrr::map(boot_list, function(x) x$model_params)
+
+  boot_elements <- list(boot_vals = vals_list,
+                        model_params = params_list)
+  return(boot_elements)
+}
+
+# maybe set names fyi
+# rlang::set_names(boot_list, species_names) |>
