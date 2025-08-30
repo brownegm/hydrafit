@@ -11,7 +11,7 @@ bootPX(
   seed = 123,
   sims = 1000,
   pairwise = F,
-  margin = c("tdist", "quantile")
+  margin = c("tdist", "quantile", "tdist_mean")
 )
 }
 \arguments{

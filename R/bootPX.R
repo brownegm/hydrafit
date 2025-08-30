@@ -26,7 +26,7 @@ bootPX <- function(fit,
                    seed = 123,
                    sims = 1000,
                    pairwise = F,
-                   margin = c("tdist", "quantile")) {
+                   margin = c("tdist", "quantile", "tdist_mean")) {
 
   # get margin method
   if (missing(margin)) {
@@ -124,6 +124,18 @@ bootPX <- function(fit,
 
     conf.low <- px_est - margin_error # using the predicted pX value to make the error make sense
     conf.high <- px_est + margin_error
+
+    }else if (margin == "tdist_mean"){
+      # t-distribution method around the mean of the bootstrapped values
+      deg_of_freedom = length(boot_vals)
+      t_score = qt(p = alpha / 2,
+                   df = deg_of_freedom,
+                   lower.tail = F)
+
+      margin_error <- t_score * boot_se
+
+      conf.low <- boot_mean - margin_error # using the predicted pX value to make the error make sense
+      conf.high <- boot_mean + margin_error
     }
 
     # save out of the results
