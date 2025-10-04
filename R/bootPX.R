@@ -20,19 +20,22 @@
 #' @importFrom stats qt sd median
 #' @export bootPX
 #'
-bootPX <- function(fit,
-                   px = 0.5,
-                   psi_max,
-                   seed = 123,
-                   sims = 1000,
-                   pairwise = F,
-                   margin = c("tdist", "quantile", "tdist_mean")) {
-
+bootPX <- function(
+  fit,
+  px = 0.5,
+  psi_max,
+  seed = 123,
+  sims = 1000,
+  pairwise = F,
+  margin = c("tdist", "quantile", "tdist_mean")
+) {
   # get margin method
   if (missing(margin)) {
-    warning("No margin of error method provided. Defaulting to t-distribution reconstruction.")
-    margin <- "tdist"
-  } else{
+    warning(
+      "No margin of error method provided. Defaulting to t-distribution reconstruction."
+    )
+    margin <- "quantile"
+  } else {
     margin <- match.arg(margin)
   }
   # manage fit list vs single fit
@@ -40,16 +43,20 @@ bootPX <- function(fit,
 
   if (fit.list) {
     n_fit <- length(fit)
-    model.test <- lapply(seq_len(n_fit), \(x) attr(fit[[x]], "mod.type")) %in% c("exp2", "log", "sig", "Linear", "exp")
-  } else{
+    model.test <- lapply(seq_len(n_fit), \(x) attr(fit[[x]], "mod.type")) %in%
+      c("exp2", "log", "sig", "Linear", "exp")
+  } else {
     n_fit <- 1
-    model.test <- attr(fit, "mod.type") %in% c("exp2", "log", "sig", "Linear", "exp")
+    model.test <- attr(fit, "mod.type") %in%
+      c("exp2", "log", "sig", "Linear", "exp")
   }
 
   #check if the model type(s) is/are valid
   if (any(!model.test)) {
     print(model.test)
-    stop("Bootstrap: Model type(s) must be one of the following: exp2, log, sig, Linear, exp")
+    stop(
+      "Bootstrap: Model type(s) must be one of the following: exp2, log, sig, Linear, exp"
+    )
   }
 
   #check if the percent loss in conductance is valid
@@ -71,7 +78,7 @@ bootPX <- function(fit,
   for (i in seq_len(n_fit)) {
     if (fit.list) {
       fit_temp <- fit[[i]]
-    } else{
+    } else {
       fit_temp <- fit
     }
 
@@ -102,35 +109,30 @@ bootPX <- function(fit,
     boot_median <- median(boot_vals, na.rm = T)
 
     #determine confidence intervals
-    if(margin == "quantile"){
-
-      conf.int <- quantile(boot_vals,
-                           probs = c(alpha/2, 1 - (alpha/2)),
-                           na.rm = T)
+    if (margin == "quantile") {
+      conf.int <- quantile(
+        boot_vals,
+        probs = c(alpha / 2, 1 - (alpha / 2)),
+        na.rm = T
+      )
 
       conf.low <- conf.int[[1]]
       conf.high <- conf.int[[2]]
       deg_of_freedom = length(boot_vals) - 1
       margin_error <- (conf.high - conf.low) / 2
-
-    }else if (margin == "tdist"){
+    } else if (margin == "tdist") {
       # t-distribution method
-    deg_of_freedom = length(boot_vals)
-    t_score = qt(p = alpha / 2,
-                 df = deg_of_freedom,
-                 lower.tail = F)
+      deg_of_freedom = length(boot_vals)
+      t_score = qt(p = alpha / 2, df = deg_of_freedom, lower.tail = F)
 
-    margin_error <- t_score * boot_se
+      margin_error <- t_score * boot_se
 
-    conf.low <- px_est - margin_error # using the predicted pX value to make the error make sense
-    conf.high <- px_est + margin_error
-
-    }else if (margin == "tdist_mean"){
+      conf.low <- px_est - margin_error # using the predicted pX value to make the error make sense
+      conf.high <- px_est + margin_error
+    } else if (margin == "tdist_mean") {
       # t-distribution method around the mean of the bootstrapped values
       deg_of_freedom = length(boot_vals)
-      t_score = qt(p = alpha / 2,
-                   df = deg_of_freedom,
-                   lower.tail = F)
+      t_score = qt(p = alpha / 2, df = deg_of_freedom, lower.tail = F)
 
       margin_error <- t_score * boot_se
 
@@ -152,7 +154,8 @@ bootPX <- function(fit,
         conf.high = conf.high,
         bootvals = boot_vals,
         model_params = fit_resample$model_params
-      ))
+      )
+    )
   }
 
   if (pairwise == T) {
@@ -163,25 +166,26 @@ bootPX <- function(fit,
   if (n_fit == 1) {
     return(structure(
       unlist(output, recursive = FALSE),
-      pairwise_comp = if (pairwise == T)
+      pairwise_comp = if (pairwise == T) {
         pw_out
-      else
-        NA,
+      } else {
+        NA
+      },
       margin = margin,
       class = c("boot_list", "list")
     ))
-  } else{
+  } else {
     return(structure(
       output,
-      pairwise_comp = if (pairwise == T)
+      pairwise_comp = if (pairwise == T) {
         pw_out
-      else
-        NA,
+      } else {
+        NA
+      },
       margin = margin,
       class = c("boot_list", "list")
     ))
   }
-
 }
 
 #' Resample PX
@@ -197,13 +201,14 @@ bootPX <- function(fit,
 #' @importFrom stats rnorm
 #' @importFrom withr with_seed
 
-
-resamplePX <- function(fit,
-                       #model_type = character(),
-                       px = 0.5,
-                       seed,
-                       sims = 1000,
-                       psi_max = numeric()) {
+resamplePX <- function(
+  fit,
+  #model_type = character(),
+  px = 0.5,
+  seed,
+  sims = 1000,
+  psi_max = numeric()
+) {
   if (length(psi_max) < 1) {
     stop("Value for psi_max must be provided.")
   }
@@ -232,7 +237,7 @@ resamplePX <- function(fit,
       #create X samples of paired values
 
       function(x) {
-        lapply(1, function(y)
+        lapply(1, function(y) {
           c(
             sample(
               rnorm(sims, A, A.sd),
@@ -242,16 +247,14 @@ resamplePX <- function(fit,
             #sample for A
             sample(
               rnorm(sims, B, B.sd),
-              size =
-                1,
+              size = 1,
               replace = T
             ) #sample for B
-          ))
-
+          )
+        })
       }
     )
-
-  } else{
+  } else {
     #exponential2, logistic, and sigmoidal
 
     # define the third parameter for models with 3 parameters...C or Xo
@@ -263,7 +266,7 @@ resamplePX <- function(fit,
       #create X samples of paired values
 
       function(x) {
-        lapply(1, function(y)
+        lapply(1, function(y) {
           c(
             sample(
               rnorm(sims, A, A.sd),
@@ -282,11 +285,10 @@ resamplePX <- function(fit,
               size = 1,
               replace = T
             )
-          ))#sample for Xo or C
-
+          )
+        }) #sample for Xo or C
       }
     )
-
   }
 
   psi_px_boot <- psiPx(model_type = model_type)
@@ -304,9 +306,8 @@ resamplePX <- function(fit,
         px = px,
         max_cond_at = psi_max
       )$psi.px
-
     }
-  } else{
+  } else {
     for (i in 1:sims) {
       psi_px[[i]] <- psi_px_boot(
         A = param_samples[[i]][[1]][1],
@@ -314,13 +315,10 @@ resamplePX <- function(fit,
         px = px,
         max_cond_at = psi_max
       )$psi.px
-
     }
+  } #end for loop
 
-  }#end for loop
-
-  psi_px_out <- structure(list(psi_px = psi_px,
-                               model_params = param_samples))
+  psi_px_out <- structure(list(psi_px = psi_px, model_params = param_samples))
 
   return(psi_px_out)
 }
@@ -357,9 +355,7 @@ print.boot_list <- function(x, ...) {
       cat("----------------------------------------------------\n")
       cat("Mean predicted PX:", x_i$boot_mean |> round(3), "\n")
       cat("Median predicted PX:", x_i$boot_median |> round(3), "\n")
-      cat("Standard Error predicted PX:",
-          x_i$boot_se |> round(3),
-          "\n")
+      cat("Standard Error predicted PX:", x_i$boot_se |> round(3), "\n")
       cat("-----------------Confidence Interval----------------\n")
       cat("Low:", x_i$conf.low |> round(3), "\n")
       cat("High:", x_i$conf.high |> round(3), "\n")
@@ -410,10 +406,7 @@ summary.boot_list <- function(object, ...) {
   cat("PX:", px, "\n")
   cat("----------------------------------------------------\n")
   print(attr(object, "pairwise_comp"))
-
 }
-
-
 
 
 get_boot_elements <- function(boot_list) {
@@ -430,8 +423,7 @@ get_boot_elements <- function(boot_list) {
 
   params_list <- purrr::map(boot_list, function(x) x$model_params)
 
-  boot_elements <- list(boot_vals = vals_list,
-                        model_params = params_list)
+  boot_elements <- list(boot_vals = vals_list, model_params = params_list)
   return(boot_elements)
 }
 
