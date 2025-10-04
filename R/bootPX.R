@@ -32,7 +32,7 @@ bootPX <- function(
   # get margin method
   if (missing(margin)) {
     warning(
-      "No margin of error method provided. Defaulting to t-distribution reconstruction."
+      "No margin of error method provided. Defaulting to quantile reconstruction."
     )
     margin <- "quantile"
   } else {
@@ -136,7 +136,7 @@ bootPX <- function(
 
       margin_error <- t_score * boot_se
 
-      conf.low <- boot_mean - margin_error # using the predicted pX value to make the error make sense
+      conf.low <- boot_mean - margin_error
       conf.high <- boot_mean + margin_error
     }
 
