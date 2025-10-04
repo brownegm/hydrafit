@@ -110,7 +110,7 @@ bootPX <- function(fit,
 
       conf.low <- conf.int[[1]]
       conf.high <- conf.int[[2]]
-      deg_of_freedom = (length(boot_vals) - 1)
+      deg_of_freedom = length(boot_vals) - 1
       margin_error <- (conf.high - conf.low) / 2
 
     }else if (margin == "tdist"){

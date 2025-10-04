@@ -26,7 +26,6 @@ for (ii in seq_along(unique(data$species))){
  }
 
 # run resample
-
 best_model <- fx_select(linear_fits, logistic_fits, sigmoidal_fits, exp1_fits, exp2_fits)
 testthat::expect_equal(attr(best_model, "fit.list"), TRUE)
 
@@ -40,6 +39,8 @@ px = 0.5
 sims = 1000
 
 bootstrap <- bootPX(fit, psi_max=0.1, seed = 202, margin = "quantile")
+bootstrap_psimax0.2 <- bootPX(fit, psi_max = 0.2, seed = 202, margin = "quantile")
+testthat::expect_no_match(bootstrap, bootstrap_psimax0.2)
 # bootstrap_td <- bootPX(fit, psi_max=0.1, seed = 202, margin = "tdist")
 # bootstrap_tdbootmean <- bootPX(fit, psi_max=0.1, seed = 202, margin = "tdist_mean")
 #
