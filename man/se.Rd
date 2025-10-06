@@ -4,7 +4,7 @@
 \alias{se}
 \title{Standard Error}
 \usage{
-se(x, na.rm = T)
+se(x)
 }
 \arguments{
 \item{x}{Input value(s)}

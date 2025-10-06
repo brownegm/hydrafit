@@ -26,14 +26,15 @@
 #' @importFrom ggplot2 ggplot geom_point geom_line labs
 #' @importFrom rlang .data
 
-
-fit_vuln_curve <- function(formula,
-                           input_df,
-                           model_type,
-                           max_cond_at = 0.1,
-                           pdf = stats::dnorm,
-                           bootstrap = F,
-                           plot = F) {
+fit_vuln_curve <- function(
+  formula,
+  input_df,
+  model_type,
+  max_cond_at = 0.1,
+  pdf = stats::dnorm,
+  bootstrap = F,
+  plot = F
+) {
   if (!inherits(formula, "formula") | is.null(formula)) {
     stop("Formula is not of class 'formula' or is not provided")
   }
@@ -81,7 +82,12 @@ fit_vuln_curve <- function(formula,
         )
       )
     }
-    stop(paste("'", input_variables[v], "'", "is not found in input dataframe."))
+    stop(paste(
+      "'",
+      input_variables[v],
+      "'",
+      "is not found in input dataframe."
+    ))
   }
 
   par_estimates <- define_pars(input_df, model_type = model_type)
@@ -99,30 +105,34 @@ fit_vuln_curve <- function(formula,
     log = TRUE
   )
 
-  res <- tryCatch({
-    result <- suppressWarnings({
-      # suppress and control NaN warnings
-      anneal(
-        model = mod,
-        par = pars,
-        source_data = input_df,
-        var = var,
-        par_lo = pars_low,
-        par_hi = pars_high,
-        dep_var = input_variables[1],
-        pdf = dnorm,
-        max_iter = 5000,
-        temp_red = 0.8
-      )
-    })
-    result
-  }, warning = function(w) {
-    message("Warning caught during annealing: ", conditionMessage(w))
-    return(result)  # or NULL or a custom result object
-  }, error = function(e) {
-    message("Error during annealing: ", conditionMessage(e))
-    return(NA)  # or NULL or a custom result object
-  })
+  res <- tryCatch(
+    {
+      result <- suppressWarnings({
+        # suppress and control NaN warnings
+        anneal(
+          model = mod,
+          par = pars,
+          source_data = input_df,
+          var = var,
+          par_lo = pars_low,
+          par_hi = pars_high,
+          dep_var = input_variables[1],
+          pdf = dnorm,
+          max_iter = 5000,
+          temp_red = 0.8
+        )
+      })
+      result
+    },
+    warning = function(w) {
+      message("Warning caught during annealing: ", conditionMessage(w))
+      return(result) # or NULL or a custom result object
+    },
+    error = function(e) {
+      message("Error during annealing: ", conditionMessage(e))
+      return(NA) # or NULL or a custom result object
+    }
+  )
 
   #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
   #helped a lot. You can watch the fitting proceed with show_display,
@@ -150,25 +160,31 @@ fit_vuln_curve <- function(formula,
 
   max_cond <- res$best_pars$A |> as.numeric()
 
-  D <- ifelse(model_type %in% c("exp", "Linear"),
-              NA,
-              res$best_pars$D |> as.numeric())
-  D.se <- ifelse(model_type %in% c("exp", "Linear"),
-                 NA,
-                 sterror[[4]] |> as.numeric())
+  D <- ifelse(
+    model_type %in% c("exp", "Linear"),
+    NA,
+    res$best_pars$D |> as.numeric()
+  )
+  D.se <- ifelse(
+    model_type %in% c("exp", "Linear"),
+    NA,
+    sterror[[4]] |> as.numeric()
+  )
 
   # create function to calculate water potential at X% max conductance
   px_fx <- hydrafit::psiPx(model_type = model_type)
 
   if (model_type %in% c("exp", "Linear")) {
     est_params <- list(A = A, B = B)
-  } else{
+  } else {
     est_params <- list(A = A, B = B, C = C)
   }
 
-  px_estimates <- estimate_pxs(params = est_params,
-                               px_fx = px_fx,
-                               max_cond_at = max_cond_at)
+  px_estimates <- estimate_pxs(
+    params = est_params,
+    px_fx = px_fx,
+    max_cond_at = max_cond_at
+  )
 
   parlist_out <- structure(
     list(
@@ -197,7 +213,8 @@ fit_vuln_curve <- function(formula,
       psi_k20_at0.1 = px_estimates$p20_atmaxcond,
       psi_k50_at0.1 = px_estimates$p50_atmaxcond,
       psi_k80_at0.1 = px_estimates$p80_atmaxcond,
-      psi_k95_at0.1 = px_estimates$p95_atmaxcond
+      psi_k95_at0.1 = px_estimates$p95_atmaxcond,
+      vcov = res$var_covar_mat
     ),
     # attributes
     mod.type = model_type,
@@ -214,19 +231,24 @@ fit_vuln_curve <- function(formula,
   if (plot == T) {
     plotdata <- res$source_data
 
-    fitplot <- ggplot2::ggplot(ggplot2::aes(x = .data$psi, y = .data$kl), data =
-                                 plotdata) +
+    fitplot <- ggplot2::ggplot(
+      ggplot2::aes(x = .data$psi, y = .data$kl),
+      data = plotdata
+    ) +
       ggplot2::geom_point(size = 2) +
-      ggplot2::geom_line(ggplot2::aes(x = .data$psi, y = .data$predicted), color =
-                           "red") +
-      ggplot2::labs(title = parlist_out$species,
-                    subtitle = paste("Model:", model_type)) +
+      ggplot2::geom_line(
+        ggplot2::aes(x = .data$psi, y = .data$predicted),
+        color = "red"
+      ) +
+      ggplot2::labs(
+        title = parlist_out$species,
+        subtitle = paste("Model:", model_type)
+      ) +
       ggplot2::theme_classic(base_size = 14)
 
     parlist_out$plot <- fitplot
   }
   return(parlist_out)
-
 }
 
 #' Estimate water potential at given percent loss of conductivity
@@ -238,10 +260,12 @@ fit_vuln_curve <- function(formula,
 #' @param max_cond_at water potential at which maximum conductance is assumed (default is 0.1 MPa)
 #' @returns list of water potential estimates at given percent loss of conductivity
 #' @export
-estimate_pxs <- function(params,
-                         px_fx,
-                         px = c(0.20, 0.50, 0.80, 0.95),
-                         max_cond_at = 0.1) {
+estimate_pxs <- function(
+  params,
+  px_fx,
+  px = c(0.20, 0.50, 0.80, 0.95),
+  max_cond_at = 0.1
+) {
   pl <- list()
   pl_atmaxcond <- list()
 
@@ -256,7 +280,6 @@ estimate_pxs <- function(params,
     maxc_atmaxpsi <- do.call(px_fx, params)[["max_c"]]
 
     params$max_cond_at <- NULL
-
   }
 
   pl_output <- structure(
