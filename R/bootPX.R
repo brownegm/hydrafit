@@ -82,14 +82,6 @@ bootPX <- function(
       fit_temp <- fit
     }
 
-    px_est <- switch(
-      px_char,
-      "0.5@" = fit_temp$psi_k50,
-      "0.8@" = fit_temp$psi_k80,
-      "0.5@0.1" = fit_temp$psi_k50_at0.1,
-      "0.8@0.1" = fit_temp$psi_k80_at0.1
-    )
-
     fit_resample <- resamplePX(
       fit = fit_temp,
       sims = sims,
