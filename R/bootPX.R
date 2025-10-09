@@ -123,7 +123,7 @@ bootPX <- function(
     #   conf.high <- px_est + margin_error
     } else if (margin == "tdist_mean") {
       # t-distribution method around the mean of the bootstrapped values
-      deg_of_freedom = length(boot_vals)
+      deg_of_freedom = length(boot_vals)-1
       t_score = qt(p = alpha / 2, df = deg_of_freedom, lower.tail = F)
 
       margin_error <- t_score * boot_se
