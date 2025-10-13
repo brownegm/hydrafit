@@ -90,9 +90,9 @@ bootPX <- function(
       seed = seed
     )
 
-    finite_values <- sapply(fit_resample$psi_px, function(x) is.finite(x[[1]]))
+    finite_values <- is.finite(fit_resample$psi_px)
 
-    boot_vals <- fit_resample$psi_px[finite_values] |> unlist()
+    boot_vals <- fit_resample$psi_px[finite_values] #|> unlist()
 
     boot_mean <- mean(boot_vals, na.rm = T)
 
@@ -180,6 +180,75 @@ bootPX <- function(
   }
 }
 
+#' Get var-cov element for annealing
+#'
+#' @description Helper to get variance covariance matrix from anneal
+#'
+#' @details
+#' pulls vcov, aligns it to variable names for the fit to be resampled (A,B,C (or Xo)),
+#' then ensure that the vcov meets the expectations of the multivariate resample
+#'
+#' @param fit Model fit with variance covariance matrix
+#' @param mu_names Character vector of variable names.
+#'
+#' @returns Variance-covariance matrix
+#'
+#' @importFrom Matrix nearPD
+get_vcov_from_anneal <- function(fit, mu_names) {
+
+  # ---- helpers ----
+  # align the vcov matrix with the number of parameters per model and use their
+  # names to define the matrix.
+  align_to <- function(Sigma, mu_names) {
+    p <- length(mu_names)
+    Sigma <- as.matrix(Sigma)
+    # try name-based selection first (case-insensitive, C/X0 synonyms)
+    cn <- colnames(Sigma)
+    rn <- rownames(Sigma)
+
+    if (ncol(Sigma) >= p) {
+      # Trim the variance covariance matrix to the number of parameters in the model,
+      Sigma <- Sigma[seq_len(p), seq_len(p), drop = FALSE]
+
+      dimnames(Sigma) <- list(mu_names, mu_names)
+    } else {
+
+      stop("vcov has fewer columns than parameters; cannot align.")
+    }
+    return(Sigma)
+  }
+
+  check_pd <- function(Sigma) {
+    Sigma <- (Sigma + t(Sigma)) / 2
+    ok <- tryCatch({
+      # compute eigen vector from Sigma
+      ev <- eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values
+      all(is.finite(ev)) && min(ev) > 0
+    }, error = function(e)
+      FALSE
+    )
+    if (!ok) {
+      #estimate the nearest possible definite matrix from vcov if nonfinite
+      Sigma <- as.matrix(Matrix::nearPD(Sigma)$mat) |>
+        align_to(Sigma=_, mu_names = mu_names)
+
+    }
+    return(Sigma)
+  }
+
+  # get vcov, check names and
+  Sigma <- NULL
+  vcov_candidate <- fit$vcov
+  if (!is.null(vcov_candidate)) {
+    Sigma <- tryCatch(
+      align_to(vcov_candidate, mu_names),
+      error = function(e)
+        NULL
+    )
+  }
+  check_pd(Sigma)
+}
+
 #' Resample PX
 #' @details Resampling is done by sampling from a normal distribution based on the mean and standard deviation of the parameter
 #' @param fit Best fitting model containing best fit models, parameter estimates and their SDs
@@ -192,10 +261,10 @@ bootPX <- function(
 #'
 #' @importFrom stats rnorm
 #' @importFrom withr with_seed
+#' @importFrom MASS mvrnorm
 
 resamplePX <- function(
   fit,
-  #model_type = character(),
   px = 0.5,
   seed,
   sims = 1000,
@@ -207,112 +276,60 @@ resamplePX <- function(
 
   withr::local_seed(seed = seed)
 
-  psi_px <- vector("list", length = sims) #initialize list to store results
   model_type <- fit$data.type
-
-  #check conditions
   fx_with_param3 <- model_type %in% c("exp2", "log", "sig")
 
-  #define model parameters
-  A <- fit$A
-  B <- fit$B
-
-  #sd of parameter estimates
-  A.sd <- fit$sterrorA
-  B.sd <- fit$sterrorB
-
-  if (fx_with_param3 == F) {
-    # linear and exponential
-
-    param_samples <- lapply(
-      c(1:sims),
-      #create X samples of paired values
-
-      function(x) {
-        lapply(1, function(y) {
-          c(
-            sample(
-              rnorm(sims, A, A.sd),
-              size = 1,
-              replace = T
-            ),
-            #sample for A
-            sample(
-              rnorm(sims, B, B.sd),
-              size = 1,
-              replace = T
-            ) #sample for B
-          )
-        })
-      }
-    )
+  # means (with names)
+  mu <- if (fx_with_param3) {
+    c(A = fit$A, B = fit$B, C = fit$C)
   } else {
-    #exponential2, logistic, and sigmoidal
-
-    # define the third parameter for models with 3 parameters...C or Xo
-    param_3 <- fit$C
-    param_3.sd <- fit$sterrorC
-
-    param_samples <- lapply(
-      c(1:sims),
-      #create X samples of paired values
-
-      function(x) {
-        lapply(1, function(y) {
-          c(
-            sample(
-              rnorm(sims, A, A.sd),
-              size = 1,
-              replace = T
-            ),
-            #sample for A
-            sample(
-              rnorm(sims, B, B.sd),
-              size = 1,
-              replace = T
-            ),
-            #sample for B
-            sample(
-              rnorm(sims, param_3, param_3.sd),
-              size = 1,
-              replace = T
-            )
-          )
-        }) #sample for Xo or C
-      }
-    )
+    c(A = fit$A, B = fit$B)
   }
 
+  # attempt to get vcov matrix
+  Sigma <- get_vcov_from_anneal(fit, mu_names = names(mu))
+
+  #sample from multivariate normal distribution
+  param_samples <- MASS::mvrnorm(n = sims, mu = mu, Sigma = Sigma)
+
+  # initialize predictions
+  predictions_px <- vector("list", length = sims)
   psi_px_boot <- psiPx(model_type = model_type)
 
-  if (fx_with_param3 == T) {
-    for (i in 1:sims) {
-      # this is a lot to look at!!!
-      # Only way to index this list of lists since unlist makes this unusable
-      # to be updated in future update
-
-      psi_px[[i]] <- psi_px_boot(
-        A = param_samples[[i]][[1]][1],
-        B = param_samples[[i]][[1]][2],
-        C = param_samples[[i]][[1]][3],
+  if (fx_with_param3) {
+    for (i in seq_len(sims)) {
+      val <- psi_px_boot(
+        A = param_samples[i, 1],
+        B = param_samples[i, 2],
+        C = param_samples[i, 3],
         px = px,
         max_cond_at = psi_max
       )$psi.px
+
+      predictions_px[[i]] <- val
     }
+
   } else {
-    for (i in 1:sims) {
-      psi_px[[i]] <- psi_px_boot(
-        A = param_samples[[i]][[1]][1],
-        B = param_samples[[i]][[1]][2],
+    for (i in seq_len(sims)) {
+      val <- psi_px_boot(
+        A = param_samples[i, 1],
+        B = param_samples[i, 2],
         px = px,
         max_cond_at = psi_max
       )$psi.px
+
+      predictions_px[[i]] <- val
     }
-  } #end for loop
+  }
 
-  psi_px_out <- structure(list(psi_px = psi_px, model_params = param_samples))
+  out_resample <- structure(list(
+    psi_px = unlist(predictions_px, use.names = FALSE),
+    model_params = param_samples,
+    seed = seed
+  ))
 
-  return(psi_px_out)
+  return(out_resample)
+
 }
 
 

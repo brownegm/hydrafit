@@ -138,4 +138,4 @@ resamplePX_new <- function(fit,
 
 }
 
-test_new <- resamplePX_new(fit = fit, px = 0.5, seed = 123, psi_max = 0.1)
+test_new <- resamplePX(fit = fit, px = 0.5, seed = 123, psi_max = 0.1)

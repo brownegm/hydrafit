@@ -76,25 +76,12 @@ test_that("bootstrap check", {
                       psi_max = 0.1,
                       seed = 202,
                       margin = "quantile")
+
   bootstrap_psimax0.2 <- bootPX(fit,
                                 psi_max = 0.2,
                                 seed = 202,
                                 margin = "quantile")
   testthat::expect_no_match(bootstrap, bootstrap_psimax0.2)
-  # bootstrap_td <- bootPX(fit, psi_max=0.1, seed = 202, margin = "tdist")
-  # bootstrap_tdbootmean <- bootPX(fit, psi_max=0.1, seed = 202, margin = "tdist_mean")
-  #
-  # all_ver <- data.frame(quantile = bootstrap$bootvals,
-  #                      tdist = bootstrap_td$bootvals,
-  #                      tdist_mean = bootstrap_tdbootmean$bootvals) |>
-  #   tidyr::pivot_longer(cols = everything(), names_to = "method", values_to = "psi_p50")|>
-  #   dplyr::filter(psi_p50 < 10)
-  #
-  # (boot_pdf <-  all_ver |>
-  #   ggplot(aes(x = psi_p50, fill = method)) +
-  #   geom_density(alpha = 0.5) +
-  #   #facet_wrap(~method, scales = "free") +
-  #   aes::theme_base())
 
   bootstrap_list <- bootPX(best_model,
                            psi_max = 0.1,
