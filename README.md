@@ -1,20 +1,37 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# hydrafit
+# hydrafit <img src="man/figures/hydrafit_hex.png" align="right" height="138" />
 
 <!-- badges: start -->
 
 [![Lifecycle:
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![Codecov test
+coverage](https://codecov.io/gh/brownegm/hydrafit/graph/badge.svg)](https://app.codecov.io/gh/brownegm/hydrafit)
 <!-- badges: end -->
+
+## Fit hydraulic vulnerability curves and bootstrap hydraulic thresholds
 
 The goal of hydrafit is to fit line parameters using a likelihood frame
 work for leaf hydraulic vulnerability curves. The functions included in
-the tests of the best fit are linear, logistic, sigmoidal, and two
-exponential functions. This package are provides support for the
-bootstrapping percent loss in hydraulic function as well as pairwise
-bootstrap comparisons.
+the tests of the best fit are:
+
+- linear
+
+<!-- -->
+
+- logistic
+
+- sigmoidal
+
+- and two exponential functions
+
+See `?hydrafit::Linear()` for all fitted functions.
+
+This package also supports for the bootstrapping percent loss in
+hydraulic function as well as pairwise bootstrap comparisons. For more
+information on bootstrapping see `?hydrafit::bootPX`.
 
 ## Installation
 
@@ -25,7 +42,7 @@ You can install the development version of hydrafit from
 devtools::install_github("brownegm/hydrafit", build_vignettes = T)
 ```
 
-## Example
+## Examples
 
 An example of the use of the functions is available as a vignette.
 

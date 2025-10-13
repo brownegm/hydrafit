@@ -9,3 +9,5 @@
 ^Meta$
 ^vignettes/\.quarto$
 ^vignettes/*_files$
+^codecov\.yml$
+^\.github$

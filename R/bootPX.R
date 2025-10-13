@@ -1,9 +1,7 @@
 #' Tool for estimating confidence intervals for percent loss in conductance.
 #'
 #' @details This function takes the best fit model chosen by `fx_select()` and estimates confidence intervals
-#'  by re-sampling model parameters from a normal distribution based on mean and standard deviation. Note that
-#'  the standard deviation used here is estimated as the square root of a hessian matrix created when the anneal
-#'  functions tests for the best fit model.
+#'  by re-sampling model parameters from a multivariate normal distribution (using MASS::mvnorm) based on the variance covariance matrix of the fitted parameters.
 #'
 #'\itemize{
 #'    \item Annealing function info: \url{https://tinyurl.com/annealingsim}
