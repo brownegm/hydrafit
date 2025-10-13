@@ -10,11 +10,10 @@
 #'
 #' @param fit
 #' @param mu_names
-#' @param ses
 #'
 #' @returns Variance-covariance matrix
 
-get_vcov_from_anneal <- function(fit, mu_names, ses = NULL) {
+get_vcov_from_anneal <- function(fit, mu_names) {
 
   # ---- helpers ----
   # align the vcov matrix with the number of parameters per model and use their
@@ -93,15 +92,8 @@ resamplePX_new <- function(fit,
     c(A = fit$A, B = fit$B)
   }
 
-  #standard error estimates (ses) for fallback
-  ses <- if (fx_with_param3) {
-    c(fit$sterrorA, fit$sterrorB, fit$sterrorC)
-  } else {
-    c(fit$sterrorA, fit$sterrorB)
-  }
-
   # attempt to get vcov matrix
-  Sigma <- get_vcov_from_anneal(fit, mu_names = names(mu), ses = ses)
+  Sigma <- get_vcov_from_anneal(fit, mu_names = names(mu))
 
   #sample from multivariate normal distribution
   param_samples <- MASS::mvrnorm(n = sims, mu = mu, Sigma = Sigma)
@@ -146,4 +138,4 @@ resamplePX_new <- function(fit,
 
 }
 
-test_new <- resamplePX_new(fit = fit, px = , seed = 123, psi_max = 0.1)
+test_new <- resamplePX_new(fit = fit, px = 0.5, seed = 123, psi_max = 0.1)
