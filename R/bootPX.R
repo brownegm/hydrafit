@@ -112,15 +112,6 @@ bootPX <- function(
       conf.high <- conf.int[[2]]
       deg_of_freedom = length(boot_vals) - 1
       margin_error <- (conf.high - conf.low) / 2
-    # } else if (margin == "tdist") {
-    #   # t-distribution method
-    #   deg_of_freedom = length(boot_vals)
-    #   t_score = qt(p = alpha / 2, df = deg_of_freedom, lower.tail = F)
-    #
-    #   margin_error <- t_score * boot_se
-    #
-    #   conf.low <- px_est - margin_error # using the predicted pX value to make the error make sense
-    #   conf.high <- px_est + margin_error
     } else if (margin == "tdist_mean") {
       # t-distribution method around the mean of the bootstrapped values
       deg_of_freedom = length(boot_vals)-1
@@ -354,7 +345,8 @@ se <- function(x, na.rm = T) {
 #' @export
 
 print.boot_list <- function(x, ...) {
-  if (length(x) > 1) {
+
+  if (!length(x)==11) {
     for (i in 1:length(x)) {
       x_i <- x[[i]]
       cat("Bootstrap Results:\n")
@@ -385,56 +377,56 @@ print.boot_list <- function(x, ...) {
     cat("----------------------------------------------------\n")
   }
 }
-
-
-#' Summary Method for lists of bootstrap results
-#'
-#' @description Summarizes the bootstrap results for a list of bootstrapped models. This summary only applies to intergroup (e.g., among species) comparisons.
-#' @param object Object of class 'boot_list'
-#' @param ... not used
-#'
-#' @returns A summary of the bootstrap results, including species names, and pairwise comparisons.
-#' @export
-
-summary.boot_list <- function(object, ...) {
-  if (!inherits(object, "boot_list")) {
-    stop("Input must be of class 'boot_list'.")
-  }
-
-  # Get species names
-  species_names <- sapply(object, \(boot) boot$species)
-  species_names <- paste(species_names, collapse = ", ")
-
-  # What PX Value was bootstrapped?
-  px <- unique(sapply(object, \(boot) boot$psi_PX))
-
-  # Print summary of bootstrap results
-  cat("Bootstrap Pairwise Summary:\n")
-  cat("----------------------------------------------------\n")
-  cat("Species:", species_names, "\n")
-  cat("PX:", px, "\n")
-  cat("----------------------------------------------------\n")
-  print(attr(object, "pairwise_comp"))
-}
-
-
-get_boot_elements <- function(boot_list) {
-  if (!inherits(boot_list, "boot_list")) {
-    stop("Input must be of class 'boot_list'.")
-  }
-
-  # Get species names
-  species_names <- sapply(boot_list, \(boot) boot$species)
-
-  # Extract bootstrap values from each element in the list
-  vals_list <- purrr::map(boot_list, function(x) x$bootvals) |>
-    rlang::set_names(species_names)
-
-  params_list <- purrr::map(boot_list, function(x) x$model_params)
-
-  boot_elements <- list(boot_vals = vals_list, model_params = params_list)
-  return(boot_elements)
-}
+#
+#
+# #' Summary Method for lists of bootstrap results
+# #'
+# #' @description Summarizes the bootstrap results for a list of bootstrapped models. This summary only applies to intergroup (e.g., among species) comparisons.
+# #' @param object Object of class 'boot_list'
+# #' @param ... Unused
+# #'
+# #' @returns A summary of the bootstrap results, including species names, and pairwise comparisons.
+# #' @export
+#
+# summary.boot_list <- function(object, ...) {
+#   if (!inherits(object, "boot_list")) {
+#     stop("Input must be of class 'boot_list'.")
+#   }
+#
+#   # Get species names
+#   species_names <- sapply(object, \(boot) boot$species)
+#   species_names <- paste(species_names, collapse = ", ")
+#
+#   # What PX Value was bootstrapped?
+#   px <- unique(sapply(object, \(boot) boot$psi_PX))
+#
+#   # Print summary of bootstrap results
+#   cat("Bootstrap Pairwise Summary:\n")
+#   cat("----------------------------------------------------\n")
+#'   cat("Species:", species_names, "\n")
+#'   cat("PX:", px, "\n")
+#'   cat("----------------------------------------------------\n")
+#   print(attr(object, "pairwise_comp"))
+# }
+#
+#
+# get_boot_elements <- function(boot_list) {
+#   if (!inherits(boot_list, "boot_list")) {
+#     stop("Input must be of class 'boot_list'.")
+#   }
+#
+#   # Get species names
+#   species_names <- sapply(boot_list, \(boot) boot$species)
+#
+#   # Extract bootstrap values from each element in the list
+#   vals_list <- purrr::map(boot_list, function(x) x$bootvals) |>
+#     rlang::set_names(species_names)
+#
+#   params_list <- purrr::map(boot_list, function(x) x$model_params)
+#
+#   boot_elements <- list(boot_vals = vals_list, model_params = params_list)
+#   return(boot_elements)
+# }
 
 # maybe set names fyi
 # rlang::set_names(boot_list, species_names) |>
