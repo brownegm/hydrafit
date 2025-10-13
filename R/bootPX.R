@@ -16,31 +16,47 @@
 #' @param seed Value for reproducibility
 #' @param sims Number of simulations to run. Default is 1000.
 #' @param pairwise Perform pairwise test among species px values.
-#'
+#' @param margin Choice of method to estimate margin of error. Options are "tdist" for t-distribution reconstruction or "quantile" for quantile based confidence intervals. Quantile is recommended.
 #' @importFrom stats qt sd median
 #' @export bootPX
 #'
-bootPX <- function(fit,
-                   px = 0.5,
-                   psi_max,
-                   seed = 123,
-                   sims = 1000,
-                   pairwise = F) {
-
-  fit.list <- attr(fit, "fit.list")
+bootPX <- function(
+  fit,
+  px = 0.5,
+  psi_max,
+  seed = 123,
+  sims = 1000,
+  pairwise = F,
+  margin = c("quantile", "tdist_mean")
+) {
+  # get margin method
+  if (missing(margin)) {
+    warning(
+      "No margin of error method provided. Defaulting to quantile reconstruction."
+    )
+    margin <- "quantile"
+  } else {
+    margin <- match.arg(margin)
+  }
+  # manage fit list vs single fit
+  fit.list <- attr(fit, "fit.list") #TRUE or FALSE
 
   if (fit.list) {
     n_fit <- length(fit)
-    model.test <- lapply(seq_len(n_fit), \(x) attr(fit[[x]], "mod.type")) %in% c("exp2", "log", "sig", "Linear", "exp")
-  } else{
+    model.test <- lapply(seq_len(n_fit), \(x) attr(fit[[x]], "mod.type")) %in%
+      c("exp2", "log", "sig", "Linear", "exp")
+  } else {
     n_fit <- 1
-    model.test <- attr(fit, "mod.type") %in% c("exp2", "log", "sig", "Linear", "exp")
+    model.test <- attr(fit, "mod.type") %in%
+      c("exp2", "log", "sig", "Linear", "exp")
   }
 
   #check if the model type(s) is/are valid
   if (any(!model.test)) {
     print(model.test)
-    stop("Bootstrap: Model type(s) must be one of the following: exp2, log, sig, Linear, exp")
+    stop(
+      "Bootstrap: Model type(s) must be one of the following: exp2, log, sig, Linear, exp"
+    )
   }
 
   #check if the percent loss in conductance is valid
@@ -53,7 +69,6 @@ bootPX <- function(fit,
     stop("Value for psi_max must be greater than 0")
   }
 
-
   px_char <- paste0(as.character(px), "@", as.character(psi_max))
 
   alpha = 0.05
@@ -63,17 +78,9 @@ bootPX <- function(fit,
   for (i in seq_len(n_fit)) {
     if (fit.list) {
       fit_temp <- fit[[i]]
-    } else{
+    } else {
       fit_temp <- fit
     }
-
-    px_est <- switch(
-      px_char,
-      "0.5@" = fit_temp$psi_k50,
-      "0.8@" = fit_temp$psi_k80,
-      "0.5@0.1" = fit_temp$psi_k50_at0.1,
-      "0.8@0.1" = fit_temp$psi_k80_at0.1
-    )
 
     fit_resample <- resamplePX(
       fit = fit_temp,
@@ -82,27 +89,39 @@ bootPX <- function(fit,
       psi_max = psi_max,
       seed = seed
     )
-    #suppressing warnings here can help if errors resulting from NAs stop you from moving forward.
-    finite_values <- sapply(fit_resample, function(x)
-      is.finite(x[[1]]))
-    boot_vals <- fit_resample[finite_values] |> unlist()
 
-    boot_mean <- mean(boot_vals, na.rm = T) # this values *is not * the same are the actual psi at X% loss in hydraulic conductance
+    finite_values <- is.finite(fit_resample$psi_px)
+
+    boot_vals <- fit_resample$psi_px[finite_values] #|> unlist()
+
+    boot_mean <- mean(boot_vals, na.rm = T)
 
     boot_se <- se(boot_vals)
 
     boot_median <- median(boot_vals, na.rm = T)
 
     #determine confidence intervals
-    deg_of_freedom = length(boot_vals)
-    t_score = qt(p = alpha / 2,
-                 df = deg_of_freedom,
-                 lower.tail = F)
+    if (margin == "quantile") {
+      conf.int <- quantile(
+        boot_vals,
+        probs = c(alpha / 2, 1 - (alpha / 2)),
+        na.rm = T
+      )
 
-    margin_error <- t_score * boot_se
+      conf.low <- conf.int[[1]]
+      conf.high <- conf.int[[2]]
+      deg_of_freedom = length(boot_vals) - 1
+      margin_error <- (conf.high - conf.low) / 2
+    } else if (margin == "tdist_mean") {
+      # t-distribution method around the mean of the bootstrapped values
+      deg_of_freedom = length(boot_vals)-1
+      t_score = qt(p = alpha / 2, df = deg_of_freedom, lower.tail = F)
 
-    conf.low <- px_est - margin_error # using the predicted pX value to make the error make sense
-    conf.high <- px_est + margin_error
+      margin_error <- t_score * boot_se
+
+      conf.low <- boot_mean - margin_error
+      conf.high <- boot_mean + margin_error
+    }
 
     # save out of the results
     output[[i]] <- structure(
@@ -116,40 +135,109 @@ bootPX <- function(fit,
         margin_error = margin_error,
         conf.low = conf.low,
         conf.high = conf.high,
-        bootvals = boot_vals
+        bootvals = boot_vals,
+        model_params = fit_resample$model_params
       )
     )
-
   }
 
   if (pairwise == T) {
-    # stopifnot(length(output)>1)
-
     # if pairwise comparisons are requested, then run them among the fits
     pw_out <- compare_sp_boot(output, conf_level = 0.95)
-
   }
 
   if (n_fit == 1) {
     return(structure(
       unlist(output, recursive = FALSE),
-      pairwise_comp = if (pairwise == T)
+      pairwise_comp = if (pairwise == T) {
         pw_out
-      else
-        NA,
+      } else {
+        NA
+      },
+      margin = margin,
       class = c("boot_list", "list")
     ))
-  } else{
+  } else {
     return(structure(
       output,
-      pairwise_comp = if (pairwise == T)
+      pairwise_comp = if (pairwise == T) {
         pw_out
-      else
-        NA,
+      } else {
+        NA
+      },
+      margin = margin,
       class = c("boot_list", "list")
     ))
   }
+}
 
+#' Get var-cov element for annealing
+#'
+#' @description Helper to get variance covariance matrix from anneal
+#'
+#' @details
+#' pulls vcov, aligns it to variable names for the fit to be resampled (A,B,C (or Xo)),
+#' then ensure that the vcov meets the expectations of the multivariate resample
+#'
+#' @param fit Model fit with variance covariance matrix
+#' @param mu_names Character vector of variable names.
+#'
+#' @returns Variance-covariance matrix
+#'
+#' @importFrom Matrix nearPD
+get_vcov_from_anneal <- function(fit, mu_names) {
+
+  # ---- helpers ----
+  # align the vcov matrix with the number of parameters per model and use their
+  # names to define the matrix.
+  align_to <- function(Sigma, mu_names) {
+    p <- length(mu_names)
+    Sigma <- as.matrix(Sigma)
+    # try name-based selection first (case-insensitive, C/X0 synonyms)
+    cn <- colnames(Sigma)
+    rn <- rownames(Sigma)
+
+    if (ncol(Sigma) >= p) {
+      # Trim the variance covariance matrix to the number of parameters in the model,
+      Sigma <- Sigma[seq_len(p), seq_len(p), drop = FALSE]
+
+      dimnames(Sigma) <- list(mu_names, mu_names)
+    } else {
+
+      stop("vcov has fewer columns than parameters; cannot align.")
+    }
+    return(Sigma)
+  }
+
+  check_pd <- function(Sigma) {
+    Sigma <- (Sigma + t(Sigma)) / 2
+    ok <- tryCatch({
+      # compute eigen vector from Sigma
+      ev <- eigen(Sigma, symmetric = TRUE, only.values = TRUE)$values
+      all(is.finite(ev)) && min(ev) > 0
+    }, error = function(e)
+      FALSE
+    )
+    if (!ok) {
+      #estimate the nearest possible definite matrix from vcov if nonfinite
+      Sigma <- as.matrix(Matrix::nearPD(Sigma)$mat) |>
+        align_to(Sigma=_, mu_names = mu_names)
+
+    }
+    return(Sigma)
+  }
+
+  # get vcov, check names and
+  Sigma <- NULL
+  vcov_candidate <- fit$vcov
+  if (!is.null(vcov_candidate)) {
+    Sigma <- tryCatch(
+      align_to(vcov_candidate, mu_names),
+      error = function(e)
+        NULL
+    )
+  }
+  check_pd(Sigma)
 }
 
 #' Resample PX
@@ -164,127 +252,75 @@ bootPX <- function(fit,
 #'
 #' @importFrom stats rnorm
 #' @importFrom withr with_seed
+#' @importFrom MASS mvrnorm
 
-
-resamplePX <- function(fit,
-                       #model_type = character(),
-                       px = 0.5,
-                       seed,
-                       sims = 1000,
-                       psi_max = numeric()) {
+resamplePX <- function(
+  fit,
+  px = 0.5,
+  seed,
+  sims = 1000,
+  psi_max = numeric()
+) {
   if (length(psi_max) < 1) {
     stop("Value for psi_max must be provided.")
   }
 
   withr::local_seed(seed = seed)
 
-  psi_px <- vector("list", length = sims) #initialize list to store results
   model_type <- fit$data.type
-
-  #check conditions
   fx_with_param3 <- model_type %in% c("exp2", "log", "sig")
 
-  #define model parameters
-  A <- fit$A
-  B <- fit$B
-
-  #sd of parameter estimates
-  A.sd <- fit$sterrorA
-  B.sd <- fit$sterrorB
-
-  if (fx_with_param3 == F) {
-    # linear and exponential
-
-    param_samples <- lapply(
-      c(1:sims),
-      #create X samples of paired values
-
-      function(x) {
-        lapply(1, function(y)
-          c(
-            sample(
-              rnorm(sims, A, A.sd),
-              size = 1,
-              replace = T
-            ),
-            #sample for A
-            sample(
-              rnorm(sims, B, B.sd),
-              size =
-                1,
-              replace = T
-            ) #sample for B
-          ))
-
-      }
-    )
-
-  } else{
-    #exponential2, logistic, and sigmoidal
-
-    # define the third parameter for models with 3 parameters...C or Xo
-    param_3 <- fit$C
-    param_3.sd <- fit$sterrorC
-
-    param_samples <- lapply(
-      c(1:sims),
-      #create X samples of paired values
-
-      function(x) {
-        lapply(1, function(y)
-          c(
-            sample(
-              rnorm(sims, A, A.sd),
-              size = 1,
-              replace = T
-            ),
-            #sample for A
-            sample(
-              rnorm(sims, B, B.sd),
-              size = 1,
-              replace = T
-            ),
-            #sample for B
-            sample(
-              rnorm(sims, param_3, param_3.sd),
-              size = 1,
-              replace = T
-            )
-          ))#sample for Xo or C
-
-      }
-    )
-
+  # means (with names)
+  mu <- if (fx_with_param3) {
+    c(A = fit$A, B = fit$B, C = fit$C)
+  } else {
+    c(A = fit$A, B = fit$B)
   }
 
+  # attempt to get vcov matrix
+  Sigma <- get_vcov_from_anneal(fit, mu_names = names(mu))
+
+  #sample from multivariate normal distribution
+  param_samples <- MASS::mvrnorm(n = sims, mu = mu, Sigma = Sigma)
+
+  # initialize predictions
+  predictions_px <- vector("list", length = sims)
   psi_px_boot <- psiPx(model_type = model_type)
 
-  if (fx_with_param3 == T) {
-    for (i in 1:sims) {
-      # this is a lot to look at!!! Only way to index this list of lists since unlist makes this unusable
-
-      psi_px[[i]] <- psi_px_boot(
-        A = param_samples[[i]][[1]][1],
-        B = param_samples[[i]][[1]][2],
-        C = param_samples[[i]][[1]][3],
+  if (fx_with_param3) {
+    for (i in seq_len(sims)) {
+      val <- psi_px_boot(
+        A = param_samples[i, 1],
+        B = param_samples[i, 2],
+        C = param_samples[i, 3],
         px = px,
         max_cond_at = psi_max
       )$psi.px
 
+      predictions_px[[i]] <- val
     }
-  } else{
-    for (i in 1:sims) {
-      psi_px[[i]] <- psi_px_boot(
-        A = param_samples[[i]][[1]][1],
-        B = param_samples[[i]][[1]][2],
+
+  } else {
+    for (i in seq_len(sims)) {
+      val <- psi_px_boot(
+        A = param_samples[i, 1],
+        B = param_samples[i, 2],
         px = px,
         max_cond_at = psi_max
       )$psi.px
 
+      predictions_px[[i]] <- val
     }
+  }
 
-  }#end for loop
-  return(psi_px)
+  out_resample <- structure(list(
+    psi_px = unlist(predictions_px, use.names = FALSE),
+    model_params = param_samples,
+    seed = seed
+  ))
+
+  return(out_resample)
+
 }
 
 
@@ -309,7 +345,8 @@ se <- function(x, na.rm = T) {
 #' @export
 
 print.boot_list <- function(x, ...) {
-  if (length(x) > 1) {
+
+  if (!length(x)==11) {
     for (i in 1:length(x)) {
       x_i <- x[[i]]
       cat("Bootstrap Results:\n")
@@ -319,9 +356,7 @@ print.boot_list <- function(x, ...) {
       cat("----------------------------------------------------\n")
       cat("Mean predicted PX:", x_i$boot_mean |> round(3), "\n")
       cat("Median predicted PX:", x_i$boot_median |> round(3), "\n")
-      cat("Standard Error predicted PX:",
-          x_i$boot_se |> round(3),
-          "\n")
+      cat("Standard Error predicted PX:", x_i$boot_se |> round(3), "\n")
       cat("-----------------Confidence Interval----------------\n")
       cat("Low:", x_i$conf.low |> round(3), "\n")
       cat("High:", x_i$conf.high |> round(3), "\n")
@@ -342,35 +377,56 @@ print.boot_list <- function(x, ...) {
     cat("----------------------------------------------------\n")
   }
 }
+#
+#
+# #' Summary Method for lists of bootstrap results
+# #'
+# #' @description Summarizes the bootstrap results for a list of bootstrapped models. This summary only applies to intergroup (e.g., among species) comparisons.
+# #' @param object Object of class 'boot_list'
+# #' @param ... Unused
+# #'
+# #' @returns A summary of the bootstrap results, including species names, and pairwise comparisons.
+# #' @export
+#
+# summary.boot_list <- function(object, ...) {
+#   if (!inherits(object, "boot_list")) {
+#     stop("Input must be of class 'boot_list'.")
+#   }
+#
+#   # Get species names
+#   species_names <- sapply(object, \(boot) boot$species)
+#   species_names <- paste(species_names, collapse = ", ")
+#
+#   # What PX Value was bootstrapped?
+#   px <- unique(sapply(object, \(boot) boot$psi_PX))
+#
+#   # Print summary of bootstrap results
+#   cat("Bootstrap Pairwise Summary:\n")
+#   cat("----------------------------------------------------\n")
+#'   cat("Species:", species_names, "\n")
+#'   cat("PX:", px, "\n")
+#'   cat("----------------------------------------------------\n")
+#   print(attr(object, "pairwise_comp"))
+# }
+#
+#
+# get_boot_elements <- function(boot_list) {
+#   if (!inherits(boot_list, "boot_list")) {
+#     stop("Input must be of class 'boot_list'.")
+#   }
+#
+#   # Get species names
+#   species_names <- sapply(boot_list, \(boot) boot$species)
+#
+#   # Extract bootstrap values from each element in the list
+#   vals_list <- purrr::map(boot_list, function(x) x$bootvals) |>
+#     rlang::set_names(species_names)
+#
+#   params_list <- purrr::map(boot_list, function(x) x$model_params)
+#
+#   boot_elements <- list(boot_vals = vals_list, model_params = params_list)
+#   return(boot_elements)
+# }
 
-
-#' Summary Method for lists of bootstrap results
-#'
-#' @description Summarizes the bootstrap results for a list of bootstrapped models. This summary only applies to intergroup (e.g., among species) comparisons.
-#' @param object Object of class 'boot_list'
-#' @param ... not used
-#'
-#' @returns A summary of the bootstrap results, including species names, and pairwise comparisons.
-#' @export
-
-summary.boot_list <- function(object, ...) {
-  if (!inherits(object, "boot_list")) {
-    stop("Input must be of class 'boot_list'.")
-  }
-
-  # Get species names
-  species_names <- sapply(object, \(boot) boot$species)
-  species_names <- paste(species_names, collapse = ", ")
-
-  # What PX Value was bootstrapped?
-  px <- unique(sapply(object, \(boot) boot$psi_PX))
-
-  # Print summary of bootstrap results
-  cat("Bootstrap Pairwise Summary:\n")
-  cat("----------------------------------------------------\n")
-  cat("Species:", species_names, "\n")
-  cat("PX:", px, "\n")
-  cat("----------------------------------------------------\n")
-  print(attr(object, "pairwise_comp"))
-
-}
+# maybe set names fyi
+# rlang::set_names(boot_list, species_names) |>

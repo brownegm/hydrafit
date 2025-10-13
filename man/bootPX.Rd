@@ -4,7 +4,15 @@
 \alias{bootPX}
 \title{Tool for estimating confidence intervals for percent loss in conductance.}
 \usage{
-bootPX(fit, px = 0.5, psi_max, seed = 123, sims = 1000, pairwise = F)
+bootPX(
+  fit,
+  px = 0.5,
+  psi_max,
+  seed = 123,
+  sims = 1000,
+  pairwise = F,
+  margin = c("quantile", "tdist_mean")
+)
 }
 \arguments{
 \item{fit}{Fit object(s) from `fit_vuln_curve()`}
@@ -18,6 +26,8 @@ bootPX(fit, px = 0.5, psi_max, seed = 123, sims = 1000, pairwise = F)
 \item{sims}{Number of simulations to run. Default is 1000.}
 
 \item{pairwise}{Perform pairwise test among species px values.}
+
+\item{margin}{Choice of method to estimate margin of error. Options are "tdist" for t-distribution reconstruction or "quantile" for quantile based confidence intervals. Quantile is recommended.}
 }
 \description{
 Tool for estimating confidence intervals for percent loss in conductance.
