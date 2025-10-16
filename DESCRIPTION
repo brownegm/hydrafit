@@ -1,7 +1,7 @@
 Package: hydrafit
 Type: Package
 Title: Tests for best fits for hydraulic vulnerability curves and bootstrap curve parameters
-Version: 0.4.0
+Version: 0.4.1
 Author: Marvin Browne, Megan Bartlett, Lawren Sack
 Maintainer: Marvin Browne <brownegm@gmail.com>
 Description: The functions provided in this package used for estimating hydraulic decline parameters. These functions include those with find outliers, fit curves, and bootstrap estimatation of percent loss in the hydraulic function.
