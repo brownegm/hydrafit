@@ -90,17 +90,22 @@ fit_vuln_curve <- function(
     ))
   }
 
-  par_estimates <- define_pars(input_df, model_type = model_type)
+  par_estimates <- define_pars(input_df,
+                               model_type = model_type,
+                               dep_var = input_variables[1],
+                               ind_var = ifelse(all.equal(mod, hydrafit::Linear),
+                                                input_variables[2],
+                                                NULL))
 
   pars = par_estimates[[1]]
   pars_low = par_estimates[[2]]
   pars_high = par_estimates[[3]]
 
   var <- list(
-    psi = input_variables[2],
     # independent variable
-    x = input_variables[1],
+    psi = input_variables[2],
     # dependent variable
+    x = input_variables[1],
     mean = "predicted",
     log = TRUE
   )
@@ -156,7 +161,7 @@ fit_vuln_curve <- function(
 
   sterror <- res$std_errs
 
-  N <- length(res$source_data$kl)
+  N <- length(res$source_data[[input_variables[2]]])
 
   max_cond <- res$best_pars$A |> as.numeric()
 

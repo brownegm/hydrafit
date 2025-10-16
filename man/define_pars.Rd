@@ -9,22 +9,26 @@
 \alias{define_parslin}
 \title{Define parameter values}
 \usage{
-define_pars(input_df, model_type)
+define_pars(input_df, model_type, dep_var, ind_var = NULL)
 
-define_parsE(input_df)
+define_parsE(input_df, dep_var)
 
-define_parsL(input_df)
+define_parsL(input_df, dep_var)
 
-define_parsS(input_df)
+define_parsS(input_df, dep_var)
 
-define_parsE2(input_df)
+define_parsE2(input_df, dep_var)
 
-define_parslin(input_df)
+define_parslin(input_df, dep_var, ind_var)
 }
 \arguments{
 \item{input_df}{Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations}
 
 \item{model_type}{Specify model type to define parameters for.}
+
+\item{dep_var}{Dependent variable}
+
+\item{ind_var}{Independent variable description}
 }
 \value{
 Parameter values to be used in setting predicting the best fit parameters

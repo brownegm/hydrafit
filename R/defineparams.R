@@ -2,6 +2,8 @@
 #'
 #' @param input_df Input data frame that contains paired conductance (e.g., "kl") and leaf water potential observations
 #' @param model_type Specify model type to define parameters for.
+#' @param dep_var Dependent variable
+#' @param ind_var Independent variable description
 
 #' @return Parameter values to be used in setting predicting the best fit parameters
 #'
@@ -24,15 +26,20 @@
 
 #' @rdname define_pars
 #' @export define_pars
-define_pars <- function(input_df, model_type){
+define_pars <- function(input_df, model_type, dep_var, ind_var = NULL){
 
   par_fx <- ifelse(model_type=="log", define_parsL,
                    ifelse(model_type=="exp", define_parsE,
                           ifelse(model_type=="exp2", define_parsE2,
                                  ifelse(model_type=="sig", define_parsS, define_parslin))))
 
-  parameters <- par_fx(input_df)
+  if(!model_type == "Linear"){
 
+  parameters <- par_fx(input_df, dep_var)
+
+  }else{
+  parameters <- par_fx(input_df, dep_var, ind_var = ind_var)
+  }
   return(parameters)
 
 }
@@ -40,9 +47,9 @@ define_pars <- function(input_df, model_type){
 #' @rdname define_pars
 #' @export define_parsE
 
-define_parsE <- function(input_df) {
+define_parsE <- function(input_df, dep_var) {
 
-  parsE = list(A = max(input_df$kl),
+  parsE = list(A = max(input_df[[dep_var]]),
                 B = 1,
                 sd = 2)
 
@@ -50,7 +57,7 @@ define_parsE <- function(input_df) {
                  B = 0.1,
                  sd = 0.0005)
 
-  par_highE = list(A = max(input_df$kl) * 2,
+  par_highE = list(A = max(input_df[[dep_var]]) * 2,
                    B = 10,
                    sd = 20)
   return(list(
@@ -63,10 +70,10 @@ define_parsE <- function(input_df) {
 
 #' @rdname define_pars
 #' @export define_parsL
-define_parsL <- function(input_df) {
+define_parsL <- function(input_df, dep_var) {
 
   parsL = list(
-    A = max(input_df$kl),
+    A = max(input_df[[dep_var]]),
     B = 5,
     Xo = 2,
     sd = 2
@@ -79,7 +86,7 @@ define_parsL <- function(input_df) {
 
   par_highL = list(
 
-    A = max(input_df$kl) * 2,
+    A = max(input_df[[dep_var]]) * 2,
     B = 25,
     Xo = 5,
     sd = 20
@@ -95,9 +102,9 @@ define_parsL <- function(input_df) {
 
 #' @rdname define_pars
 #' @export define_parsS
-define_parsS <- function(input_df) {
+define_parsS <- function(input_df, dep_var) {
   parsS <- list(
-    A = max(input_df$kl),
+    A = max(input_df[[dep_var]]),
     B = -0.5,
     Xo = 2,
     sd = 2
@@ -109,7 +116,7 @@ define_parsS <- function(input_df) {
     sd = 0.0005
   )
   par_highS = list(
-    A = max(input_df$kl) * 1.5,
+    A = max(input_df[[dep_var]]) * 1.5,
     B = 0,
     Xo = 6,
     sd = 20
@@ -123,10 +130,10 @@ define_parsS <- function(input_df) {
 
 #' @rdname define_pars
 #' @export define_parsE2
-define_parsE2 <- function(input_df) {
+define_parsE2 <- function(input_df, dep_var) {
 
   parsE2 <- list(
-    A = max(input_df$kl),
+    A = max(input_df[[dep_var]]),
     B = 1,
     C = 0.1,
     sd = 2
@@ -137,7 +144,7 @@ define_parsE2 <- function(input_df) {
                   sd = 0.0005)
 
   par_highE2 = list(
-    A = max(input_df$kl) * 2,
+    A = max(input_df[[dep_var]]) * 2,
     B = 10,
     C = 2,
     sd = 20
@@ -152,9 +159,9 @@ define_parsE2 <- function(input_df) {
 
 #' @rdname define_pars
 #' @export define_parslin
-define_parslin<-function(input_df){
+define_parslin<-function(input_df, dep_var, ind_var){
 
-lm(input_df$kl ~ input_df$psi)-> fita #a normal linear regression gave the best starting parameters
+lm(input_df[[dep_var]] ~ input_df[[ind_var]])-> fita #a normal linear regression gave the best starting parameters
 
   pars = list(
     A = summary(fita)$coeff[1, 1],

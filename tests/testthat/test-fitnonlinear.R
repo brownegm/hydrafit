@@ -15,7 +15,7 @@ kl_sig <- hydrafit::Sigmoidal(A = A, B = B, Xo = C, psi = psi)
 kl_log <- hydrafit::Logistic(A = A, B = B, Xo = C, psi = psi)
 
 test_df_exp <- data.frame(psi=psi, kl=kl_exp)
-test_df_exp2 <- data.frame(psi=psi, kl= kl_exp2)
+test_df_exp2 <- data.frame(psi=psi, k = kl_exp2)
 test_df_sig <- data.frame(psi=psi, kl=kl_sig)
 test_df_log <- data.frame(psi=psi, kl=kl_log)
 
@@ -24,6 +24,9 @@ test_df_log <- data.frame(psi=psi, kl=kl_log)
  expect_error(hydrafit::fit_vuln_curve(kl~psi,input_df = test_df_exp, model_type = "exp", max_cond_at = 0))
  # check that the model type error is working (it should be one of the options above not test)
  expect_error(hydrafit::fit_vuln_curve(kl~psi, input_df = test_df_exp2, model_type = "test"))
+
+ # check that changing the column names doesn't break the fx
+expect_no_error(hydrafit::fit_vuln_curve(k~psi, input_df = test_df_exp2, model_type = "exp", max_cond_at = 0.1))
 }
 )
 
