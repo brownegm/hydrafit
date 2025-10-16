@@ -237,12 +237,12 @@ fit_vuln_curve <- function(
     plotdata <- res$source_data
 
     fitplot <- ggplot2::ggplot(
-      ggplot2::aes(x = .data$psi, y = .data$kl),
+      ggplot2::aes(x = .data[[input_variables[2]]], y = .data[[input_variables[1]]]),
       data = plotdata
     ) +
       ggplot2::geom_point(size = 2) +
       ggplot2::geom_line(
-        ggplot2::aes(x = .data$psi, y = .data$predicted),
+        ggplot2::aes(x = .data[[input_variables[2]]], y = .data$predicted),
         color = "red"
       ) +
       ggplot2::labs(
