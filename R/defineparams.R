@@ -135,7 +135,7 @@ define_parsE2 <- function(input_df, dep_var) {
   parsE2 <- list(
     A = max(input_df[[dep_var]]),
     B = 1,
-    C = 0.1,
+    C = quantile(input_df[[dep_var]], 0.05, na.rm = T),
     sd = 2
   )
   par_loE2 = list(A = 0,
