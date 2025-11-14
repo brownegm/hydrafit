@@ -30,9 +30,9 @@ psiPx <- function(model_type = character()) {
     \(A, B, px = 0.5, max_cond_at = 0) {
       px_op <- 1-px
 
-      max_c <- (B * max_cond_at) + A
+      max_c <- (A * max_cond_at) + B
 
-      psi.px <- ((px_op * max_c) - A) / (B)
+      psi.px <- ((px_op * max_c) - B) / (A)
 
       return(list(psi.px=psi.px, max_c= max_c))
 
