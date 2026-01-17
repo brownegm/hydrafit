@@ -34,7 +34,7 @@ psiPx <- function(model_type = character()) {
 
       psi.px <- ((px_op * max_c) - B) / (A)
 
-      return(list(psi.px=psi.px, max_c= max_c))
+      return(list(psi.px=psi.px, max_c = max_c))
 
     }
 
@@ -45,7 +45,7 @@ psiPx <- function(model_type = character()) {
 
       max_c <- A * exp(-B * max_cond_at)
 
-      psi.px <- (log((px_op * max_c) / A)) / (-B)
+      psi.px <- (log((max_c * px_op) / A)) * (-1/B)
 
       return(list(psi.px=psi.px, max_c= max_c))
     }
@@ -57,7 +57,7 @@ psiPx <- function(model_type = character()) {
 
       max_c <- C + (A * exp(-B * max_cond_at))
 
-      psi.px <- -((log(((px_op * max_c) - C) / A)) / (B))
+      psi.px <- (log(((px_op * max_c) - C) / A)) * (-1/B)
 
       return(list(psi.px=psi.px, max_c= max_c))
 
