@@ -17,7 +17,6 @@ test_that("best fitting model selected", {
                      data.type = "exp2",
                      AICcorr = c(333, 53, 3124))
 
-
   #establish objects
   output <- lin|> apply( MARGIN = c(1,2), FUN = \(x) x<-NA)
    ## create list of input dataframes
