@@ -27,21 +27,25 @@ test_that("bootstrap check", {
     logistic_fits[[ii]] = fit_vuln_curve(formula,
                                          data_by_sp,
                                          model_type = "log",
+                                         max_cond_at = 0.1,
                                          plot = F)
 
     sigmoidal_fits[[ii]] = fit_vuln_curve(formula,
                                           data_by_sp,
                                           model_type = "sig",
+                                          max_cond_at = 0.1,
                                           plot = F)
 
     exp1_fits[[ii]] = fit_vuln_curve(formula,
                                      data_by_sp,
                                      model_type = "exp",
+                                     max_cond_at = 0.1,
                                      plot = F)
 
     exp2_fits[[ii]] = fit_vuln_curve(formula,
                                      data_by_sp,
                                      model_type = "exp2",
+                                     max_cond_at = 0.1,
                                      plot = F)
   }
 
