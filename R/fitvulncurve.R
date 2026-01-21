@@ -271,28 +271,28 @@ estimate_pxs <- function(
   px = c(0.20, 0.50, 0.80, 0.95),
   max_cond_at = 0.1
 ) {
+
+  ## create output objects
   pl <- list()
   pl_atmaxcond <- list()
 
+  # for each px value calculate the psi and max conductance at that percent loss
   for (kx in seq_along(px)) {
-    params["px"] <- px[[kx]]
-
-    pl[kx] <- do.call(px_fx, params)[["psi.px"]]
-
-    params["max_cond_at"] <- max_cond_at
-
-    pl_atmaxcond[kx] <- do.call(px_fx, params)[["psi.px"]]
-    maxc_atmaxpsi <- do.call(px_fx, params)[["max_c"]]
-
-    params$max_cond_at <- NULL
+    # calculate the psi at px; return the water potential
+    pl[kx] <- do.call(px_fx, c(params, px = px[kx]))[["psi.px"]]
+    # calculate the psi at px at the new max conductance.
+    est_atmaxcond <- do.call(px_fx, c(params, max_cond_at = max_cond_at))
+    pl_atmaxcond[kx] <- est_atmaxcond$psi.px # get the psi at the specific percent loss
   }
+
+  maxc_atmaxpsi <- est_atmaxcond$max_c # get the max conductance value(This should be the same)
 
   pl_output <- structure(
     list(
-      p20 = pl[[1]],
-      p50 = pl[[2]],
-      p80 = pl[[3]],
-      p95 = pl[[4]],
+      p20 = pl[[1]], # @ 20% loss
+      p50 = pl[[2]], # 50% loss
+      p80 = pl[[3]], # 80% loss
+      p95 = pl[[4]], # 95% loss
       p20_atmaxcond = pl_atmaxcond[[1]],
       p50_atmaxcond = pl_atmaxcond[[2]],
       p80_atmaxcond = pl_atmaxcond[[3]],

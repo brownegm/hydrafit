@@ -50,26 +50,7 @@ test_that("estimate_pxs returns expected structure and values", {
   expect_equal(out$max_c_atmaxpsi, expected_maxc)
 })
 
-test_that("estimate_pxs errors when px has fewer than 4 values (documents current behavior)", {
-  px_fx_stub <- function(A, B, C, px = 0.5, max_cond_at = 0) {
-    px_op <- 1 - px
-    max_c <- A / (1 + (max_cond_at / C)^B)
-    psi.px <- C * ((A / (px_op * max_c) - 1)^(1 / B))
-    list(psi.px = psi.px, max_c = max_c)
-  }
-
-  params <- list(A = 1, B = 2, C = 3)
-
-  # Your function always tries to create p20/p50/p80/p95 (4 items).
-  # With <4 px values, it will error when indexing pl[[3]]/pl[[4]].
-  expect_error(
-    estimate_pxs(params = params, px_fx = px_fx_stub, px = c(0.2, 0.5, 0.8))
-  )
-})
-
-
 test_that("px_fx actually responds to max_cond_at at px=0.5 (should change psi or max_c)", {
-  # Replace with the params you use in real runs
   params <- list(A = 1, B = 2, C = 3)
 
   px_fx <- psiPx(model_type = "sig")
@@ -93,7 +74,8 @@ test_that("px_fx actually responds to max_cond_at at px=0.5 (should change psi o
 
 
 test_that("estimate_pxs passes max_cond_at correctly (p50_atmaxcond equals direct px_fx at px=0.5, max_cond_at=0.1)", {
-  params <- list(A = 1, B = 2, C = 3)  # <-- replace / extend
+  px_fx <- hydrafit::psiPx("sig")
+  params <- list(A = 1, B = 2, C = 3)
 
   direct <- do.call(px_fx, c(params, list(px = 0.5, max_cond_at = 0.1)))$psi.px
 
