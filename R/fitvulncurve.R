@@ -90,21 +90,21 @@ fit_vuln_curve <- function(
     ))
   }
 
-  par_estimates <- define_pars(input_df,
-                               model_type = model_type,
-                               dep_var = input_variables[1],
-                               ind_var = ifelse(all.equal(mod, hydrafit::Linear),
-                                                input_variables[2],
-                                                NULL))
+  par_estimates <- define_pars(
+    input_df,
+    model_type = model_type,
+    dep_var = input_variables[1],
+    ind_var = ifelse(all.equal(mod, hydrafit::Linear), input_variables[2], NULL)
+  )
 
   pars = par_estimates[[1]]
   pars_low = par_estimates[[2]]
   pars_high = par_estimates[[3]]
 
   var <- list(
-    # independent variable
-    psi = input_variables[2],
     # dependent variable
+    psi = input_variables[2],
+    # independent variable
     x = input_variables[1],
     mean = "predicted",
     log = TRUE
@@ -123,25 +123,21 @@ fit_vuln_curve <- function(
           par_hi = pars_high,
           dep_var = input_variables[1],
           pdf = dnorm,
-          max_iter = 5000,
-          temp_red = 0.8
+          max_iter = 50000,
+          temp_red = 0.5
         )
       })
       result
     },
     warning = function(w) {
       message("Warning caught during annealing: ", conditionMessage(w))
-      return(result) # or NULL or a custom result object
+      return(result)
     },
     error = function(e) {
       message("Error during annealing: ", conditionMessage(e))
-      return(NA) # or NULL or a custom result object
+      return(NA)
     }
   )
-
-  #Setting the parameters to change slowly in the fitting procedure (the temp_red variable)
-  #helped a lot. You can watch the fitting proceed with show_display,
-  #but I've never found it very informative
 
   # organize output
   A = res$best_pars[[1]] |> as.numeric()
@@ -237,7 +233,10 @@ fit_vuln_curve <- function(
     plotdata <- res$source_data
 
     fitplot <- ggplot2::ggplot(
-      ggplot2::aes(x = .data[[input_variables[2]]], y = .data[[input_variables[1]]]),
+      ggplot2::aes(
+        x = .data[[input_variables[2]]],
+        y = .data[[input_variables[1]]]
+      ),
       data = plotdata
     ) +
       ggplot2::geom_point(size = 2) +
@@ -271,7 +270,6 @@ estimate_pxs <- function(
   px = c(0.20, 0.50, 0.80, 0.95),
   max_cond_at = 0.1
 ) {
-
   ## create output objects
   pl <- list()
   pl_atmaxcond <- list()
