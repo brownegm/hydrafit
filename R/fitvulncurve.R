@@ -279,7 +279,7 @@ estimate_pxs <- function(
     # calculate the psi at px; return the water potential
     pl[kx] <- do.call(px_fx, c(params, px = px[kx]))[["psi.px"]]
     # calculate the psi at px at the new max conductance.
-    est_atmaxcond <- do.call(px_fx, c(params, max_cond_at = max_cond_at))
+    est_atmaxcond <- do.call(px_fx, c(params, px = px[kx], max_cond_at = max_cond_at))
     pl_atmaxcond[kx] <- est_atmaxcond$psi.px # get the psi at the specific percent loss
   }
 
