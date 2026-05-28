@@ -38,7 +38,7 @@ test_that("estimate_pxs returns expected structure and values", {
   testthat::expect_lt(out$p50, out$p80)
   testthat::expect_lt(out$p80, out$p95)
 
-  # monotonicity across px (given this stub)
+  # monotonicity across px at max conductance value. this should increase and not be the same as the previous (given this stub)
   testthat::expect_lt(out$p20_atmaxcond, out$p50_atmaxcond)
   testthat::expect_lt(out$p50_atmaxcond, out$p80_atmaxcond)
   testthat::expect_lt(out$p80_atmaxcond, out$p95_atmaxcond)
