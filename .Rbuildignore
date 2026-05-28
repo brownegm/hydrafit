@@ -11,3 +11,5 @@
 ^vignettes/*_files$
 ^codecov\.yml$
 ^\.github$
+^\.positai$
+^\.claude$
