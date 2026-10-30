@@ -9,6 +9,7 @@
 stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![Codecov test
 coverage](https://codecov.io/gh/brownegm/hydrafit/graph/badge.svg)](https://app.codecov.io/gh/brownegm/hydrafit)
+[![R-CMD-check](https://github.com/brownegm/hydrafit/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/brownegm/hydrafit/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Fit hydraulic vulnerability curves and bootstrap hydraulic thresholds
