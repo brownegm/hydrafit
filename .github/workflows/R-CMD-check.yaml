@@ -45,6 +45,15 @@ jobs:
           extra-packages: any::rcmdcheck
           needs: check
 
+      # Make Quarto render vignettes with the same R that runs the check
+      # (on Windows it can otherwise pick up the runner's preinstalled R)
+      - name: Set QUARTO_R
+        run: cat(sprintf("QUARTO_R=%s\n", R.home("bin")), file = Sys.getenv("GITHUB_ENV"), append = TRUE)
+        shell: Rscript {0}
+
+      - name: Show R used by Quarto
+        run: quarto check knitr
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
