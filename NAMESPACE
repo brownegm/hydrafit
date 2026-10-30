@@ -23,28 +23,36 @@ export(save_plots)
 import(stats)
 importFrom(MASS,mvrnorm)
 importFrom(Matrix,nearPD)
-importFrom(dplyr,mutate)
-importFrom(dplyr,select)
-importFrom(dplyr,summarise)
-importFrom(ggplot2,geom_line)
-importFrom(ggplot2,geom_point)
-importFrom(ggplot2,ggplot)
-importFrom(ggplot2,ggsave)
-importFrom(ggplot2,labs)
-importFrom(graphics,lines)
-importFrom(graphics,title)
+importFrom(dplyr,
+  mutate,
+  select,
+  summarise
+)
+importFrom(ggplot2,
+  geom_line,
+  geom_point,
+  ggplot,
+  ggsave,
+  labs
+)
+importFrom(graphics,
+  lines,
+  title
+)
 importFrom(nlme,fdHess)
 importFrom(patchwork,wrap_plots)
 importFrom(purrr,map_dfr)
 importFrom(rlang,.data)
-importFrom(stats,dbeta)
-importFrom(stats,dnorm)
-importFrom(stats,lm)
-importFrom(stats,median)
-importFrom(stats,qt)
-importFrom(stats,rnorm)
-importFrom(stats,runif)
-importFrom(stats,sd)
+importFrom(stats,
+  dbeta,
+  dnorm,
+  lm,
+  median,
+  qt,
+  rnorm,
+  runif,
+  sd
+)
 importFrom(tidyr,pivot_wider)
 importFrom(utils,combn)
 importFrom(withr,with_seed)
