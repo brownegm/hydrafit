@@ -8,7 +8,7 @@
 ^doc$
 ^Meta$
 ^vignettes/\.quarto$
-^vignettes/*_files$
+^vignettes/.*_files$
 ^codecov\.yml$
 ^\.github$
 ^\.positai$
